@@ -829,7 +829,7 @@ Information about users.
 |      | selectedWord          | ObjectId          | Unique identifier for the record of the word to guess |
 |      | tryedWords          | string[]          | Array of words tryed by players |
 
-GET `api/v1/v1/rooms/{roomId}/teams`
+#### 2. GET `api/v1/v1/rooms/{roomId}/teams`
 
 - Description: Method to get all the room's teams.
 - Authentication: This endpoint requires the user to be authenticated with a valid access token
@@ -908,11 +908,11 @@ Description: The user does not have the required permissions to access the teams
 ```
 Status Code: **404 Not Found**
 
-Description: The specified room cannot be found or there are no teams associated with the room.
+Description: The specified room cannot be found.
 
 ```
 {
-    "message": "No teams found for the specified room."
+    "message": "Room was not found."
 }
 ```
 
@@ -926,7 +926,7 @@ Description: The server encountered an unexpected error while processing the req
 }
 ```
 
-POST `api/v1/rooms/{roomId}/teams`
+#### 3. POST `api/v1/rooms/{roomId}/teams`
 
 Description: Method to create a new team in the specified room.
     Authentication: This endpoint requires the user to be authenticated with a valid access token.
@@ -1028,7 +1028,7 @@ Description: The server encountered an unexpected error while processing the req
 }
 ```
 
-GET `api/v1/rooms/{roomId}/teams/{teamId}`
+#### 4. GET `api/v1/rooms/{roomId}/teams/{teamId}`
 
 Description: Method to retrieve a specific team by its ID in the specified room.
 
@@ -1108,7 +1108,7 @@ Description: The server encountered an unexpected error while processing the req
 }
 ```
 
-PUT `api/v1/rooms/{roomId}/teams/{teamId}`
+#### 5. PUT `api/v1/rooms/{roomId}/teams/{teamId}`
 
 Description: Method to update the details of a specific team in the specified room.
 
@@ -1219,7 +1219,7 @@ Description: The server encountered an unexpected error while processing the req
 ```
 
 
-DELETE `api/v1/rooms/{roomId}/teams/{teamId}`
+#### 6. DELETE `api/v1/rooms/{roomId}/teams/{teamId}`
 
 Description: Method to delete a specific team in the specified room.
 
@@ -1284,7 +1284,7 @@ Description: The server encountered an unexpected error while processing the req
 }
 ```
 
-GET `api/v1/rooms/{roomId}/teams/{teamId}/players`
+#### 7. GET `api/v1/rooms/{roomId}/teams/{teamId}/players`
 
     Description: Method to get all players in a specific team within a specified room.
     Authentication: This endpoint requires the user to be authenticated with a valid access token.
@@ -1365,7 +1365,7 @@ Description: The server encountered an unexpected error while processing the req
 }
 ```
 
-POST `api/v1/rooms/{roomId}/teams/{teamId}/players/{userId}`
+#### 8. POST `api/v1/rooms/{roomId}/teams/{teamId}/players/{userId}`
 
 Description: Method to add a player (specified by userId) to a team in a particular room.
 
@@ -1444,7 +1444,7 @@ Description: The server encountered an unexpected error while processing the req
 }
 ```
 
-DELETE `api/v1/rooms/{roomId}/teams/{teamId}/players/{userId}`
+#### 9. DELETE `api/v1/rooms/{roomId}/teams/{teamId}/players/{userId}`
 
 Description: Method to remove a player (specified by userId) from a team in a particular room.
 
@@ -1520,7 +1520,7 @@ Description: The server encountered an unexpected error while processing the req
 }
 ```
 
-PUT `/api/v1/rooms/{roomId}/teams/{teamId}/describer`
+#### 10. PUT `/api/v1/rooms/{roomId}/teams/{teamId}/describer`
 
 Description: This method sets a specific player (from the list of players in the team) as the describer of the team. The describer is responsible for explaining or describing selected words during the game.
 
@@ -1613,7 +1613,7 @@ Description: The server encountered an unexpected error while processing the req
 }
 ```
 
-PUT `/api/v1/rooms/{roomId}/teams/{teamId}/teamLeader`
+#### 11. PUT `/api/v1/rooms/{roomId}/teams/{teamId}/teamLeader`
 
 Description: This method sets a specific player (from the list of players in the team) as the team leader. The team leader may have additional responsibilities, such as managing the team or making strategic decisions during the game.
 
