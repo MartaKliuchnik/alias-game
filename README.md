@@ -7,34 +7,43 @@
 3. [Base URL](#base-url)
 4. [API Documentation](#api-documentation)
 
-    4.1 [User Management](#user-management)
+   4.1 [User Management](#user-management)
 
-    - User data model.
-    - Endpoint **/api/v1/auth/register**
-    - Endpoint **/api/v1/auth/login**
-    - Endpoint **/api/v1/auth/logout**
-    - Endpoint **/api/v1/users**
-    - Endpoint **/api/v1/users/{userId}**
-    - Endpoint **/api/v1/users/{userId}/stats**
-    - Endpoint **/api/v1/leaderboard**
+   - User data model.
+   - Endpoint **/api/v1/auth/register**
+   - Endpoint **/api/v1/auth/login**
+   - Endpoint **/api/v1/auth/logout**
+   - Endpoint **/api/v1/users**
+   - Endpoint **/api/v1/users/{userId}**
+   - Endpoint **/api/v1/users/{userId}/stats**
+   - Endpoint **/api/v1/leaderboard**
+
+   5.1 [Chat Management](#chat-management)
+
+   6.1 [Message Management](#message-management)
 
 ## Description
 
 Alias is a word-guessing game where players form teams. Each team takes turns where one member describes a word and others guess it. The game includes a chat for players to communicate and a system to check for similar words.
 
 ### Objective
+
 Teams try to guess as many words as possible from their teammates' descriptions.
 
 ### Turns
+
 Each turn is timed. Describers cannot use the word or its derivatives.
 
 ### Scoring
+
 Points are awarded for each correct guess. Similar words are checked for validation.
 
 ### End Game
+
 The game concludes after a predetermined number of rounds, with the highest-scoring team winning.
 
 ## System Requirements
+
 - **Programming language**: JavaScript
 - **Backend**: Node.js framework - Nest.js
 - **Frontend framework**: React.js
@@ -799,3 +808,239 @@ request.
     "message": "An unexpected error occurred while retrieving the leaderboard."
 }
 ```
+
+### Chat Management
+
+The Chat collection stores chat-related information, including the list of messages exchanged in the chat and the users who are allowed to write in this chat.
+
+| Key | Column Name   | Data Type  | Description                                   |
+| :-- | :------------ | :--------- | :-------------------------------------------- |
+| PK  | \_id (chatId) | ObjectId   | Unique identifier for each chat (Primary Key) |
+|     | messagesId    | ObjectId[] | Array of messages exchanged in the chat       |
+|     | writeUsersId  | ObjectId[] | Users able to send messages                   |
+
+Example:
+
+```json
+{
+    "_id": ObjectId("60d5f9a47f39b30b47deab33"),
+    "messagesId": [
+        ObjectId("60d5f9a47f39b30b47deab34"),
+        ObjectId("60d5f9a47f39b30b47deab35")
+    ],
+    "writeUsersId": [
+        ObjectId("60d5f9a47f39b30b47deab36"),
+        ObjectId("60d5f9a47f39b30b47deab37")
+    ]
+}
+```
+
+### Message Management
+
+The Message collection stores individual messages exchanged in the chat, each associated with a user who sent the message and the timestamp when the message was sent.
+
+| Key | Column Name      | Data Type | Description                                      |
+| :-- | :--------------- | :-------- | :----------------------------------------------- |
+| PK  | \_id (messageId) | ObjectId  | Unique identifier for each message (Primary Key) |
+|     | userId           | ObjectId  | Reference to the user who sent the message       |
+|     | text             | string    | The content of the message                       |
+|     | timestamp        | Date      | Timestamp for when the message was sent          |
+
+Example:
+
+```json
+{
+    "_id": ObjectId("60d5f9a47f39b30b47deab34"),
+    "userId": ObjectId("60d5f9a47f39b30b47deab36"),
+    "text": "Hello, this is a message.",
+    "timestamp": Date("2024-09-25T10:00:00Z")
+}
+```
+
+## Endpoints
+
+### Chat Endpoints:
+
+1. **Create a New Chat**
+
+   **Description**: Creates a new chat with the specified users.
+
+   `POST /api/v1/chats`
+
+   **Request Body:**
+
+   ```json
+   {
+     "roomId": "roomId1",
+     "writeUsersId": ["writeUserId1", "writeUserId2"],
+     "readUserId": "readUserId1"
+   }
+   ```
+
+   **Responses:**
+
+   - **201 Created:**
+
+   ```json
+   {
+     "statusMessage": "Chat was successfully created",
+     "chatId": "chatId1"
+   }
+   ```
+
+   - **400 Bad Request:**
+
+   ```json
+   {
+     "statusMessage": "Invalid input data"
+   }
+   ```
+
+2. **Get Chat by ID**
+
+   **Description**: Retrieves chat details, including the active users and message history.
+
+   `GET /api/v1/chats/:id`
+
+   **Responses:**
+
+   - **200 OK:**
+
+   ```json
+   {
+     "chatId": "chatId1",
+     "writeUsersId": ["userId1", "userId2"],
+     "messagesId": ["messageId1", "messageId2"]
+   }
+   ```
+
+   - **404 Not Found:**
+
+   ```json
+   {
+     "statusMessage": "Chat not found"
+   }
+   ```
+
+3. **Add Users to Chat**
+
+   **Description**: Adds one or more users to the chat’s active participants.
+
+   `PUT /api/v1/chats/:id/users`
+
+   **Request Body:**
+
+   ```json
+   {
+     "chatId": "chatId1",
+     "usersId": ["userId1", "userId2"]
+   }
+   ```
+
+   #### ??? Add Info about leader player
+
+   **Responses:**
+
+   - **200 OK:**
+
+   ```json
+   {
+     "statusMessage": "Users were added successfully",
+     "chatId": "chatId1"
+   }
+   ```
+
+   - **404 Not Found:**
+
+   ```json
+   {
+     "statusMessage": "Chat not found"
+   }
+   ```
+
+4. **Delete Chat**
+
+   **Description**: Deletes a chat by its ID.
+
+   `DELETE /api/v1/chats/:id`
+
+   **Responses:**
+
+   - **200 OK:**
+
+   ```json
+   {
+     "statusMessage": "Chat was deleted successfully"
+   }
+   ```
+
+   - **404 Not Found:**
+
+   ```json
+   {
+     "statusMessage": "Chat not found"
+   }
+   ```
+
+### Message Endpoints:
+
+1. **Send a New Message**
+
+   **Description**: Sends a message in the chat.
+
+   `POST /api/v1/messages`
+
+   **Request Body:**
+
+   ```json
+   {
+     "chatId": "chatId1",
+     "userId": "userId1",
+     "text": "Hello!"
+   }
+   ```
+
+   **Responses:**
+
+   - **201 Created:**
+
+   ```json
+   {
+     "messageId": "messageId1"
+   }
+   ```
+
+2. **Get Messages for a Chat**
+   `GET /api/v1/chats/:id/messages`
+
+   **Description**: Retrieves all messages for a specific chat.
+
+   **Responses:**
+
+   - **200 OK:**
+
+   ```json
+   {
+     "messages": [
+       {
+         "messageId": "messageId1",
+         "user": {
+           "_id": "user",
+           "username": "user123"
+         },
+         "text": "Hello!",
+         "timestamp": "2024-09-25T10:05:00Z"
+       }
+     ]
+   }
+   ```
+
+   - **404 Not Found:**
+
+   ```json
+   {
+     "statusMessage": "Chat not found"
+   }
+   ```
+
+   #### ??? Optionally add delete and update messages
