@@ -433,8 +433,7 @@ curl -X GET http://localhost:8080/api/v1/users \
 
 Status code: **200 OK**
 
-Description: The request was successful, and the response contains an array of
-user objects.
+Description: This status indicates that the request was successful, and the response contains an array of user objects, or an empty array if no users are found.
 
 ```
 [
@@ -474,16 +473,6 @@ this operation.
 ```
 {
     "message": "Access denied. Admin privileges required."
-}
-```
-
-Status Code: **404 Not Found**
-
-Description: The server cannot find any users in the database.
-
-```
-{
-    "message": "No users found in the database."
 }
 ```
 
@@ -815,6 +804,17 @@ the system.
 }
 ```
 
+Status code: **409 Conflict**
+
+Description: This response indicates that the request could not be processed
+because the username is already in use.
+
+```
+{
+    "message": "Username already in use."
+}
+```
+
 Status Code: **500 Internal Server Error**
 
 Description: An unexpected error occurred on the server while processing the
@@ -852,8 +852,7 @@ curl -X GET http://localhost:8080/api/v1/leaderboard \
 
 Status Code: **200 OK**
 
-Description: This status indicates that the request was successful, and the
-server returns the leaderboard data.
+Description: This status indicates that the request was successful, and the server returns an array of user objects (the leaderboard data), or an empty array if no users are found.
 
 ```
 [
