@@ -9,7 +9,7 @@
 
     4.1 [User Management](#user-management)
 
-    - User data model.
+    - User data model
     - Endpoint **/api/v1/auth/register**
     - Endpoint **/api/v1/auth/login**
     - Endpoint **/api/v1/auth/logout**
@@ -17,6 +17,26 @@
     - Endpoint **/api/v1/users/{userId}**
     - Endpoint **/api/v1/users/{userId}/stats**
     - Endpoint **/api/v1/leaderboard**
+
+   4.2 [Room](#room)
+
+    - Room data model
+    - Endpoint **POST /api/v1/room**
+    - Endpoint **PATCH /api/v1/room/:roomId**
+    - Endpoint **GET /api/v1/rooms**
+    - Endpoint **GET /api/v1/rooms/:roomId**
+    - Endpoint **DELETE /api/v1/rooms/:roomId**
+    - Endpoint 
+
+    4.2 [Word](#word)
+    
+   - Word data model
+   - Endpoint **POST /api/v1/word**
+   - Endpoint **GET /api/v1/words**
+   - Endpoint **GET /api/v1/words/:wordId**
+   - Endpoint **PATCH /api/v1/words/:wordId**
+   - Endpoint **DELETE /api/v1/words/:wordId**
+   - Endpoint
 
 ## Description
 
@@ -35,7 +55,7 @@ Points are awarded for each correct guess. Similar words are checked for validat
 The game concludes after a predetermined number of rounds, with the highest-scoring team winning.
 
 ## System Requirements
-- **Programming language**: JavaScript
+- **Programming language**: TypeScript
 - **Backend**: Node.js framework - Nest.js
 - **Frontend framework**: React.js
 - **Database**: MongoDB
@@ -797,5 +817,831 @@ request.
 ```
 {
     "message": "An unexpected error occurred while retrieving the leaderboard."
+}
+```
+
+### Room
+
+#### 1. Room data model
+
+Information about the room
+
+| Column Name | Data Type | Description                     |
+|:------------|:----------|:--------------------------------|
+| _id         | UUID      | Unique identifier for each room |
+| name        | string    | Room name                       |
+| joinedUsers | User[]    | An array of joined users        |
+| teams       | Team[]    | An array of teams               |
+| createdAt   | Date      | Time when the room was created  |
+| turnTime    | Time      | Time                            |
+
+#### 2. Create a new room
+
+Endpoint
+
+- URL Path: **_/api/v1/room_**
+- Description: This endpoint creates a new room. It accepts room details in
+  the request body and returns a response indicating the result of the
+  creating process.
+- Authentication: Authentication is required for this endpoint.
+
+**Request Body**
+
+The request body must be in JSON format and include the following fields:
+
+- name: (string, required): The name of the new room. Must be unique
+- teams: (array of teams, required): The array of created teams
+- turnTime: (time, required): The time given for a turn
+
+**Example Request**
+
+Description: A `POST` request to the room creation endpoint. It includes a room name, an array of created teams and turn time. 
+
+```
+
+curl -X POST http://localhost:8080/api/v1/room \
+-H "Content-Type: application/json" \
+-d '{
+  "name": "test_room",
+  "teams": [team1, team2],
+  "turnTime": "30"
+}'
+
+```
+
+**Example Responses**
+
+Status code: **201 Created**
+
+Description: The room has been successfully created. The response includes a
+success message and the data of the created room.
+
+```
+{
+    "message": "Room created successfully.",
+    "data": {
+        "_id": "1245678",
+        "name": "test_room",
+        "joinedUsers": [],
+        "teams": [team1, team2],
+        "createdAt": "Date/time",
+        "turnTime": "30"
+    }
+}
+```
+
+Status code: **400 Bad Request**
+
+Description: The request was invalid because one or more of the provided fields did not meet the required format or were missing.
+
+```
+{
+    "message": "All fields are required and must be in a valid format."
+}
+```
+
+Status code: **409 Conflict**
+
+Description: This response indicates that the request could not be processed
+because the room name is already in use.
+
+```
+{
+    "message": "The room with the specified name is already in use."
+}
+```
+
+Status code: **500 Internal Server Error**
+
+Description: This response indicates an unexpected error occurred during the
+creation process.
+
+```
+{
+    "message": "An unexpected error occurred during creation."
+}
+```
+
+#### 3. Join to the room
+
+Endpoint
+
+- URL Path: **_/api/v1/room/:roomId_**
+- Description: This endpoint joins a user to specific room. It accepts userId in
+  the request body and returns a response indicating the result of the
+  joining process.
+- Authentication: Authentication is required for this endpoint.
+
+**Request Body**
+
+The request body must be in JSON format and include the following fields:
+
+- userId: (string, required): The id of joining user. Must be unique
+
+**Example Request**
+
+Description: A `PATCH` request to the room joining endpoint. 
+
+```
+
+curl -X PATCH http://localhost:8080/api/v1/room/:id \
+-H "Content-Type: application/json" \
+-d '{
+  "userId": "1245"
+}'
+
+```
+
+**Example Responses**
+
+Status code: **200 OK**
+
+Description: The user has been successfully joined. The response includes a
+success message and the data of the room.
+
+```
+{
+    "message": "User joined successfully.",
+    "data": {
+        "_id": "1245678",
+        "name": "test_room",
+        "joinedUsers": [User1],
+        "teams": [team1, team2],
+        "createdAt": "Date/time",
+        "turnTime": "30"
+    }
+}
+```
+
+Status code: **400 Bad Request**
+
+Description: The request was invalid because one or more of the provided fields did not meet the required format or were missing.
+
+```
+{
+    "message": "All fields are required and must be in a valid format."
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
+
+```
+{
+    "message": "Unauthorized access."
+}
+```
+
+Status code: **409 Conflict**
+
+Description: This response indicates that the request could not be processed
+because the user is already joined.
+
+```
+{
+    "message": "The user with the specified id is already joined."
+}
+```
+
+Status code: **500 Internal Server Error**
+
+Description: This response indicates an unexpected error occurred during the
+joining process.
+
+```
+{
+    "message": "An unexpected error occurred during registration."
+}
+```
+
+#### 4. Get all rooms
+
+Endpoint
+
+- URL Path: **_/api/v1/rooms_**
+- Description: This endpoint returns all created rooms.
+- Authentication: Authentication is required for this endpoint.
+
+**Example Request**
+
+Description: A `GET` request to the getting all rooms endpoint.
+
+```
+
+curl -X GET http://localhost:8080/api/v1/rooms \
+-H "Content-Type: application/json"
+
+```
+
+**Example Responses**
+
+Status code: **200 OK**
+
+Description: The array of rooms has been successfully returned. The response includes a
+success message and the array of rooms.
+
+```
+{
+    "message": "Rooms recieved successfully.",
+    "data": [
+    {
+        "_id": "1245678",
+        "name": "test_room",
+        "joinedUsers": [User1],
+        "teams": [team1, team2],
+        "createdAt": "Date/time",
+        "turnTime": "30"
+    }, 
+    {
+        "_id": "12456789",
+        "name": "test_room2",
+        "joinedUsers": [User3, User4],
+        "teams": [team3, team4],
+        "createdAt": "Date/time",
+        "turnTime": "25"
+    }]
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
+
+```
+{
+    "message": "Unauthorized access."
+}
+```
+
+Status code: **500 Internal Server Error**
+
+Description: This response indicates an unexpected error occurred during the
+getting all rooms process.
+
+```
+{
+    "message": "An unexpected error occurred during getting all rooms."
+}
+```
+
+#### 5. Get the room by id
+
+Endpoint
+
+- URL Path: **_/api/v1/rooms/:roomId_**
+- Description: This endpoint returns room with the specified id.
+- Authentication: Authentication is required for this endpoint.
+
+**Example Request**
+
+Description: A `GET` request to the getting room endpoint.
+
+```
+
+curl -X GET http://localhost:8080/api/v1/rooms/:id \
+-H "Content-Type: application/json"
+
+```
+
+**Example Responses**
+
+Status code: **200 OK**
+
+Description: The room has been successfully returned. The response includes a
+success message and the data of the room.
+
+```
+{
+    "message": "Room recieved successfully.",
+    "data": {
+        "_id": "1245678",
+        "name": "test_room",
+        "joinedUsers": [User1],
+        "teams": [team1, team2],
+        "createdAt": "Date/time",
+        "turnTime": "30"
+    }
+}
+```
+
+Status Code: **400 Bad Request**
+
+Description: The provided ID is invalid or missing.
+
+```
+{
+    "message": "ID is required."
+}
+```
+
+```
+{
+    "message": "Invalid ID."
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
+
+```
+{
+    "message": "Unauthorized access."
+}
+```
+
+Status code: **500 Internal Server Error**
+
+Description: This response indicates an unexpected error occurred during the
+getting the room process.
+
+```
+{
+    "message": "An unexpected error occurred during getting the room."
+}
+```
+
+#### 6. Delete the room
+
+Endpoint
+
+- URL Path: **_/api/v1/rooms/:roomId_**
+- Description: This endpoint deletes room with the specified id.
+- Authentication: Authentication is required for this endpoint.
+
+**Example Request**
+
+Description: A `DELETE` request to the deleting room endpoint.
+
+```
+
+curl -X DELETE http://localhost:8080/api/v1/rooms/:id \
+-H "Content-Type: application/json"
+
+```
+
+**Example Responses**
+
+Status code: **204 DELETED**
+
+Description: The room has been successfully deleted. The response includes a
+success message
+
+```
+{
+    "message": "Room deleted successfully.",
+}
+```
+
+Status Code: **400 Bad Request**
+
+Description: The provided ID is invalid or missing.
+
+```
+{
+    "message": "ID is required."
+}
+```
+
+```
+{
+    "message": "Invalid ID."
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
+
+```
+{
+    "message": "Unauthorized access."
+}
+```
+
+Status code: **404 Not Found**
+
+Description: This response indicates a missing room error.
+
+```
+{
+    "message": "The room with specified id doesnt exist"
+}
+```
+
+Status code: **500 Internal Server Error**
+
+Description: This response indicates an unexpected error occurred during the
+getting the room process.
+
+```
+{
+    "message": "An unexpected error occurred during getting the room."
+}
+```
+
+
+### Word
+
+#### 1. Word data model
+
+Information about the word
+
+| Column Name  | Data Type | Description                     |
+|:-------------|:----------|:--------------------------------|
+| _id          | UUID      | Unique identifier for each word |
+| word         | string    | Word name                       |
+| similarWords | string[]  | An array of similar words       |
+
+#### 2. Create a new word
+
+Endpoint
+
+- URL Path: **_/api/v1/word_**
+- Description: This endpoint creates a new word. It accepts word details in
+  the request body and returns a response indicating the result of the
+  creating process.
+- Authentication: Authentication is required for this endpoint.
+
+**Request Body**
+
+The request body must be in JSON format and include the following fields:
+
+- word: (string, required): The name of the new word. Must be unique
+- similarWords: (array of strings): An array of similar words
+
+**Example Request**
+
+Description: A `POST` request to the word creation endpoint. It includes a word name and an array of similar words.
+
+```
+
+curl -X POST http://localhost:8080/api/v1/word \
+-H "Content-Type: application/json" \
+-d '{
+  "word": "apple",
+  "similarWords": ["", ""]
+}'
+
+```
+
+**Example Responses**
+
+Status code: **201 Created**
+
+Description: The word has been successfully created. The response includes a
+success message and the data of the created word.
+
+```
+{
+    "message": "Word created successfully.",
+    "data": {
+        "_id": "12456789",
+        "word": "apple",
+        "similarWords": ["", ""]
+    }
+}
+```
+
+Status code: **400 Bad Request**
+
+Description: The request was invalid because one or more of the provided fields did not meet the required format or were missing.
+
+```
+{
+    "message": "All fields are required and must be in a valid format."
+}
+```
+
+Status code: **409 Conflict**
+
+Description: This response indicates that the request could not be processed
+because the word is already in use.
+
+```
+{
+    "message": "The word with the specified name is already in use."
+}
+```
+
+Status code: **500 Internal Server Error**
+
+Description: This response indicates an unexpected error occurred during the
+creation process.
+
+```
+{
+    "message": "An unexpected error occurred during creation."
+}
+```
+
+#### 3. Get all words
+
+Endpoint
+
+- URL Path: **_/api/v1/words_**
+- Description: This endpoint returns all words.
+- Authentication: Authentication is required for this endpoint.
+
+**Example Request**
+
+Description: A `GET` request to the getting all words endpoint.
+
+```
+
+curl -X GET http://localhost:8080/api/v1/words \
+-H "Content-Type: application/json"
+
+```
+
+**Example Responses**
+
+Status code: **200 OK**
+
+Description: The array of words has been successfully returned. The response includes a
+success message and the array of words.
+
+```
+{
+    "message": "Words recieved successfully.",
+    "data": [
+    {
+        "_id": "12456789",
+        "word": "apple",
+        "similarWords": ["", ""]
+    }, 
+    {
+        "_id": "12458942",
+        "word": "car",
+        "similarWords": ["", ""]
+    }]
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
+
+```
+{
+    "message": "Unauthorized access."
+}
+```
+
+Status code: **500 Internal Server Error**
+
+Description: This response indicates an unexpected error occurred during the
+getting all words process.
+
+```
+{
+    "message": "An unexpected error occurred during getting all words."
+}
+```
+
+#### 4. Get the word by id
+
+Endpoint
+
+- URL Path: **_/api/v1/words/:wordId_**
+- Description: This endpoint returns word with the specified id.
+- Authentication: Authentication is required for this endpoint.
+
+**Example Request**
+
+Description: A `GET` request to the getting word endpoint.
+
+```
+
+curl -X GET http://localhost:8080/api/v1/words/:id \
+-H "Content-Type: application/json"
+
+```
+
+**Example Responses**
+
+Status code: **200 OK**
+
+Description: The word has been successfully returned. The response includes a
+success message and the data of the word.
+
+```
+{
+    "message": "Word recieved successfully.",
+    "data": {
+        "_id": "12456789",
+        "word": "apple",
+        "similarWords": ["", ""]
+    }
+}
+```
+
+Status Code: **400 Bad Request**
+
+Description: The provided ID is invalid or missing.
+
+```
+{
+    "message": "ID is required."
+}
+```
+
+```
+{
+    "message": "Invalid ID."
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
+
+```
+{
+    "message": "Unauthorized access."
+}
+```
+
+Status code: **500 Internal Server Error**
+
+Description: This response indicates an unexpected error occurred during the
+getting the word process.
+
+```
+{
+    "message": "An unexpected error occurred during getting the word."
+}
+```
+
+#### 5. Update the word
+
+Endpoint
+
+- URL Path: **_/api/v1/words/:wordId_**
+- Description: This endpoint returns updated word with the specified id.
+- Authentication: Authentication is required for this endpoint.
+
+**Request Body**
+
+The request body must be in JSON format and include the following fields:
+
+- word: (string, required): The name of the updated word. Must be unique
+- similarWords: (array of strings): An array of similar words
+
+**Example Request**
+
+Description: A `PATCH` request to the getting word endpoint.
+
+```
+
+curl -X PATCH http://localhost:8080/api/v1/words/:id \
+-H "Content-Type: application/json"
+-d '{
+  "word": "tie",
+  "similarWords": ["", ""]
+}'
+
+```
+
+**Example Responses**
+
+Status code: **200 OK**
+
+Description: The word has been successfully updated. The response includes a
+success message and the data of the updated word.
+
+```
+{
+    "message": "Word recieved successfully.",
+    "data": {
+        "_id": "12456789",
+        "word": "tie",
+        "similarWords": ["", ""]
+    }
+}
+```
+
+Status Code: **400 Bad Request**
+
+Description: The provided ID is invalid or missing.
+
+```
+{
+    "message": "ID is required."
+}
+```
+
+```
+{
+    "message": "Invalid ID."
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
+
+```
+{
+    "message": "Unauthorized access."
+}
+```
+
+Status code: **500 Internal Server Error**
+
+Description: This response indicates an unexpected error occurred during the
+getting the word process.
+
+```
+{
+    "message": "An unexpected error occurred during getting the word."
+}
+```
+
+#### 6. Delete the word
+
+Endpoint
+
+- URL Path: **_/api/v1/words/:wordId_**
+- Description: This endpoint deletes word with the specified id.
+- Authentication: Authentication is required for this endpoint.
+
+**Example Request**
+
+Description: A `DELETE` request to the deleting word endpoint.
+
+```
+
+curl -X DELETE http://localhost:8080/api/v1/words/:id \
+-H "Content-Type: application/json"
+
+```
+
+**Example Responses**
+
+Status code: **204 DELETED**
+
+Description: The word has been successfully deleted. The response includes a
+success message
+
+```
+{
+    "message": "Wordd deleted successfully.",
+}
+```
+
+Status Code: **400 Bad Request**
+
+Description: The provided ID is invalid or missing.
+
+```
+{
+    "message": "ID is required."
+}
+```
+
+```
+{
+    "message": "Invalid ID."
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
+
+```
+{
+    "message": "Unauthorized access."
+}
+```
+
+Status code: **404 Not Found**
+
+Description: This response indicates a missing word error.
+
+```
+{
+    "message": "The word with specified id doesnt exist"
+}
+```
+
+Status code: **500 Internal Server Error**
+
+Description: This response indicates an unexpected error occurred during the
+getting the word process.
+
+```
+{
+    "message": "An unexpected error occurred during getting the word."
 }
 ```
