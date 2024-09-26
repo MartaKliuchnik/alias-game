@@ -38,6 +38,7 @@
 
      4.4 [Message Management](#message-management)
 
+   - Message data model.
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}/user/{userId}/message**
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}/user/{userId}/messages**
 
