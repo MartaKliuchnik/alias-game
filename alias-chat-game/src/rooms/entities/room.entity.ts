@@ -1,1 +1,5 @@
-export class Room {}
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
+@Schema()
+export class Room extends Document{}
+
