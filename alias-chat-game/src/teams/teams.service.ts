@@ -9,7 +9,6 @@ import { SetTeamLeaderDto } from './dto/set-team-leader.dto';
 
 @Injectable()
 export class TeamsService {
-
   constructor(@InjectModel(Team.name) private teamModel: Model<Team>) {}
 
   create(roomId: number, createTeamDto: CreateTeamDto) {

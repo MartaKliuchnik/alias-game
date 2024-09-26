@@ -7,8 +7,9 @@ import { UpdateMessageDto } from './dto/update-message.dto';
 
 @Injectable()
 export class MessagesService {
-  
-  constructor(@InjectModel(Message.name) private messageModel: Model<Message>) {}
+  constructor(
+    @InjectModel(Message.name) private messageModel: Model<Message>,
+  ) {}
 
   create(createMessageDto: CreateMessageDto) {
     return 'This action adds a new message';

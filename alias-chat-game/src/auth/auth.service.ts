@@ -9,7 +9,6 @@ import { LogoutDto } from './dto/logout.dto';
 
 @Injectable()
 export class AuthService {
-
   constructor(@InjectModel(Auth.name) private authModel: Model<Auth>) {}
 
   register(createUserDto: CreateUserDto) {
