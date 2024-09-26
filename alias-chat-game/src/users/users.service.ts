@@ -6,7 +6,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
-
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
   findAll() {

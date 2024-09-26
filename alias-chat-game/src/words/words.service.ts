@@ -7,7 +7,6 @@ import { UpdateWordDto } from './dto/update-word.dto';
 
 @Injectable()
 export class WordsService {
-
   constructor(@InjectModel(Word.name) private wordModel: Model<Word>) {}
 
   create(createWordDto: CreateWordDto) {
