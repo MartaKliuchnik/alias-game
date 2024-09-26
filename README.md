@@ -828,7 +828,7 @@ Information about the room
 
 | Column Name | Data Type | Description                     |
 |:------------|:----------|:--------------------------------|
-| _id         | UUID      | Unique identifier for each room |
+| _id         | ObjectId  | Unique identifier for each room |
 | name        | string    | Room name                       |
 | joinedUsers | User[]    | An array of joined users        |
 | teams       | Team[]    | An array of teams               |
@@ -883,7 +883,7 @@ success message and the data of the created room.
         "_id": "1245678",
         "name": "test_room",
         "joinedUsers": [],
-        "teams": [team1, team2],
+        "teams": [ObjectId, ObjectId],
         "createdAt": "Date/time",
         "turnTime": "30"
     }
@@ -965,8 +965,8 @@ success message and the data of the room.
     "data": {
         "_id": "1245678",
         "name": "test_room",
-        "joinedUsers": [User1],
-        "teams": [team1, team2],
+        "joinedUsers": [ObjectId],
+        "teams": [ObjectId, ObjectId],
         "createdAt": "Date/time",
         "turnTime": "30"
     }
@@ -1049,16 +1049,16 @@ success message and the array of rooms.
     {
         "_id": "1245678",
         "name": "test_room",
-        "joinedUsers": [User1],
-        "teams": [team1, team2],
+        "joinedUsers": [ObjectId],
+        "teams": [ObjectId, team2],
         "createdAt": "Date/time",
         "turnTime": "30"
     }, 
     {
         "_id": "12456789",
         "name": "test_room2",
-        "joinedUsers": [User3, User4],
-        "teams": [team3, team4],
+        "joinedUsers": [ObjectId, ObjectId],
+        "teams": [ObjectId, ObjectId],
         "createdAt": "Date/time",
         "turnTime": "25"
     }]
@@ -1119,8 +1119,8 @@ success message and the data of the room.
     "data": {
         "_id": "1245678",
         "name": "test_room",
-        "joinedUsers": [User1],
-        "teams": [team1, team2],
+        "joinedUsers": [ObjectId],
+        "teams": [ObjectId, ObjectId],
         "createdAt": "Date/time",
         "turnTime": "30"
     }
@@ -1254,7 +1254,7 @@ Information about the word
 
 | Column Name  | Data Type | Description                     |
 |:-------------|:----------|:--------------------------------|
-| _id          | UUID      | Unique identifier for each word |
+| _id          | ObjectId  | Unique identifier for each word |
 | word         | string    | Word name                       |
 | similarWords | string[]  | An array of similar words       |
 
