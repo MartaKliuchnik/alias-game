@@ -1650,7 +1650,7 @@ Description: The server encountered an unexpected error while processing the req
 }
 ```
 
-#### 10. PUT `/api/v1/rooms/{roomId}/teams/{teamId}/describer`
+#### 10. PATCH `/api/v1/rooms/{roomId}/teams/{teamId}/describer`
 
 Description: This method sets a specific player (from the list of players in the team) as the describer of the team. The describer is responsible for explaining or describing selected words during the game.
 Authentication: This endpoint requires the user to be authenticated with a valid access token.
@@ -1661,10 +1661,10 @@ userId (string): The ID of the player to be set as the describer. This player mu
 
 **Example Request**
 
-Description: A `PUT` request to set a player (specified by userId) as the describer in a specific team within a room.
+Description: A `PATCH` request to set a player (specified by userId) as the describer in a specific team within a room.
 
 ```
-curl -X PUT http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/describer \
+curl -X PATCH http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/describer \
 -H "Authorization: Bearer access_token" \
 -H "Content-Type: application/json" \
 -d '{"userId": "60d5f9a2b0f8b8e17a15f5f2"}'
@@ -1746,7 +1746,7 @@ Description: The server encountered an unexpected error while processing the req
 }
 ```
 
-#### 11. PUT `/api/v1/rooms/{roomId}/teams/{teamId}/teamLeader`
+#### 11. PATCH `/api/v1/rooms/{roomId}/teams/{teamId}/team-leader`
 
 Description: This method sets a specific player (from the list of players in the team) as the team leader. The team leader may have additional responsibilities, such as managing the team or making strategic decisions during the game.
 Authentication: This endpoint requires the user to be authenticated with a valid access token.
@@ -1757,10 +1757,10 @@ userId (string): The ID of the player to be set as the team leader. This player 
 
 **Example Request**
 
-Description: A `PUT` request to set a player (specified by userId) as the team leader in a specific team within a room.
+Description: A `PATCH` request to set a player (specified by userId) as the team leader in a specific team within a room.
 
 ```
-curl -X PUT http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/teamLeader \
+curl -X PATCH http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/team-leader \
 -H "Authorization: Bearer access_token" \
 -H "Content-Type: application/json" \
 -d '{"userId": "60d5f9a2b0f8b8e17a15f5f3"}'
@@ -1841,6 +1841,90 @@ Description: The server encountered an unexpected error while processing the req
     "message": "An unexpected error occurred while setting the team leader."
 }
 ```
+
+#### 12. POST `/api/v1/rooms/{roomId}/teams/{teamId}/check-word`
+
+Description: This method sends to server a word team members try to guess as the one described. It responds with the score they get for this guess and logical value of wheter they have guessed the word exactly.
+Authentication: This endpoint requires the user to be authenticated with a valid access token.
+
+**Request Body**
+
+guessWord (string): The string of the word the team tryes to guess.
+
+**Example Request**
+
+Description: A `POST` request to get a scrote team gets for trying to guess a word and bollean value of the guessed word being exactly the same or not.
+
+```
+curl -X POST http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/check-word \
+-H "Authorization: Bearer access_token" \
+-H "Content-Type: application/json" \
+-d '{"guessWord": "apple"}'
+```
+
+**Example Responses**
+
+Status Code: **200 OK**
+
+Description: The word was checked and it's rightness and score are returned.
+
+```
+{
+    "isRight": false,
+    "score": 30
+}
+```
+
+Status Code: **400 Bad Request**
+
+Description: The request body is invalid.
+
+```
+{
+    "message": "Invalid request body."
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided token is invalid.
+
+```
+{
+    "message": "Unauthorized access."
+}
+```
+
+Status Code: **403 Forbidden**
+
+Description: The user does not have sufficient permissions to guess a word.
+
+```
+{
+    "message": "Access denied. Insufficient permissions."
+}
+```
+
+Status Code: **404 Not Found**
+
+Description: The specified room or team cannot be found.
+
+```
+{
+    "message": "Team or room not found."
+}
+```
+
+Status Code: **500 Internal Server Error**
+
+Description: The server encountered an unexpected error while processing the request.
+
+```
+{
+    "message": "An unexpected error occurred while checking the guessed word."
+}
+```
+
 
 ### Chat Management
 
