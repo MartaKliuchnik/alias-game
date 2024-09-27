@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-
 @Schema()
-export class Word extends Document {}
+export class Team extends Document {}
 
-export const WordSchema = SchemaFactory.createForClass(Word);
+export const TeamSchema = SchemaFactory.createForClass(Team);

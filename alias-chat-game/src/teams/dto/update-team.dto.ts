@@ -1,3 +1,4 @@
+
 import { IsOptional, IsArray, IsMongoId, IsString } from 'class-validator';
 
 export class UpdateTeamDto {
@@ -26,3 +27,4 @@ export class UpdateTeamDto {
   @IsArray()
   tryedWords?: string[];
 }
+
