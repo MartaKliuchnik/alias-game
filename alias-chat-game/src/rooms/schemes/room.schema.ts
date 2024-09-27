@@ -11,7 +11,7 @@ export class Room {
   @Prop({ type: [Types.ObjectId], required: true, default: [] })
   joinedUsers: Types.ObjectId[];
 
-  @Prop({ type: [Types.ObjectId], required: true })
+  @Prop({ type: [Types.ObjectId], default: [] })
   teams: Types.ObjectId[];
 
   @Prop({ type: Date, default: Date.now })
