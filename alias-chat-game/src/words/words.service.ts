@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Word } from './entities/word.entity';
+import { Word } from './schemas/word.schema';
+
 import { CreateWordDto } from './dto/create-word.dto';
 import { UpdateWordDto } from './dto/update-word.dto';
 
 @Injectable()
 export class WordsService {
-
   constructor(@InjectModel(Word.name) private wordModel: Model<Word>) {}
 
-  create(createWordDto: CreateWordDto) {
-    return 'This action adds a new word';
+  // POST http://localhost:8080/api/v1/words
+  async create(createWordDto: CreateWordDto): Promise<Word> {
+    const createdWord = new this.wordModel(createWordDto);
+    return createdWord.save();
   }
 
   findAll() {

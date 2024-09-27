@@ -7,7 +7,6 @@ import { UpdateRoomDto } from './dto/update-room.dto';
 
 @Injectable()
 export class RoomsService {
-
   constructor(@InjectModel(Room.name) private roomModel: Model<Room>) {}
 
   create(createRoomDto: CreateRoomDto) {
