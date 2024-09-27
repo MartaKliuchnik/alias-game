@@ -833,7 +833,7 @@ Information about the room
 | joinedUsers | User[]    | An array of joined users        |
 | teams       | Team[]    | An array of teams               |
 | createdAt   | Date      | Time when the room was created  |
-| turnTime    | Time      | Time                            |
+| turnTime    | integer   | Turn time                       |
 
 #### 2. Create a new room
 
@@ -863,8 +863,8 @@ curl -X POST http://localhost:8080/api/v1/room \
 -H "Content-Type: application/json" \
 -d '{
   "name": "test_room",
-  "teams": [team1, team2],
-  "turnTime": "30"
+  "teams": [ObjectId, ObjectId],
+  "turnTime": 30
 }'
 
 ```
@@ -885,7 +885,7 @@ success message and the data of the created room.
         "joinedUsers": [],
         "teams": [ObjectId, ObjectId],
         "createdAt": "Date/time",
-        "turnTime": "30"
+        "turnTime": 30
     }
 }
 ```
@@ -932,26 +932,6 @@ Endpoint
   joining process.
 - Authentication: Authentication is required for this endpoint.
 
-**Request Body**
-
-The request body must be in JSON format and include the following fields:
-
-- userId: (string, required): The id of joining user. Must be unique
-
-**Example Request**
-
-Description: A `PATCH` request to the room joining endpoint. 
-
-```
-
-curl -X PATCH http://localhost:8080/api/v1/room/:id \
--H "Content-Type: application/json" \
--d '{
-  "userId": "1245"
-}'
-
-```
-
 **Example Responses**
 
 Status code: **200 OK**
@@ -968,7 +948,7 @@ success message and the data of the room.
         "joinedUsers": [ObjectId],
         "teams": [ObjectId, ObjectId],
         "createdAt": "Date/time",
-        "turnTime": "30"
+        "turnTime": 30
     }
 }
 ```
@@ -1050,9 +1030,9 @@ success message and the array of rooms.
         "_id": "1245678",
         "name": "test_room",
         "joinedUsers": [ObjectId],
-        "teams": [ObjectId, team2],
+        "teams": [ObjectId, ObjectId],
         "createdAt": "Date/time",
-        "turnTime": "30"
+        "turnTime": 30
     }, 
     {
         "_id": "12456789",
@@ -1060,7 +1040,7 @@ success message and the array of rooms.
         "joinedUsers": [ObjectId, ObjectId],
         "teams": [ObjectId, ObjectId],
         "createdAt": "Date/time",
-        "turnTime": "25"
+        "turnTime": 25
     }]
 }
 ```
@@ -1122,7 +1102,7 @@ success message and the data of the room.
         "joinedUsers": [ObjectId],
         "teams": [ObjectId, ObjectId],
         "createdAt": "Date/time",
-        "turnTime": "30"
+        "turnTime": 30
     }
 }
 ```
