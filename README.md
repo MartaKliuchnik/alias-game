@@ -95,15 +95,15 @@ endpoint path. For instance, to access the registration endpoint:
 
 Information about users.
 
-| Column Name    | Data Type | Description                                  |
-| :------------- | :-------- | :------------------------------------------- |
-| userId         | ObjectId  | Unique identifier for each user              |
-| username       | string    | Username chosen by the user (must be unique) |
-| hashedPassword | string    | Encrypted password for user authentication   |
-| salt           | string    | Salt used to secure the user's password      |
-| score          | int       | Total points scored by the user in the game  |
-| played         | int       | Number of games the user has participated in |
-| wins           | int       | Number of games the user has won             |
+| Column Name    | Data Type   | Description                                  |
+| :------------- | :---------- | :------------------------------------------- |
+| userId         | ObjectId    | Unique identifier for each user              |
+| username       | string      | Username chosen by the user (must be unique) |
+| hashedPassword | string      | Encrypted password for user authentication   |
+| salt           | string      | Salt used to secure the user's password      |
+| score          | int         | Total points scored by the user in the game  |
+| played         | int         | Number of games the user has participated in |
+| wins           | int         | Number of games the user has won             |
 
 #### 2. Register a new user
 
@@ -594,9 +594,9 @@ request.
 Endpoint
 
 - URL Path: **_/api/v1/users/{userId}_**
-- Description: This endpoint allows a user to delete their own account. It supports both soft and hard deletes.
-  - Soft Delete: Marks the user as inactive but retains their record in the system (default behavior).
-  - Hard Delete: Permanently removes the user's account and all associated data. This action requires special authorization by an admin using a password validation step in the request body.
+- Description: This endpoint allows a user to delete their own account. It supports both soft and hard deletes. 
+    - Soft Delete: Marks the user as inactive but retains their record in the system (default behavior).
+    - Hard Delete: Permanently removes the user's account and all associated data. This action requires special authorization by an admin using a password validation step in the request body.
 - Authentication: The request must include a valid access token for the authenticated user. Hard delete requests also require admin-level authorization.
 
 **Request Parameter**
@@ -941,17 +941,18 @@ request.
 
 Information about users.
 
-| Column Name  | Data Type  | Description                                            |
-| :----------- | :--------- | :----------------------------------------------------- |
-| teamId       | ObjectId   | Unique identifier for each team                        |
-| roomId       | ObjectId   | Unique identifier for the team's room                  |
-| name         | string     | Username chosen by the user (must be unique)           |
-| score        | int        | Total points scored by the team during this game       |
-| players      | ObjectId[] | Array of ids of team's players                         |
-| describer    | ObjectId   | Unique identifier of the player who describes the word |
-| teamLeader   | ObjectId   | Unique identifier of the player who makes a word guess |
-| selectedWord | ObjectId   | Unique identifier for the record of the word to guess  |
-| tryedWords   | string[]   | Array of words tryed by players                        |
+| Column Name      | Data Type         | Description                                            |
+| :--------------- | :---------------- | :----------------------------------------------------- |
+| teamId           | ObjectId          | Unique identifier for each team                        |
+| roomId           | ObjectId          | Unique identifier for the team's room                  |
+| name             | string            | Username chosen by the user (must be unique)           |
+| score            | int               | Total points scored by the team during this game       |
+| players          | ObjectId[]        | Array of ids of team's players                         |
+| describer        | ObjectId          | Unique identifier of the player who describes the word |
+| teamLeader       | ObjectId          | Unique identifier of the player who makes a word guess |
+| selectedWord     | ObjectId          | Unique identifier for the record of the word to guess  |
+| tryedWords       | string[]          | Array of words tryed by players                        |
+
 
 #### 2. GET `api/v1/v1/rooms/{roomId}/teams`
 
@@ -1853,8 +1854,8 @@ guessWord (string): The string of the word the team tryes to guess.
 
 **Example Request**
 
-Description: A `POST` request to get a scrote team gets for trying to guess a word and bollean value of the guessed word being exactly the same or not.
 
+Description: A `POST` request to get a scrote team gets for trying to guess a word and bollean value of the guessed word being exactly the same or not. 
 ```
 curl -X POST http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/check-word \
 -H "Authorization: Bearer access_token" \
@@ -1923,6 +1924,7 @@ Description: The server encountered an unexpected error while processing the req
 {
     "message": "An unexpected error occurred while checking the guessed word."
 }
+
 ```
 
 
