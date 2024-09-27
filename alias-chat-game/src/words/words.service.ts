@@ -8,7 +8,7 @@ import { UpdateWordDto } from './dto/update-word.dto';
 
 @Injectable()
 export class WordsService {
-  constructor(@InjectModel(Word.name) private wordModel: Model<Word>) { }
+  constructor(@InjectModel(Word.name) private wordModel: Model<Word>) {}
 
   // POST http://localhost:8080/api/v1/words
   async create(createWordDto: CreateWordDto): Promise<Word> {
