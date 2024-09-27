@@ -18,16 +18,29 @@
    - Endpoint **/api/v1/users/{userId}**
    - Endpoint **/api/v1/leaderboard**
 
-    4.2 [Team Management](#team-management)
+     4.2 [Team Management](#team-management)
 
-    - Team data model.
-    - Endpoint **/api/v1/rooms/{roomId}/teams**
-    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}**
-    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/players**
-    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/players/{userId}**
-    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/describer**
-    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/leader**
-    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chat**
+   - Team data model.
+   - Endpoint **/api/v1/rooms/{roomId}/teams**
+   - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}**
+   - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/players**
+   - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/players/{userId}**
+   - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/describer**
+   - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/leader**
+   - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chat**
+
+     4.3 [Chat Management](#chat-management)
+
+   - Chat data model.
+   - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chat**
+   - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}**
+   - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}**
+
+     4.4 [Message Management](#message-management)
+
+   - Message data model.
+   - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}/user/{userId}/message**
+   - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}/user/{userId}/messages**
 
 ## Description
 
@@ -54,6 +67,7 @@ The game concludes after a predetermined number of rounds, with the
 highest-scoring team winning.
 
 ## System Requirements
+
 - **Programming language**: JavaScript, TypeScript
 - **Backend**: Node.js framework - Nest.js
 - **Frontend framework**: React.js
@@ -715,7 +729,7 @@ The request must include the following path parameter:
 Request Body:
 
 The request body should include the fields that need to be updated:
- 
+
 - username: The unique new username.
 
 **Example Request**
@@ -939,6 +953,7 @@ Information about users.
 | selectedWord     | ObjectId          | Unique identifier for the record of the word to guess  |
 | tryedWords       | string[]          | Array of words tryed by players                        |
 
+
 #### 2. GET `api/v1/v1/rooms/{roomId}/teams`
 
 - Description: Method to get all the room's teams.
@@ -954,7 +969,7 @@ Description: A `GET` request to retrieve a list of all teams in a specific room.
 
 ```sh
 curl -X GET http://localhost:8080/api/v1/rooms/{roomId}/teams \
--H "Authorization: Bearer access_token" 
+-H "Authorization: Bearer access_token"
 ```
 
 **Example Responses**
@@ -1009,7 +1024,6 @@ Description: The request lacks proper authentication credentials or the provided
 Status Code: **403 Forbidden**
 
 Description: The user does not have the required permissions to access the teams in this room.
-
 
 ```
 {
@@ -1840,8 +1854,8 @@ guessWord (string): The string of the word the team tryes to guess.
 
 **Example Request**
 
-Description: A `POST` request to get a scrote team gets for trying to guess a word and bollean value of the guessed word being exactly the same or not. 
 
+Description: A `POST` request to get a scrote team gets for trying to guess a word and bollean value of the guessed word being exactly the same or not. 
 ```
 curl -X POST http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/check-word \
 -H "Authorization: Bearer access_token" \
@@ -1909,5 +1923,484 @@ Description: The server encountered an unexpected error while processing the req
 ```
 {
     "message": "An unexpected error occurred while checking the guessed word."
+}
+
+```
+
+
+### Chat Management
+
+#### 1. Chat data model
+
+The Chat collection stores chat-related information, including the list of messages exchanged in the chat and the users who are allowed to write in this chat.
+
+| Column Name   | Data Type  | Description                                   |
+| :------------ | :--------- | :-------------------------------------------- |
+| \_id (chatId) | ObjectId   | Unique identifier for each chat (Primary Key) |
+| messagesId    | ObjectId[] | Array of messages exchanged in the chat       |
+| writeUsersId  | ObjectId[] | Users able to send messages                   |
+
+#### 2. POST `/api/v1/rooms/{roomId}/teams/{teamId}/chat`
+
+- Description: Method to create a new chat with the specified users.
+- Authentication: This endpoint requires the user to be authenticated with a valid access token
+
+**Request Body**
+
+- writeUsersId (array of strings): An array of users IDs to be added to the chat.
+- readUserId (string): id of the describer who can only read
+
+**Example Request**
+
+Description: A `POST` to create a new chat with the specified users.
+
+```sh
+curl -X GET http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/chat \
+-H "Authorization: Bearer access_token"
+```
+
+**Example Responses**
+
+Status code: **201 Created**
+
+Description: The request was successful, and the response contains message about successfull creation and chatId.
+
+```json
+{
+  "message": "Chat was successfully created",
+  "chatId": "chatId1"
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided token is invalid. Ensure that the correct authentication token is provided.
+
+```
+{
+    "message": "Unauthorized access."
+}
+```
+
+Status Code: **403 Forbidden**
+
+Description: The user does not have the required permissions to access the teams in this room.
+
+```
+{
+    "message": "Access denied. Insufficient permissions."
+}
+```
+
+Status Code: **404 Not Found**
+
+Description: The specified room cannot be found.
+
+```
+{
+    "message": "Room was not found."
+}
+```
+
+Status Code: **404 Not Found**
+
+Description: The specified team cannot be found.
+
+```
+{
+    "message": "Team was not found."
+}
+```
+
+Status code: **500 Internal Server Error**
+
+Description: The server encountered an unexpected error while processing the request.
+
+```
+{
+    "message": "An unexpected error occurred while retrieving the teams."
+}
+```
+
+#### 3. GET `/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}`
+
+Description: Method to retrieve a specific chat with chat details by its ID in the specified team and room.
+Authentication: This endpoint requires the user to be authenticated with a valid access token.
+
+**Request body**
+
+Empty
+
+**Example Request**
+
+Description: A `GET` request to retrieve a specific chat with chat details by its ID in the specified team and room.
+
+```
+curl -X GET http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId} \
+-H "Authorization: Bearer access_token"
+```
+
+**Example Responses**
+
+Status code: **200 OK**
+
+Description: The request was successful, and the response contains the details of the requested chat.
+
+```json
+{
+  "chatId": "chatId1",
+  "writeUsersId": ["userId1", "userId2"],
+  "messagesId": ["messageId1", "messageId2"]
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided token is invalid. Ensure that the correct authentication token is provided.
+
+```
+{
+    "message": "Unauthorized access."
+}
+```
+
+Status Code: **403 Forbidden**
+
+Description: The user does not have the required permissions to access the team in this room.
+
+```
+{
+    "message": "Access denied. Insufficient permissions."
+}
+```
+
+Status Code: **404 Not Found**
+
+Description: The specified room cannot be found.
+
+```
+{
+    "message": "Room not found."
+}
+```
+
+Status Code: **404 Not Found**
+
+Description: The specified team cannot be found in the specified room.
+
+```
+{
+    "message": "Team not found."
+}
+```
+
+Status Code: **404 Not Found**
+
+Description: The specified chat cannot be found.
+
+```
+{
+    "message": "Chat not found."
+}
+```
+
+Status code: **500 Internal Server Error**
+
+Description: The server encountered an unexpected error while processing the request.
+
+```
+{
+    "message": "An unexpected error occurred while retrieving the team."
+}
+```
+
+#### 4. DELETE `/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}`
+
+Description: Method to delete a specific chat in the specified team and room.
+Authentication: This endpoint requires the user to be authenticated with a valid access token.
+
+**Request body:**
+
+Empty
+
+**Example Request**
+
+Description: A `DELETE` request to remove a specific chat in the specified team and room.
+
+```
+curl -X DELETE http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId} \
+-H "Authorization: Bearer access_token"
+```
+
+**Example Responses**
+
+Status code: **204 No Content**
+
+Description: The request was successful, and the chat has been deleted. No content is returned in the response.
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided token is invalid. Ensure that the correct authentication token is provided.
+
+```
+{
+    "message": "Unauthorized access."
+}
+```
+
+Status Code: **403 Forbidden**
+
+Description: The user does not have the required permissions to delete the team in this room.
+
+```
+{
+    "message": "Access denied. Insufficient permissions."
+}
+```
+
+Status Code: **404 Not Found**
+
+Description: The specified team or room cannot be found.
+
+```
+{
+    "message": "Team or room not found."
+}
+```
+
+Status code: **500 Internal Server Error**
+
+Description: The server encountered an unexpected error while processing the request.
+
+```
+{
+    "message": "An unexpected error occurred while deleting the team."
+}
+```
+
+### Message Management
+
+#### 1. Message data model
+
+The Message collection stores individual messages exchanged in the chat, each associated with a user who sent the message and the timestamp when the message was sent.
+
+| Column Name      | Data Type | Description                                      |
+| :--------------- | :-------- | :----------------------------------------------- |
+| \_id (messageId) | ObjectId  | Unique identifier for each message (Primary Key) |
+| userId           | ObjectId  | Reference to the user who sent the message       |
+| text             | string    | The content of the message                       |
+| timestamp        | Date      | Timestamp for when the message was sent          |
+
+#### 2. POST `/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}/user/{userId}/message`
+
+- Description: Method to send a message in the chat.
+- Authentication: This endpoint requires the user to be authenticated with a valid access token
+
+**Request Body**
+
+- text (string): text that the user wrote.
+
+**Example Request**
+
+Description: A `POST` to send a message in the chat.
+
+```
+curl -X POST http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}/user/{userId}/message \
+-H "Authorization: Bearer access_token" \
+-H "Content-Type: application/json" \
+-d '{
+    "messageId": "messageId1"
+}'
+```
+
+**Example Responses**
+
+Status code: **201 Created**
+
+Description: The request was successful, and the response contains message ID.
+
+```json
+{
+  "messageId": "messageId1"
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided token is invalid. Ensure that the correct authentication token is provided.
+
+```
+{
+    "message": "Unauthorized access."
+}
+```
+
+Status Code: **400 Bad Request**
+
+Description: The request body is missing required fields or contains invalid data.
+
+```
+{
+    "message": "Invalid input. Please provide all required fields."
+}
+```
+
+Status Code: **403 Forbidden**
+
+Description: The user does not have the required permissions to access the teams in this room.
+
+```
+{
+    "message": "Access denied. Insufficient permissions."
+}
+```
+
+Status Code: **404 Not Found**
+
+Description: The specified room cannot be found.
+
+```
+{
+    "message": "Room was not found."
+}
+```
+
+Status Code: **404 Not Found**
+
+Description: The specified team cannot be found.
+
+```
+{
+    "message": "Team was not found."
+}
+```
+
+Status Code: **404 Not Found**
+
+Description: The specified chat cannot be found.
+
+```
+{
+    "message": "Chat was not found."
+}
+```
+
+Status Code: **404 Not Found**
+
+Description: The specified user cannot be found.
+
+```
+{
+    "message": "User was not found."
+}
+```
+
+Status code: **500 Internal Server Error**
+
+Description: The server encountered an unexpected error while processing the request.
+
+```
+{
+    "message": "An unexpected error occurred while retrieving the teams."
+}
+```
+
+#### 3. GET `GET /api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}/messages`
+
+Description: Method to retrieve all messages for a specific chat.
+Authentication: This endpoint requires the user to be authenticated with a valid access token.
+
+**Request body**
+
+Empty
+
+**Example Request**
+
+Description: A `GET` request to retrieve all messages for a specific chat.
+
+```
+curl -X GET http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}/messages \
+-H "Authorization: Bearer access_token"
+```
+
+**Example Responses**
+
+Status code: **200 OK**
+
+Description: The request was successful, and the response contains all messages of the requested chat.
+
+```json
+{
+  "messages": [
+    {
+      "messageId": "messageId1",
+      "user": {
+        "_id": "user",
+        "username": "user123"
+      },
+      "text": "Hello!",
+      "timestamp": "2024-09-25T10:05:00Z"
+    }
+  ]
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided token is invalid. Ensure that the correct authentication token is provided.
+
+```
+{
+    "message": "Unauthorized access."
+}
+```
+
+Status Code: **403 Forbidden**
+
+Description: The user does not have the required permissions to access the team in this room.
+
+```
+{
+    "message": "Access denied. Insufficient permissions."
+}
+```
+
+Status Code: **404 Not Found**
+
+Description: The specified room cannot be found.
+
+```
+{
+    "message": "Room not found."
+}
+```
+
+Status Code: **404 Not Found**
+
+Description: The specified team cannot be found in the specified room.
+
+```
+{
+    "message": "Team not found."
+}
+```
+
+Status Code: **404 Not Found**
+
+Description: The specified chat cannot be found.
+
+```
+{
+    "message": "Chat not found."
+}
+```
+
+Status code: **500 Internal Server Error**
+
+Description: The server encountered an unexpected error while processing the request.
+
+```
+{
+    "message": "An unexpected error occurred while retrieving the team."
 }
 ```
