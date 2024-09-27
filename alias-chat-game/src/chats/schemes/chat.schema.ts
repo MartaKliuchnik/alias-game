@@ -8,8 +8,11 @@ export class Chat {
   @Prop({ type: [Types.ObjectId], ref: 'messages', required: true })
   messageIds: Types.ObjectId[];
 
+  @Prop({ type: [Types.ObjectId], ref: 'users', required: true })
+  writeUserIds: Types.ObjectId[];
+
   @Prop({ type: Types.ObjectId, ref: 'users', required: true })
-  writeUserId: Types.ObjectId;
+  readUserId: Types.ObjectId;
 }
 
 export const ChatSchema = SchemaFactory.createForClass(Chat);
