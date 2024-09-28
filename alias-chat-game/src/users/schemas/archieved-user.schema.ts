@@ -1,10 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 
-export type UserDocument = HydratedDocument<User>;
+export type ArchievedUserDocument = HydratedDocument<ArchivedUser>;
 
-@Schema()
-export class User {
+@Schema({
+  collection: 'archivedUsers',
+})
+export class ArchivedUser {
   @Prop({ type: Types.ObjectId, auto: true })
   userId: Types.ObjectId;
 
@@ -25,6 +27,9 @@ export class User {
 
   @Prop({ type: Number, default: 0 })
   wins: number;
+
+  @Prop({ type: Date, default: Date.now })
+  deletedAt: Date;
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
+export const ArchivedUserSchema = SchemaFactory.createForClass(ArchivedUser);

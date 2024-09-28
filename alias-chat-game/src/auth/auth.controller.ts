@@ -3,7 +3,6 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { LogoutDto } from './dto/logout.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -24,8 +23,8 @@ export class AuthController {
     return this.authService.refresh(refreshTokenDto);
   }
 
-  @Post('logout') // /api/v1/auth/logout
-  async logout(@Body() logoutDto: LogoutDto) {
-    return this.authService.logout(logoutDto);
-  }
+  // @Post('logout') // /api/v1/auth/logout
+  // async logout(@Body() ) {
+  //   return this.authService.logout();
+  // }
 }
