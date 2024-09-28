@@ -10,6 +10,7 @@ import {
 import { WordsService } from './words.service';
 import { CreateWordDto } from './dto/create-word.dto';
 import { UpdateWordDto } from './dto/update-word.dto';
+import { Types } from 'mongoose';
 
 @Controller('words')
 export class WordsController {
@@ -26,17 +27,20 @@ export class WordsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: Types.ObjectId) {
     return this.wordsService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateWordDto: UpdateWordDto) {
+  update(
+    @Param('id') id: Types.ObjectId,
+    @Body() updateWordDto: UpdateWordDto,
+  ) {
     return this.wordsService.update(id, updateWordDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: Types.ObjectId) {
     return this.wordsService.remove(id);
   }
 }
