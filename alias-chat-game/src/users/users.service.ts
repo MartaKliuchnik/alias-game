@@ -26,6 +26,17 @@ export class UsersService {
     private archievedUserModel: Model<ArchievedUserDocument>,
   ) { }
 
+  generateSalt(): string {
+    return crypto.randomBytes(16).toString('hex');
+  }
+
+  hashPassword(password: string): string {
+    // temp secret for hashing
+    const secret = 'AliasSecret';
+
+    return crypto.createHmac('sha256', secret).update(password).digest('hex');
+  }
+
   /**
    * Create a new client
    * @param {CreateUserDto} createUserDto - The DTO containing user creation data
@@ -41,16 +52,10 @@ export class UsersService {
       throw new ConflictException('Username already in use.');
     }
 
-    // fake secret for hashing
-    const secret = 'AliasSecret';
-
     // salting and hashing
-    const salt = crypto.randomBytes(16).toString('hex');
+    const salt = this.generateSalt();
     const saltedPassword = password + salt;
-    const hashedPassword = crypto
-      .createHmac('sha256', secret)
-      .update(saltedPassword)
-      .digest('hex');
+    const hashedPassword = this.hashPassword(saltedPassword);
 
     const newUser = new this.userModel({ username, hashedPassword, salt });
     return newUser.save();
