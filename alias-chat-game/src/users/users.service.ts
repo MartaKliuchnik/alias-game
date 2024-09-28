@@ -217,8 +217,4 @@ export class UsersService {
       }
     }
   }
-
-  // findLeaderboard() {
-  //   return `This action returns the leaderboard`;
-  // }
 }
