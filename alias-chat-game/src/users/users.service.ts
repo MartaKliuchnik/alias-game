@@ -15,6 +15,7 @@ import {
   ArchievedUserDocument,
   ArchivedUser,
 } from './schemas/archieved-user.schema';
+import crypto from 'crypto';
 
 // UsersService responsible for handling user-related operations.
 @Injectable()
@@ -23,7 +24,7 @@ export class UsersService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(ArchivedUser.name)
     private archievedUserModel: Model<ArchievedUserDocument>,
-  ) {}
+  ) { }
 
   /**
    * Create a new client
@@ -40,9 +41,16 @@ export class UsersService {
       throw new ConflictException('Username already in use.');
     }
 
-    // Fake hashing
-    const salt = '1wefr456';
-    const hashedPassword = `Hashed${password}`;
+    // fake secret for hashing
+    const secret = 'AliasSecret';
+
+    // salting and hashing
+    const salt = crypto.randomBytes(16).toString('hex');
+    const saltedPassword = password + salt;
+    const hashedPassword = crypto
+      .createHmac('sha256', secret)
+      .update(saltedPassword)
+      .digest('hex');
 
     const newUser = new this.userModel({ username, hashedPassword, salt });
     return newUser.save();
