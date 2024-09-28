@@ -16,19 +16,25 @@ export class WordsService {
     return createdWord.save();
   }
 
-  findAll() {
-    return `This action returns all words`;
+  // GET /api/v1/words
+  async findAll(): Promise<Word[]> {
+    return this.wordModel.find().exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} word`;
+  // GET /api/v1/words/:id
+  async findOne(id: string): Promise<Word> {
+    return this.wordModel.findById(id).exec();
   }
 
-  update(id: number, updateWordDto: UpdateWordDto) {
-    return `This action updates a #${id} word`;
+  // PATCH /api/v1/words/:id
+  async update(id: string, updateWordDto: UpdateWordDto): Promise<Word> {
+    return this.wordModel
+      .findByIdAndUpdate(id, updateWordDto, { new: true })
+      .exec();
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} word`;
+  // DELETE /api/v1/words/:id
+  async remove(id: string): Promise<Word> {
+    return this.wordModel.findByIdAndDelete(id).exec();
   }
 }
