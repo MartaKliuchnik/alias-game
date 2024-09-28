@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ChatsService } from './chats.service';
 import { ChatsController } from './chats.controller';
-import { Chat, ChatSchema } from './entities/chat.entity';
+import { Chat, ChatSchema } from './schemas/chat.schema';
 
 @Module({
   imports: [
