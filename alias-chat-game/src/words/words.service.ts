@@ -1,40 +1,73 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Word } from './schemas/word.schema';
-
+import { Model, Types } from 'mongoose';
+import { Word, WordDocument } from './schemas/word.schema';
 import { CreateWordDto } from './dto/create-word.dto';
 import { UpdateWordDto } from './dto/update-word.dto';
 
 @Injectable()
 export class WordsService {
-  constructor(@InjectModel(Word.name) private wordModel: Model<Word>) {}
+  constructor(@InjectModel(Word.name) private wordModel: Model<WordDocument>) {}
 
-  // POST http://localhost:8080/api/v1/words
-  async create(createWordDto: CreateWordDto): Promise<Word> {
+  async create(createWordDto: CreateWordDto): Promise<WordDocument> {
+    // Check if the word already exists
+    const existingWord = await this.wordModel.findOne({
+      word: createWordDto.word,
+    });
+    if (existingWord) {
+      throw new BadRequestException(
+        `Word '${createWordDto.word}' already exists.`,
+      );
+    }
+
     const createdWord = new this.wordModel(createWordDto);
     return createdWord.save();
   }
 
-  // GET /api/v1/words
-  async findAll(): Promise<Word[]> {
+  async findAll(): Promise<WordDocument[]> {
     return this.wordModel.find().exec();
   }
 
-  // GET /api/v1/words/:id
-  async findOne(id: string): Promise<Word> {
-    return this.wordModel.findById(id).exec();
+  async findOne(wordId: Types.ObjectId): Promise<WordDocument> {
+    return this.findById(wordId);
   }
 
-  // PATCH /api/v1/words/:id
-  async update(id: string, updateWordDto: UpdateWordDto): Promise<Word> {
+  async update(
+    wordId: Types.ObjectId,
+    updateWordDto: UpdateWordDto,
+  ): Promise<WordDocument> {
+    if (Object.keys(updateWordDto).length === 0) {
+      throw new BadRequestException('At least one field must be updated.');
+    }
+
+    await this.findById(wordId);
     return this.wordModel
-      .findByIdAndUpdate(id, updateWordDto, { new: true })
+      .findByIdAndUpdate(wordId, updateWordDto, {
+        new: true,
+        runValidators: true,
+      })
       .exec();
   }
 
-  // DELETE /api/v1/words/:id
-  async remove(id: string): Promise<Word> {
-    return this.wordModel.findByIdAndDelete(id).exec();
+  async remove(wordId: Types.ObjectId): Promise<void> {
+    await this.findById(wordId);
+    await this.wordModel.findByIdAndDelete(wordId).exec();
+  }
+
+  private async findById(wordId: Types.ObjectId): Promise<WordDocument> {
+    if (!Types.ObjectId.isValid(wordId)) {
+      throw new BadRequestException('Invalid word ID format.');
+    }
+
+    const word = await this.wordModel.findById(wordId).exec();
+    if (!word) {
+      throw new NotFoundException(`Word with ID '${wordId}' not found.`);
+    }
+
+    return word;
   }
 }
