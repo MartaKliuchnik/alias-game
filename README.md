@@ -102,7 +102,6 @@ Information about users.
 | userId         | ObjectId  | Unique identifier for each user              |
 | username       | string    | Username chosen by the user (must be unique) |
 | hashedPassword | string    | Hashed password for user authentication      |
-| salt           | string    | Salt used to secure the user's password      |
 | score          | int       | Total points scored by the user in the game  |
 | played         | int       | Number of games the user has participated in |
 | wins           | int       | Number of games the user has won             |
