@@ -18,7 +18,7 @@
    - Endpoint **/api/v1/users/{userId}**
    - Endpoint **/api/v1/leaderboard**
 
-     4.2 [Team Management](#team-management)
+   4.2 [Team Management](#team-management)
 
    - Team data model.
    - Endpoint **/api/v1/rooms/{roomId}/teams**
@@ -29,18 +29,40 @@
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/leader**
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chat**
 
-     4.3 [Chat Management](#chat-management)
+   4.3 [Chat Management](#chat-management)
 
    - Chat data model.
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chat**
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}**
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}**
 
-     4.4 [Message Management](#message-management)
+   4.4 [Message Management](#message-management)
 
    - Message data model.
-   - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}/user/{userId}/message**
-   - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}/user/{userId}/messages**
+   - Endpoint
+     **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}/user/{userId}/message**
+   - Endpoint
+     **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}/user/{userId}/messages**
+
+     4.5 [Room](#room)
+
+    - Room data model
+    - Endpoint **POST /api/v1/room**
+    - Endpoint **PATCH /api/v1/room/:roomId**
+    - Endpoint **GET /api/v1/rooms**
+    - Endpoint **GET /api/v1/rooms/:roomId**
+    - Endpoint **DELETE /api/v1/rooms/:roomId**
+    - Endpoint 
+
+    4.6 [Word](#word)
+    
+   - Word data model
+   - Endpoint **POST /api/v1/word**
+   - Endpoint **GET /api/v1/words**
+   - Endpoint **GET /api/v1/words/:wordId**
+   - Endpoint **PATCH /api/v1/words/:wordId**
+   - Endpoint **DELETE /api/v1/words/:wordId**
+   - Endpoint
 
      4.5 [Room](#room)
 
@@ -106,15 +128,15 @@ endpoint path. For instance, to access the registration endpoint:
 
 Information about users.
 
-| Key | Column Name    | Data Type    | Description                                   |
-| :-- | :------------- | :----------- | :-------------------------------------------- |
-| PK  | userId         | int          | Unique identifier for each user (Primary Key) |
-|     | username       | varchar(50)  | Username chosen by the user (must be unique)  |
-|     | hashedPassword | varchar(255) | Encrypted password for user authentication    |
-|     | salt           | varchar(50)  | Salt used to secure the user's password       |
-|     | score          | int          | Total points scored by the user in the game   |
-|     | played         | int          | Number of games the user has participated in  |
-|     | wins           | int          | Number of games the user has won              |
+| Column Name    | Data Type | Description                                  |
+| :------------- | :-------- | :------------------------------------------- |
+| userId         | ObjectId  | Unique identifier for each user              |
+| username       | string    | Username chosen by the user (must be unique) |
+| hashedPassword | string    | Hashed password for user authentication      |
+| salt           | string    | Salt used to secure the user's password      |
+| score          | int       | Total points scored by the user in the game  |
+| played         | int       | Number of games the user has participated in |
+| wins           | int       | Number of games the user has won             |
 
 #### 2. Register a new user
 
@@ -130,10 +152,12 @@ Endpoint
 
 The request body must be in JSON format and include the following fields:
 
-- username: (string, required): The username of the new user. Must be unique and
-  between 3-50 characters.
-- password: (string, required): The password for the new user. Should meet
-  security requirements such as minimum length, inclusion of special characters.
+- username (string, required): The username of the new user. Must be unique and
+  between 3-20 characters;
+- password (string, required): The password for the new user. It should meet the
+  following security requirements: a minimum length of 8 characters, and must
+  include at least one number, one uppercase letter, one lowercase letter, and
+  at least one symbol (e.g., !@#$%^&\*).
 
 **Example Request**
 
@@ -157,7 +181,8 @@ curl -X POST http://localhost:8080/api/v1/auth/register \
 Status code: **201 Created**
 
 Description: The user has been successfully registered. The response includes a
-success message and the data with the userId of the newly created user.
+success message and the data with the userId of the newly created
+user.
 
 ```
 {
@@ -296,7 +321,90 @@ or refresh token.
 }
 ```
 
-#### 4. Logs a user out of the system
+#### 4. Refresh user's access token
+
+Endpoint
+
+- URL Path: **_/api/v1/auth/refresh_**
+- Description: This endpoint allows a user to obtain a new access token by
+  providing a valid refresh token. When the user's access token expires, they
+  can use their refresh token to request a new access token without needing to
+  log in again. This ensures continued access to the system without frequent
+  re-authentication.
+- Authentication: This endpoint does not require an access token but does
+  require a valid refresh token, which must be provided in the request body.
+
+**Request Body**
+
+The request body should include the refresh token in JSON format.
+
+- refresh_token: The valid refresh token that was previously issued to the user.
+  This token will be used to generate a new access token.
+
+**Example Request**
+
+Description: A `POST` request to refresh the user's access token using the
+refresh token. The new access token is issued if the refresh token is valid.
+
+```
+
+curl -X POST http://localhost:8080/api/v1/auth/refresh \
+-H "Content-Type: application/json" \
+-d '{
+  "refresh_token": "d1Gh9zG8eXpz1I2kA6vR"
+}'
+
+```
+
+**Example Responses**
+
+Status code: **200 OK**
+
+Description: This status indicates that the refresh request was successful. A
+new access token is returned.
+
+```
+{
+    "message": "Access token refreshed successfully.",
+    "data": {
+      "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiO5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQss"
+    }
+}
+```
+
+Status code: **400 Bad Request**
+
+Description: The refresh token is missing or improperly formatted.
+
+```
+{
+    "message": "Refresh token is required."
+}
+```
+
+Status code: **401 Unauthorized**
+
+Description: The provided refresh token is invalid or expired. The user must log
+in again to obtain a new token.
+
+```
+{
+    "message": "Invalid or expired refresh token. Please log in again."
+}
+```
+
+Status code: **500 Internal Server Error**
+
+Description: An unexpected error occurred on the server, possibly during the
+token verification or creation process.
+
+```
+{
+    "message": "An unexpected error occurred while refreshing the token."
+}
+```
+
+#### 5. Logs a user out of the system
 
 Endpoint
 
@@ -305,7 +413,8 @@ Endpoint
   invalidating the refresh token, and optionally clearing any session data.
   After logging out, the user must authenticate again to access protected
   resources.
-- Authentication: Requires the user to provide a valid access token in the
+- Authentication: Requires the user to provide a
+  valid access token in the
   request headers to authorize the logout operation.
 
 **Request Body**
@@ -369,8 +478,8 @@ Endpoint
 - URL Path: **_/api/v1/users_**
 - Description: This endpoint retrieves a list of all registered users in the
   system. The response includes details for each user.
-- Authentication: Requires a valid access token with admin or moderator
-  privileges.
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token.
 
 **Example Request**
 
@@ -387,8 +496,9 @@ curl -X GET http://localhost:8080/api/v1/users \
 
 Status code: **200 OK**
 
-Description: The request was successful, and the response contains an array of
-user objects.
+Description: This status indicates that the request was successful, and the
+response contains an array of user objects, or an empty array if no users are
+found.
 
 ```
 [
@@ -464,8 +574,8 @@ Endpoint
 - Description: This endpoint retrieves the details of a specific user based on
   the provided user ID. It returns user information such as username, score,
   total games played, and wins.
-- Authentication: Requires authentication. A valid access token must be provided
-  in the request headers.
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token.
 
 **Request Parameter**
 
@@ -510,7 +620,7 @@ Description: The valid user ID must be provided to proceed.
 
 ```
 {
-    "message": "Invalid user ID."
+    "message": "Invalid ObjectId"
 }
 ```
 
@@ -553,12 +663,14 @@ Endpoint
 
 - URL Path: **_/api/v1/users/{userId}_**
 - Description: This endpoint allows a user to delete their own account. It
-  requires user confirmation before proceeding with the deletion to prevent
-  accidental loss of data. By default, the deletion performs a soft delete
-  (marking the user as inactive) but can be configured for a hard delete
-  (permanent removal of the user record) using a query parameter.
-- Authentication: This endpoint requires the user to be authenticated with a
-  valid token.
+  supports both soft and hard deletes.
+  - Soft Delete: Marks the user account as inactive by moving it to an archived collection.
+  - Hard Delete: Permanently removes the user's account and all associated data.
+    This action requires special authorization by an admin using a password
+    validation step in the request body.
+- Authentication: The request must include a valid access token for the
+  authenticated user. Hard delete requests also require admin-level
+  authorization.
 
 **Request Parameter**
 
@@ -566,10 +678,13 @@ The request must include the following path parameter:
 
 - userId: The unique identifier of the user requesting the deletion (the
   logged-in user's ID).
+- userId: The unique identifier of the user requesting the deletion (the
+  logged-in user's ID).
 
 Optional query parameter:
 
-- hardDelete: If set to 'true', performs a hard delete instead of a soft delete.
+- hardDelete: If set to true, attempts a hard delete (permanent removal of the
+  user). Requires admin validation.
 
 **Example Request**
 
@@ -600,13 +715,13 @@ Description: The user account was successfully deleted (soft or hard).
 
 ```
 {
-    "message": "User account soft deleted successfully."
+    "message": "User account permanently deleted."
 }
 ```
 
 ```
 {
-    "message": "User account hard deleted successfully."
+    "message": "User account soft deleted and moved to archive successfully."
 }
 ```
 
@@ -616,13 +731,7 @@ Description: The provided user ID is invalid or missing.
 
 ```
 {
-    "message": "User ID is required."
-}
-```
-
-```
-{
-    "message": "Invalid user ID."
+    "message": "Invalid ObjectId"
 }
 ```
 
@@ -674,12 +783,12 @@ request.
 
 Endpoint
 
-- URL Path: **_/api/v1/users/{userId}/stats_**
-- Description: This endpoint retrieves the game statistics for a specific user,
-  including the user's score, total games played, and total wins. Access to this
-  endpoint requires authentication.
+- URL Path: **_/api/v1/users/{userId}_**
+- Description: This endpoint allows an authenticated user to update their
+  account details. The fields that can be updated user-specific attributes such
+  as username.
 - Authentication: This endpoint requires the user to be authenticated with a
-  valid token.
+  valid access token.
 
 **Request Parameter**
 
@@ -690,8 +799,8 @@ The request must include the following path parameter:
 
 **Example Request**
 
-Description: A `GET` request to retrieve the statistics for a user with the
-specified user ID.
+Description: A `PUT` request to update the authenticated user's details. Only
+the provided fields will be updated.
 
 ```
 
@@ -704,8 +813,8 @@ curl -X GET http://localhost:8080/api/v1/users/2/stats \
 
 Status Code: **200 OK**
 
-Description: The request was successful, and the response contains the
-statistics for the specified user.
+Description: This status indicates that the request was successful, and the
+user’s information was updated.
 
 ```
 [
@@ -753,8 +862,8 @@ request.
 Endpoint
 
 - URL Path: **_/api/v1/leaderboard_**
-- Description: This endpoint retrieves the top players based on their game
-  statistics, including score and wins. The response contains a ranked list of
+- Description: This endpoint retrieves the top players (10) based on their game
+  statistics, including score. The response contains a ranked list of
   players, providing insights into the performance of the best players in the
   game.
 - Authentication: This endpoint does not require authentication. Any user can
@@ -775,7 +884,8 @@ curl -X GET http://localhost:8080/api/v1/leaderboard \
 Status Code: **200 OK**
 
 Description: This status indicates that the request was successful, and the
-server returns the leaderboard data.
+server returns an array of user objects (the leaderboard data), or an empty
+array if no users are found.
 
 ```
 [
@@ -796,43 +906,6 @@ server returns the leaderboard data.
 ]
 ```
 
-Status Code: **400 Bad Request**
-
-Description: The provided user ID is invalid or missing.
-
-```
-{
-    "message": "User ID is required."
-}
-```
-
-```
-{
-    "message": "Invalid user ID."
-}
-```
-
-Status Code: **401 Unauthorized**
-
-Description: The request lacks proper authentication credentials or the provided
-token is invalid. Ensure that the correct authentication token is provided.
-
-```
-{
-    "message": "Unauthorized access."
-}
-```
-
-Status Code: **404 Not Found**
-
-Description: The server cannot find any users in the database.
-
-```
-{
-    "message": "No users found in the database."
-}
-```
-
 Status Code: **500 Internal Server Error**
 
 Description: An unexpected error occurred on the server while processing the
@@ -850,23 +923,23 @@ request.
 
 Information about the room
 
-| Column Name | Data Type | Description                     |
-|:------------|:----------|:--------------------------------|
-| _id         | ObjectId  | Unique identifier for each room |
-| name        | string    | Room name                       |
-| joinedUsers | User[]    | An array of joined users        |
-| teams       | Team[]    | An array of teams               |
-| createdAt   | Date      | Time when the room was created  |
-| turnTime    | integer   | Turn time                       |
+| Column Name  | Data Type  | Description                                            |
+| :----------- | :--------- | :----------------------------------------------------- |
+| teamId       | ObjectId   | Unique identifier for each team                        |
+| roomId       | ObjectId   | Unique identifier for the team's room                  |
+| name         | string     | Username chosen by the user (must be unique)           |
+| score        | int        | Total points scored by the team during this game       |
+| players      | ObjectId[] | Array of ids of team's players                         |
+| describer    | ObjectId   | Unique identifier of the player who describes the word |
+| teamLeader   | ObjectId   | Unique identifier of the player who makes a word guess |
+| selectedWord | ObjectId   | Unique identifier for the record of the word to guess  |
+| tryedWords   | string[]   | Array of words tryed by players                        |
 
-#### 2. Create a new room
-Endpoint
+#### 2. GET `api/v1/v1/rooms/{roomId}/teams`
 
-- URL Path: **_/api/v1/room_**
-- Description: This endpoint creates a new room. It accepts room details in
-  the request body and returns a response indicating the result of the
-  creating process.
-- Authentication: Authentication is required for this endpoint.
+- Description: Method to get all the room's teams.
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token
 
 **Request Body**
 
@@ -1648,12 +1721,13 @@ getting the word process.
 
 ```
 
-
 ### Chat Management
 
 #### 1. Chat data model
 
-The Chat collection stores chat-related information, including the list of messages exchanged in the chat and the users who are allowed to write in this chat.
+The Chat collection stores chat-related information, including the list of
+messages exchanged in the chat and the users who are allowed to write in this
+chat.
 
 | Column Name   | Data Type  | Description                                   |
 | :------------ | :--------- | :-------------------------------------------- |
@@ -1664,11 +1738,13 @@ The Chat collection stores chat-related information, including the list of messa
 #### 2. POST `/api/v1/rooms/{roomId}/teams/{teamId}/chat`
 
 - Description: Method to create a new chat with the specified users.
-- Authentication: This endpoint requires the user to be authenticated with a valid access token
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token
 
 **Request Body**
 
-- writeUsersId (array of strings): An array of users IDs to be added to the chat.
+- writeUsersId (array of strings): An array of users IDs to be added to the
+  chat.
 - readUserId (string): id of the describer who can only read
 
 **Example Request**
@@ -1684,18 +1760,20 @@ curl -X GET http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/chat \
 
 Status code: **201 Created**
 
-Description: The request was successful, and the response contains message about successfull creation and chatId.
+Description: The request was successful, and the response contains message about
+successfull creation and chatId.
 
 ```json
 {
-  "message": "Chat was successfully created",
-  "chatId": "chatId1"
+	"message": "Chat was successfully created",
+	"chatId": "chatId1"
 }
 ```
 
 Status Code: **401 Unauthorized**
 
-Description: The request lacks proper authentication credentials or the provided token is invalid. Ensure that the correct authentication token is provided.
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
@@ -1705,7 +1783,8 @@ Description: The request lacks proper authentication credentials or the provided
 
 Status Code: **403 Forbidden**
 
-Description: The user does not have the required permissions to access the teams in this room.
+Description: The user does not have the required permissions to access the teams
+in this room.
 
 ```
 {
@@ -1735,7 +1814,8 @@ Description: The specified team cannot be found.
 
 Status code: **500 Internal Server Error**
 
-Description: The server encountered an unexpected error while processing the request.
+Description: The server encountered an unexpected error while processing the
+request.
 
 ```
 {
@@ -1745,8 +1825,9 @@ Description: The server encountered an unexpected error while processing the req
 
 #### 3. GET `/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}`
 
-Description: Method to retrieve a specific chat with chat details by its ID in the specified team and room.
-Authentication: This endpoint requires the user to be authenticated with a valid access token.
+Description: Method to retrieve a specific chat with chat details by its ID in
+the specified team and room. Authentication: This endpoint requires the user to
+be authenticated with a valid access token.
 
 **Request body**
 
@@ -1754,7 +1835,8 @@ Empty
 
 **Example Request**
 
-Description: A `GET` request to retrieve a specific chat with chat details by its ID in the specified team and room.
+Description: A `GET` request to retrieve a specific chat with chat details by
+its ID in the specified team and room.
 
 ```
 curl -X GET http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId} \
@@ -1765,19 +1847,21 @@ curl -X GET http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/chats/{ch
 
 Status code: **200 OK**
 
-Description: The request was successful, and the response contains the details of the requested chat.
+Description: The request was successful, and the response contains the details
+of the requested chat.
 
 ```json
 {
-  "chatId": "chatId1",
-  "writeUsersId": ["userId1", "userId2"],
-  "messagesId": ["messageId1", "messageId2"]
+	"chatId": "chatId1",
+	"writeUsersId": ["userId1", "userId2"],
+	"messagesId": ["messageId1", "messageId2"]
 }
 ```
 
 Status Code: **401 Unauthorized**
 
-Description: The request lacks proper authentication credentials or the provided token is invalid. Ensure that the correct authentication token is provided.
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
@@ -1787,7 +1871,8 @@ Description: The request lacks proper authentication credentials or the provided
 
 Status Code: **403 Forbidden**
 
-Description: The user does not have the required permissions to access the team in this room.
+Description: The user does not have the required permissions to access the team
+in this room.
 
 ```
 {
@@ -1827,7 +1912,8 @@ Description: The specified chat cannot be found.
 
 Status code: **500 Internal Server Error**
 
-Description: The server encountered an unexpected error while processing the request.
+Description: The server encountered an unexpected error while processing the
+request.
 
 ```
 {
@@ -1838,7 +1924,8 @@ Description: The server encountered an unexpected error while processing the req
 #### 4. DELETE `/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}`
 
 Description: Method to delete a specific chat in the specified team and room.
-Authentication: This endpoint requires the user to be authenticated with a valid access token.
+Authentication: This endpoint requires the user to be authenticated with a valid
+access token.
 
 **Request body:**
 
@@ -1846,7 +1933,8 @@ Empty
 
 **Example Request**
 
-Description: A `DELETE` request to remove a specific chat in the specified team and room.
+Description: A `DELETE` request to remove a specific chat in the specified team
+and room.
 
 ```
 curl -X DELETE http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId} \
@@ -1857,11 +1945,13 @@ curl -X DELETE http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/chats/
 
 Status code: **204 No Content**
 
-Description: The request was successful, and the chat has been deleted. No content is returned in the response.
+Description: The request was successful, and the chat has been deleted. No
+content is returned in the response.
 
 Status Code: **401 Unauthorized**
 
-Description: The request lacks proper authentication credentials or the provided token is invalid. Ensure that the correct authentication token is provided.
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
@@ -1871,7 +1961,8 @@ Description: The request lacks proper authentication credentials or the provided
 
 Status Code: **403 Forbidden**
 
-Description: The user does not have the required permissions to delete the team in this room.
+Description: The user does not have the required permissions to delete the team
+in this room.
 
 ```
 {
@@ -1891,7 +1982,8 @@ Description: The specified team or room cannot be found.
 
 Status code: **500 Internal Server Error**
 
-Description: The server encountered an unexpected error while processing the request.
+Description: The server encountered an unexpected error while processing the
+request.
 
 ```
 {
@@ -1903,7 +1995,9 @@ Description: The server encountered an unexpected error while processing the req
 
 #### 1. Message data model
 
-The Message collection stores individual messages exchanged in the chat, each associated with a user who sent the message and the timestamp when the message was sent.
+The Message collection stores individual messages exchanged in the chat, each
+associated with a user who sent the message and the timestamp when the message
+was sent.
 
 | Column Name      | Data Type | Description                                      |
 | :--------------- | :-------- | :----------------------------------------------- |
@@ -1915,7 +2009,8 @@ The Message collection stores individual messages exchanged in the chat, each as
 #### 2. POST `/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}/user/{userId}/message`
 
 - Description: Method to send a message in the chat.
-- Authentication: This endpoint requires the user to be authenticated with a valid access token
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token
 
 **Request Body**
 
@@ -1942,13 +2037,14 @@ Description: The request was successful, and the response contains message ID.
 
 ```json
 {
-  "messageId": "messageId1"
+	"messageId": "messageId1"
 }
 ```
 
 Status Code: **401 Unauthorized**
 
-Description: The request lacks proper authentication credentials or the provided token is invalid. Ensure that the correct authentication token is provided.
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
@@ -1958,7 +2054,8 @@ Description: The request lacks proper authentication credentials or the provided
 
 Status Code: **400 Bad Request**
 
-Description: The request body is missing required fields or contains invalid data.
+Description: The request body is missing required fields or contains invalid
+data.
 
 ```
 {
@@ -1968,7 +2065,8 @@ Description: The request body is missing required fields or contains invalid dat
 
 Status Code: **403 Forbidden**
 
-Description: The user does not have the required permissions to access the teams in this room.
+Description: The user does not have the required permissions to access the teams
+in this room.
 
 ```
 {
@@ -2018,7 +2116,8 @@ Description: The specified user cannot be found.
 
 Status code: **500 Internal Server Error**
 
-Description: The server encountered an unexpected error while processing the request.
+Description: The server encountered an unexpected error while processing the
+request.
 
 ```
 {
@@ -2029,7 +2128,8 @@ Description: The server encountered an unexpected error while processing the req
 #### 3. GET `GET /api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}/messages`
 
 Description: Method to retrieve all messages for a specific chat.
-Authentication: This endpoint requires the user to be authenticated with a valid access token.
+Authentication: This endpoint requires the user to be authenticated with a valid
+access token.
 
 **Request body**
 
@@ -2048,27 +2148,29 @@ curl -X GET http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/chats/{ch
 
 Status code: **200 OK**
 
-Description: The request was successful, and the response contains all messages of the requested chat.
+Description: The request was successful, and the response contains all messages
+of the requested chat.
 
 ```json
 {
-  "messages": [
-    {
-      "messageId": "messageId1",
-      "user": {
-        "_id": "user",
-        "username": "user123"
-      },
-      "text": "Hello!",
-      "timestamp": "2024-09-25T10:05:00Z"
-    }
-  ]
+	"messages": [
+		{
+			"messageId": "messageId1",
+			"user": {
+				"_id": "user",
+				"username": "user123"
+			},
+			"text": "Hello!",
+			"timestamp": "2024-09-25T10:05:00Z"
+		}
+	]
 }
 ```
 
 Status Code: **401 Unauthorized**
 
-Description: The request lacks proper authentication credentials or the provided token is invalid. Ensure that the correct authentication token is provided.
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
@@ -2078,7 +2180,8 @@ Description: The request lacks proper authentication credentials or the provided
 
 Status Code: **403 Forbidden**
 
-Description: The user does not have the required permissions to access the team in this room.
+Description: The user does not have the required permissions to access the team
+in this room.
 
 ```
 {
@@ -2118,7 +2221,8 @@ Description: The specified chat cannot be found.
 
 Status code: **500 Internal Server Error**
 
-Description: The server encountered an unexpected error while processing the request.
+Description: The server encountered an unexpected error while processing the
+request.
 
 ```
 {

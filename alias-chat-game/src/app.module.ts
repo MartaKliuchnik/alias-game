@@ -10,6 +10,7 @@ import { RoomsModule } from './rooms/rooms.module';
 import { TeamsModule } from './teams/teams.module';
 import { ChatsModule } from './chats/chats.module';
 import { AuthModule } from './auth/auth.module';
+import { LeaderboardModule } from './leaderboard/leaderboard.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AuthModule } from './auth/auth.module';
     MessagesModule,
     ChatsModule,
     AuthModule,
+    LeaderboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],

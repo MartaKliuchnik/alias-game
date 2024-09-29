@@ -1,17 +1,18 @@
 import {
-  IsNotEmpty,
   IsString,
-  IsStrongPassword,
+  IsNotEmpty,
   Length,
+  IsStrongPassword,
 } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
-  @IsNotEmpty()
   @Length(3, 20)
-  username: string;
+  @IsNotEmpty({ message: 'Username is required' })
+  readonly username: string;
 
+  @IsString()
+  @IsNotEmpty({ message: 'Password is required' })
   @IsStrongPassword()
-  @IsNotEmpty()
-  password: string;
+  readonly password: string;
 }
