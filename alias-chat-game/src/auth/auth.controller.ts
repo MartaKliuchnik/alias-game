@@ -23,8 +23,8 @@ export class AuthController {
     return this.authService.refresh(refreshTokenDto);
   }
 
-  // @Post('logout') // /api/v1/auth/logout
-  // async logout(@Body() ) {
-  //   return this.authService.logout();
-  // }
+  @Post('logout') // /api/v1/auth/logout
+  async logout() {
+    return this.authService.logout();
+  }
 }
