@@ -1,9 +1,14 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UnauthorizedException,
+  Headers,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { LogoutDto } from './dto/logout.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -25,7 +30,10 @@ export class AuthController {
   }
 
   @Post('logout') // /api/v1/auth/logout
-  async logout(@Body() logoutDto: LogoutDto) {
-    return this.authService.logout(logoutDto);
+  async logout(@Headers('Authorization') authHeader) {
+    if (!authHeader) {
+      throw new UnauthorizedException('Authorization header is missing');
+    }
+    return this.authService.logout(authHeader);
   }
 }
