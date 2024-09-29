@@ -5,12 +5,13 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
   const configService = app.get(ConfigService);
 
+  // Set global API prefix for all routes
   app.setGlobalPrefix('api/v1');
 
-  // stop the request from processing when non-whitelisted properties
-  // ensures that the user only submits valid data
+  // Enable validation with whitelisting and forbidding non-whitelisted properties
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -18,7 +19,7 @@ async function bootstrap() {
     }),
   );
 
-  const port = configService.get<number>('APP_PORT', 3000);
+  const port = configService.get<number>('APP_PORT') || 4000;
   await app.listen(port);
 }
 bootstrap();
