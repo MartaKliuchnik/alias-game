@@ -6,7 +6,7 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../users/users.service';
+// import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -21,7 +21,7 @@ export class AuthService {
 
   login(loginDto: LoginDto) {
     const { username, password } = loginDto;
-    UsersService.
+    // UsersService.
     return { message: 'User logged successfully.', data: loginDto };
   }
 
