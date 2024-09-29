@@ -24,7 +24,7 @@ export class UsersService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(ArchivedUser.name)
     private archievedUserModel: Model<ArchievedUserDocument>,
-  ) { }
+  ) {}
 
   /**
    * Create a new client

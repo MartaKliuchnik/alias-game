@@ -18,7 +18,7 @@ export class AuthService {
     @InjectModel(Auth.name) private authModel: Model<Auth>,
     private jwtService: JwtService,
     private readonly usersService: UsersService,
-  ) { }
+  ) {}
 
   async register(createUserDto: CreateUserDto): Promise<any> {
     const { userId } = await this.usersService.createUser(createUserDto);
@@ -55,7 +55,6 @@ export class AuthService {
   }
 
   private extractUserIdFromToken(token: string): string {
-
     const decoded = this.jwtService.verify(token, { secret: 'AliasSecret' });
     const userId = decoded.userId;
 
@@ -64,7 +63,6 @@ export class AuthService {
     }
 
     return userId;
-
   }
 
   async refresh(refreshTokenDto: RefreshTokenDto): Promise<any> {

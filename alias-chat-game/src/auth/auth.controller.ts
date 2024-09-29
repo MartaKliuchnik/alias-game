@@ -12,7 +12,7 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @Post('register') // /api/v1/auth/register
   async register(@Body() createUserDto: CreateUserDto) {
@@ -36,5 +36,4 @@ export class AuthController {
     }
     return this.authService.logout(authHeader);
   }
-
 }
