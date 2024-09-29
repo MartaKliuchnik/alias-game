@@ -12,7 +12,7 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserSafeDto } from './dto/user-safe.dto';
-import { ParseObjectIdPipe } from 'src/parse-int.pipe';
+import { ParseObjectIdPipe } from '../parse-int.pipe';
 import { Types } from 'mongoose';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -27,7 +27,11 @@ export class UsersController {
    * @access Public
    */
   @Post()
-  async create(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
+  async create(
+    @Body(new ValidationPipe()) createUserDto: CreateUserDto,
+  ): Promise<{
+    userId: string;
+  }> {
     return this.usersService.createUser(createUserDto);
   }
 
@@ -38,7 +42,7 @@ export class UsersController {
    */
   @Get()
   async findAll(): Promise<UserSafeDto[] | []> {
-    return this.usersService.findAll();
+    return this.usersService.getUsers();
   }
 
   /**
@@ -50,7 +54,7 @@ export class UsersController {
   async findOne(
     @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
   ): Promise<UserSafeDto | null> {
-    const user = await this.usersService.findOne(userId);
+    const user = await this.usersService.getUserById(userId);
     return user;
   }
 
@@ -65,7 +69,7 @@ export class UsersController {
     @Query('hardDelete') hardDelete: string,
   ) {
     const isHardDelete = hardDelete === 'true';
-    return this.usersService.remove(userId, isHardDelete);
+    return this.usersService.removeUser(userId, isHardDelete);
   }
 
   /**
@@ -78,6 +82,6 @@ export class UsersController {
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
     @Body(new ValidationPipe()) updateUserDto: UpdateUserDto,
   ) {
-    return this.usersService.update(id, updateUserDto);
+    return this.usersService.updateUser(id, updateUserDto);
   }
 }

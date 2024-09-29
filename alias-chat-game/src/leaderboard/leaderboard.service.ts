@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { UserSafeDto } from 'src/users/dto/user-safe.dto';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 
 // LeaderboardService is responsible for retrieving the top players' leaderboard.
 @Injectable()
@@ -14,7 +14,7 @@ export class LeaderboardService {
    */
   async findAll(): Promise<UserSafeDto[]> {
     try {
-      const users = await this.usersService.findAll();
+      const users = await this.usersService.getUsers();
 
       const leaderboard = users.sort((a, b) => b.score - a.score).slice(0, 10);
       return leaderboard;
