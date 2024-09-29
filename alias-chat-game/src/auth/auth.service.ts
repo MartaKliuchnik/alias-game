@@ -5,27 +5,34 @@ import { Auth } from './schemas/auth.schema';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { JwtService } from '@nestjs/jwt';
+// import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectModel(Auth.name) private authModel: Model<Auth>) {}
+  constructor(
+    @InjectModel(Auth.name) private authModel: Model<Auth>,
+    private jwtService: JwtService,
+  ) {}
 
   register(createUserDto: CreateUserDto) {
-    console.log(createUserDto);
-    return { message: 'User registered successfully.' };
+    return { message: 'User registered successfully.', data: createUserDto };
   }
 
   login(loginDto: LoginDto) {
-    console.log(loginDto);
-    return { message: 'User logged successfully.' };
+    const { username, password } = loginDto;
+    // UsersService.
+    return { message: 'User logged successfully.', data: loginDto };
   }
 
-  // logout(logoutDto: LogoutDto) {
-  //   return { message: 'User logged out successfully.' };
-  // }
+  logout() {
+    return { message: 'User logged out successfully.' };
+  }
 
   refresh(refreshTokenDto: RefreshTokenDto) {
-    console.log(refreshTokenDto);
-    return { message: 'Access token refreshed successfully.' };
+    return {
+      message: 'Access token refreshed successfully.',
+      data: refreshTokenDto,
+    };
   }
 }
