@@ -14,9 +14,6 @@ export class User {
   @Prop({ type: String, required: true })
   hashedPassword: string;
 
-  @Prop({ type: String, required: true })
-  salt: string;
-
   @Prop({ type: Number, default: 0 })
   score: number;
 

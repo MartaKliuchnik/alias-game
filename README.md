@@ -44,7 +44,7 @@
    - Endpoint
      **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}/user/{userId}/messages**
 
-     4.5 [Room](#room)
+   4.5 [Room Management](#room-management)
 
     - Room data model
     - Endpoint **POST /api/v1/room**
@@ -52,9 +52,8 @@
     - Endpoint **GET /api/v1/rooms**
     - Endpoint **GET /api/v1/rooms/:roomId**
     - Endpoint **DELETE /api/v1/rooms/:roomId**
-    - Endpoint 
 
-    4.6 [Word](#word)
+   4.6 [Word Management](#word-management)
     
    - Word data model
    - Endpoint **POST /api/v1/word**
@@ -62,27 +61,7 @@
    - Endpoint **GET /api/v1/words/:wordId**
    - Endpoint **PATCH /api/v1/words/:wordId**
    - Endpoint **DELETE /api/v1/words/:wordId**
-   - Endpoint
 
-     4.5 [Room](#room)
-
-    - Room data model
-    - Endpoint **POST /api/v1/room**
-    - Endpoint **PATCH /api/v1/room/:roomId**
-    - Endpoint **GET /api/v1/rooms**
-    - Endpoint **GET /api/v1/rooms/:roomId**
-    - Endpoint **DELETE /api/v1/rooms/:roomId**
-    - Endpoint 
-
-    4.6 [Word](#word)
-    
-   - Word data model
-   - Endpoint **POST /api/v1/word**
-   - Endpoint **GET /api/v1/words**
-   - Endpoint **GET /api/v1/words/:wordId**
-   - Endpoint **PATCH /api/v1/words/:wordId**
-   - Endpoint **DELETE /api/v1/words/:wordId**
-   - Endpoint
 
 ## Description
 
@@ -133,7 +112,6 @@ Information about users.
 | userId         | ObjectId  | Unique identifier for each user              |
 | username       | string    | Username chosen by the user (must be unique) |
 | hashedPassword | string    | Hashed password for user authentication      |
-| salt           | string    | Salt used to secure the user's password      |
 | score          | int       | Total points scored by the user in the game  |
 | played         | int       | Number of games the user has participated in |
 | wins           | int       | Number of games the user has won             |
@@ -506,7 +484,6 @@ found.
         "userId": 1,
         "username": "Alex",
         "hashedPassword": "$2b$10$KJHjdlfDkSDF3nX8DJfksw==",
-        "salt": "a3g6t7",
         "score": 1500,
         "played": 20,
         "wins": 10
@@ -515,7 +492,6 @@ found.
         "userId": 2,
         "username": "JaneDoe",
         "hashedPassword": "$2b$10$YKD35lKD5rflj3KE0sd/",
-        "salt": "l4j3t2",
         "score": 1800,
         "played": 25,
         "wins": 15
@@ -607,7 +583,6 @@ server returns the requested user details.
       "userId": 2,
       "username": "JaneDoe",
       "hashedPassword": "$2b$10$YKD35lKD5rflj3KE0sd/",
-      "salt": "l4j3t2",
       "score": 1800,
       "played": 25,
       "wins": 15
@@ -917,7 +892,7 @@ request.
 }
 ```
 
-### Room
+### Room Management
 
 #### 1. Room data model
 
@@ -1320,7 +1295,7 @@ getting the room process.
 ```
 
 
-### Word
+### Word Management
 
 #### 1. Word data model
 

@@ -9,21 +9,21 @@ import {
 export class UserSafeDto {
   @IsMongoId()
   @IsNotEmpty({ message: 'User ID is required' })
-  userId: string;
+  readonly userId: string;
 
   @IsString()
   @IsNotEmpty({ message: 'Username is required' })
-  username: string;
+  readonly username: string;
 
   @IsNumber()
   @IsInt()
-  score: number;
+  readonly score: number;
 
   @IsNumber()
   @IsInt()
-  played: number;
+  readonly played: number;
 
   @IsNumber()
   @IsInt()
-  wins: number;
+  readonly wins: number;
 }

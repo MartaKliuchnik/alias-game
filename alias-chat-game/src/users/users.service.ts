@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
+import * as bcrypt from 'bcrypt';
 import { User, UserDocument } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserSafeDto } from './dto/user-safe.dto';
@@ -15,7 +16,6 @@ import {
   ArchievedUserDocument,
   ArchivedUser,
 } from './schemas/archieved-user.schema';
-import crypto from 'crypto';
 
 // UsersService responsible for handling user-related operations.
 @Injectable()
@@ -24,18 +24,7 @@ export class UsersService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(ArchivedUser.name)
     private archievedUserModel: Model<ArchievedUserDocument>,
-  ) { }
-
-  generateSalt(): string {
-    return crypto.randomBytes(16).toString('hex');
-  }
-
-  hashPassword(password: string): string {
-    // temp secret for hashing
-    const secret = 'AliasSecret';
-
-    return crypto.createHmac('sha256', secret).update(password).digest('hex');
-  }
+  ) {}
 
   /**
    * Create a new client
@@ -52,12 +41,9 @@ export class UsersService {
       throw new ConflictException('Username already in use.');
     }
 
-    // salting and hashing
-    const salt = this.generateSalt();
-    const saltedPassword = password + salt;
-    const hashedPassword = this.hashPassword(saltedPassword);
+    const hashedPassword = await this.hashPassword(password);
 
-    const newUser = new this.userModel({ username, hashedPassword, salt });
+    const newUser = new this.userModel({ username, hashedPassword });
     return newUser.save();
   }
 
@@ -120,9 +106,7 @@ export class UsersService {
         user.username = updateUserDto.username;
       }
       if (updateUserDto.password) {
-        // Fake hashing
-        user.hashedPassword = `hashedUpdatedPassword${updateUserDto.password}`;
-        user.salt = 'saltForUpdatedPassword';
+        user.hashedPassword = await this.hashPassword(updateUserDto.password);
       }
 
       const updatedUser = await user.save();
@@ -229,5 +213,29 @@ export class UsersService {
         throw new ConflictException('Username already in use.');
       }
     }
+  }
+
+  /**
+   * Generates a bcrypt hash of the provided password.
+   * @param {string} password - The plain text password to hash.
+   * @returns {Promise<string>} - A promise that resolves to the hashed password using bcrypt.
+   */
+  private async hashPassword(password: string): Promise<string> {
+    const saltRounds = 10;
+    const salt = await bcrypt.genSalt(saltRounds);
+    return bcrypt.hash(password, salt);
+  }
+
+  /**
+   * Compares a plain text password with a bcrypt-hashed password.
+   * @param {string} password - The plain text password to compare.
+   * @param {string} hashedPassword - The previously hashed password for comparison.
+   * @returns {Promise<boolean>} - A promise that resolves to true if passwords match, otherwise false.
+   */
+  private async comparePasswords(
+    password: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
+    return bcrypt.compare(password, hashedPassword);
   }
 }
