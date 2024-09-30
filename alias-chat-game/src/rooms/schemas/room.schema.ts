@@ -3,19 +3,16 @@ import { HydratedDocument, Types } from 'mongoose';
 
 export type RoomDocument = HydratedDocument<Room>;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Room {
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: true, unique: true })
   name: string;
 
-  @Prop({ type: [Types.ObjectId], required: true, default: [] })
+  @Prop({ type: [Types.ObjectId], default: [] })
   joinedUsers: Types.ObjectId[];
 
   @Prop({ type: [Types.ObjectId], default: [] })
   teams: Types.ObjectId[];
-
-  @Prop({ type: Date, default: Date.now })
-  createdAt: Date;
 
   @Prop({
     type: Number,
