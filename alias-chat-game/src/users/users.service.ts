@@ -242,12 +242,19 @@ export class UsersService {
     return bcrypt.compare(password, hashedPassword);
   }
 
+  /**
+   * Authenticates a user by validating the provided username and password.
+   * @param {string} username - The username of the user to authenticate.
+   * @param {string} password - The plain text password provided by the user.
+   * @returns {Promise<UserSafeDto>} - A promise that resolves to the UserSafeDto.
+   * @throws {NotFoundException} - If a user with the provided username is not found.
+   * @throws {BadRequestException} - If the provided password is incorrect.
+   */
   public async checkAuth(
     username: string,
     password: string,
   ): Promise<UserSafeDto> {
     const user = await this.userModel.findOne({ username }).exec();
-
     if (!user) {
       throw new NotFoundException('User not found.');
     }
