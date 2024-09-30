@@ -5,55 +5,78 @@ import {
   Patch,
   Param,
   Delete,
-  ParseIntPipe,
-  UsePipes,
-  ValidationPipe,
   Post,
+  ValidationPipe,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UserSafeDto } from './dto/user-safe.dto';
+import { ParseObjectIdPipe } from 'src/parse-int.pipe';
+import { Types } from 'mongoose';
+import { UpdateUserDto } from './dto/update-user.dto';
 
+// UsersController handles CRUD operations for user management.
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  /**
+   * @route POST /api/v1/users
+   * @description Create a new user
+   * @access Public
+   */
   @Post()
-  async create(@Body() body: CreateUserDto) {
-    const { username, password } = body;
-    return this.usersService.createUser(username, password);
+  async create(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
+    return this.usersService.createUser(createUserDto);
   }
 
-  @Get() // /api/v1/users
-  findAll() {
+  /**
+   * @route GET /api/v1/users
+   * @description Retrieve all users
+   * @access Private (Authenticated user)
+   */
+  @Get()
+  async findAll(): Promise<UserSafeDto[] | []> {
     return this.usersService.findAll();
   }
 
-  @Get(':id') // /api/v1/users/{userId}
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.findOne(id);
+  /**
+   * @route GET /api/v1/users/{userId}
+   * @description Retrieve a specified user by id
+   * @access Private (Authenticated user)
+   */
+  @Get(':userId')
+  async findOne(
+    @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
+  ): Promise<UserSafeDto | null> {
+    const user = await this.usersService.findOne(userId);
+    return user;
   }
 
-  @Delete(':id') // /api/v1/users/{userId}
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.remove(id);
+  /**
+   * @route DELETE /api/v1/users/{userId}
+   * @description Delete a specified user by id (supports hard/soft delete)
+   * @access Private (Authenticated user)
+   */
+  @Delete(':userId')
+  async remove(
+    @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
+    @Query('hardDelete') hardDelete: string,
+  ) {
+    const isHardDelete = hardDelete === 'true';
+    return this.usersService.remove(userId, isHardDelete);
   }
 
-  @Get() // /api/v1/users/leaderboard
-  findLeaderboard() {
-    return this.usersService.findLeaderboard();
-  }
-
-  // @UsePipes(
-  //   new ValidationPipe({
-  //     whitelist: true,
-  //     forbidNonWhitelisted: true,
-  //   }),
-  // )
-  @Patch(':id') // /api/v1/users/{userId}
+  /**
+   * @route PATCH /api/v1/users/{userId}
+   * @description Update the specified user
+   * @access Private (Authenticated user)
+   */
+  @Patch(':id')
   update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateUserDto: UpdateUserDto,
+    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
+    @Body(new ValidationPipe()) updateUserDto: UpdateUserDto,
   ) {
     return this.usersService.update(id, updateUserDto);
   }
