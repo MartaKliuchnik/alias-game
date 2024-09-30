@@ -4,21 +4,22 @@ import { UsersService } from '../users.service';
 import { ParseObjectIdPipe } from '../../parse-int.pipe';
 import { UserSafeDto } from '../dto/user-safe.dto';
 import { Types } from 'mongoose';
-import { NotFoundException } from '@nestjs/common';
+import { CanActivate, NotFoundException } from '@nestjs/common';
 import { UpdateUserDto } from '../dto/update-user.dto';
-import { CreateUserDto } from '../dto/create-user.dto';
+import { AuthGuard } from '../../auth/gurards/auth.guard';
 
 describe('UsersController', () => {
   let controller: UsersController;
   let service: UsersService;
 
   const mockUsersService = {
-    createUser: jest.fn(),
     getUsers: jest.fn(),
     getUserById: jest.fn(),
     updateUser: jest.fn(),
     removeUser: jest.fn(),
   };
+
+  const mockAuthGuard: CanActivate = { canActivate: jest.fn(() => true) };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -30,30 +31,15 @@ describe('UsersController', () => {
         },
         ParseObjectIdPipe,
       ],
-    }).compile();
+    })
+      .overrideGuard(AuthGuard)
+      .useValue(mockAuthGuard)
+      .compile();
 
     controller = module.get<UsersController>(UsersController);
     service = module.get<UsersService>(UsersService);
+
     jest.clearAllMocks();
-  });
-
-  describe('create', () => {
-    it('should create a new user', async () => {
-      const createUserDto: CreateUserDto = {
-        username: 'Alex',
-        password: 'SecurePass!123',
-      };
-      const expectedResult = {
-        userId: '66f8f7fb027b5bb2be6d0ddd',
-      };
-
-      mockUsersService.createUser.mockResolvedValue(expectedResult);
-
-      const result = await controller.create(createUserDto);
-
-      expect(service.createUser).toHaveBeenCalledWith(createUserDto);
-      expect(result).toEqual(expectedResult);
-    });
   });
 
   describe('findAll', () => {
@@ -117,20 +103,20 @@ describe('UsersController', () => {
   });
 
   describe('updateUser', () => {
-    it('should update a user when username is not exist', async () => {
-      const userId = new Types.ObjectId('66f8f7fb027b5bb2be6d0ddd');
-      const updateUser: UpdateUserDto = {
-        username: 'Tomas',
-        password: 'SecurePass!123',
-      };
-      const expectedResult: UserSafeDto = {
-        userId: userId.toString(),
-        username: 'Tomas',
-        score: 0,
-        played: 0,
-        wins: 0,
-      };
+    const userId = new Types.ObjectId('66f8f7fb027b5bb2be6d0ddd');
+    const updateUser: UpdateUserDto = {
+      username: 'Tomas',
+      password: 'SecurePass!123',
+    };
+    const expectedResult: UserSafeDto = {
+      userId: userId.toString(),
+      username: 'Tomas',
+      score: 0,
+      played: 0,
+      wins: 0,
+    };
 
+    it('should update a user when username is not exist', async () => {
       mockUsersService.updateUser.mockResolvedValue(expectedResult);
 
       const result = await controller.update(userId, updateUser);
@@ -141,8 +127,9 @@ describe('UsersController', () => {
   });
 
   describe('remove', () => {
+    const userId = new Types.ObjectId('66f8f7fb027b5bb2be6d0ddd');
+
     it('should remove a user (soft delete)', async () => {
-      const userId = new Types.ObjectId('66f8f7fb027b5bb2be6d0ddd');
       const expectedResult = {
         message: 'User account soft deleted and moved to archive successfully.',
       };
@@ -156,7 +143,6 @@ describe('UsersController', () => {
     });
 
     it('should remove a user (hard delete)', async () => {
-      const userId = new Types.ObjectId('66f8f7fb027b5bb2be6d0ddd');
       const expectedResult = {
         message: 'User account permanently deleted.',
       };

@@ -5,41 +5,26 @@ import {
   Patch,
   Param,
   Delete,
-  Post,
-  ValidationPipe,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UserSafeDto } from './dto/user-safe.dto';
 import { ParseObjectIdPipe } from '../parse-int.pipe';
 import { Types } from 'mongoose';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthGuard } from '../auth/gurards/auth.guard';
 
 // UsersController handles CRUD operations for user management.
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-
-  /**
-   * @route POST /api/v1/users
-   * @description Create a new user
-   * @access Public
-   */
-  @Post()
-  async create(
-    @Body(new ValidationPipe()) createUserDto: CreateUserDto,
-  ): Promise<{
-    userId: string;
-  }> {
-    return this.usersService.createUser(createUserDto);
-  }
-
   /**
    * @route GET /api/v1/users
    * @description Retrieve all users
    * @access Private (Authenticated user)
    */
+  @UseGuards(AuthGuard)
   @Get()
   async findAll(): Promise<UserSafeDto[] | []> {
     return this.usersService.getUsers();
@@ -50,6 +35,7 @@ export class UsersController {
    * @description Retrieve a specified user by id
    * @access Private (Authenticated user)
    */
+  @UseGuards(AuthGuard)
   @Get(':userId')
   async findOne(
     @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
@@ -63,6 +49,7 @@ export class UsersController {
    * @description Delete a specified user by id (supports hard/soft delete)
    * @access Private (Authenticated user)
    */
+  @UseGuards(AuthGuard)
   @Delete(':userId')
   async remove(
     @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
@@ -77,10 +64,11 @@ export class UsersController {
    * @description Update the specified user
    * @access Private (Authenticated user)
    */
+  @UseGuards(AuthGuard)
   @Patch(':id')
   update(
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
-    @Body(new ValidationPipe()) updateUserDto: UpdateUserDto,
+    @Body() updateUserDto: UpdateUserDto,
   ) {
     return this.usersService.updateUser(id, updateUserDto);
   }

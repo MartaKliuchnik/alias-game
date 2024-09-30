@@ -12,7 +12,7 @@ export class LeaderboardService {
    * @returns {Promise<UserSafeDto[]>} - A promise that resolves to an array of UserSafeDto objects.
    * @throws {InternalServerErrorException} - If an error occurs during the database operation.
    */
-  async findAll(): Promise<UserSafeDto[]> {
+  async getLeaderboard(): Promise<UserSafeDto[]> {
     try {
       const users = await this.usersService.getUsers();
 
