@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  HttpCode,
 } from '@nestjs/common';
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
@@ -16,27 +17,28 @@ export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
   @Post()
-  create(@Body() createRoomDto: CreateRoomDto) {
+  async create(@Body() createRoomDto: CreateRoomDto) {
     return this.roomsService.create(createRoomDto);
   }
 
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() updateRoomDto: UpdateRoomDto) {
+    return this.roomsService.update(id, updateRoomDto);
+  }
+
   @Get()
-  findAll() {
+  async findAll() {
     return this.roomsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.roomsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRoomDto: UpdateRoomDto) {
-    return this.roomsService.update(+id, updateRoomDto);
+  async findOne(@Param('id') id: string) {
+    return this.roomsService.findOne(id);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.roomsService.remove(+id);
+  @HttpCode(204)
+  async delete(@Param('id') id: string) {
+    return this.roomsService.delete(id);
   }
 }
