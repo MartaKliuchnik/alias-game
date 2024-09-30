@@ -33,7 +33,9 @@ export class UsersService {
    * @throws {ConflictException} - If the username is already in use
    * @throws {InternalServerErrorException} - If an error occurs during the database operation
    */
-  async createUser(createUserDto: CreateUserDto): Promise<{ userId: string }> {
+  async createUser(
+    createUserDto: CreateUserDto,
+  ): Promise<{ userId: string; user: User }> {
     const { username, password } = createUserDto;
 
     const existingUser = await this.userModel.findOne({ username }).exec();
@@ -44,8 +46,8 @@ export class UsersService {
     const hashedPassword = await this.hashPassword(password);
 
     const newUser = new this.userModel({ username, hashedPassword });
-    newUser.save();
-    return { userId: newUser._id.toString() };
+    const savedUser = await newUser.save();
+    return { userId: savedUser._id.toString(), user: savedUser };
   }
 
   /**
@@ -238,5 +240,26 @@ export class UsersService {
     hashedPassword: string,
   ): Promise<boolean> {
     return bcrypt.compare(password, hashedPassword);
+  }
+
+  public async checkAuth(
+    username: string,
+    password: string,
+  ): Promise<UserSafeDto> {
+    const user = await this.userModel.findOne({ username }).exec();
+
+    if (!user) {
+      throw new NotFoundException('User not found.');
+    }
+
+    const isPasswordValid = await this.comparePasswords(
+      password,
+      user.hashedPassword,
+    );
+    if (!isPasswordValid) {
+      throw new BadRequestException('Invalid password.');
+    }
+
+    return this.mapToSafeDto(user);
   }
 }
