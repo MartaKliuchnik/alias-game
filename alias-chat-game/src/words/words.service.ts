@@ -14,7 +14,6 @@ export class WordsService {
   constructor(@InjectModel(Word.name) private wordModel: Model<WordDocument>) {}
 
   async create(createWordDto: CreateWordDto): Promise<WordDocument> {
-    // Check if the word already exists
     const existingWord = await this.wordModel.findOne({
       word: createWordDto.word,
     });
@@ -24,8 +23,8 @@ export class WordsService {
       );
     }
 
-    const createdWord = new this.wordModel(createWordDto);
-    return createdWord.save();
+    const createdWord = await this.wordModel.create(createWordDto);
+    return createdWord;
   }
 
   async findAll(): Promise<WordDocument[]> {
@@ -53,9 +52,10 @@ export class WordsService {
       .exec();
   }
 
-  async remove(wordId: Types.ObjectId): Promise<void> {
+  async remove(wordId: Types.ObjectId): Promise<{ message: string }> {
     await this.findById(wordId);
     await this.wordModel.findByIdAndDelete(wordId).exec();
+    return { message: 'Word succesfully deleted.' };
   }
 
   private async findById(wordId: Types.ObjectId): Promise<WordDocument> {
