@@ -1,9 +1,9 @@
 import { Route, Routes } from 'react-router-dom';
-import Navbar from './components/nav/index';
-import Register from './components/register/index';
-import Login from './components/login/index';
-import LeaderBoard from './components/leaderboard/index';
-import Room from './components/room/room';
+import Navbar from './components/Navbar/Navbar';
+import Register from './components/Register/Register';
+import Login from './components/Login/Login';
+import LeaderBoard from './components/LeaderBoard/LeaderBoard';
+import Room from './components/Room/Room';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default function App() {
