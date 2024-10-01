@@ -5,32 +5,21 @@ import {
   Patch,
   Param,
   Delete,
-  Post,
-  ValidationPipe,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UserSafeDto } from './dto/user-safe.dto';
-import { ParseObjectIdPipe } from 'src/parse-int.pipe';
+import { ParseObjectIdPipe } from '../parse-int.pipe';
 import { Types } from 'mongoose';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthGuard } from '../auth/gurards/auth.guard';
 
 // UsersController handles CRUD operations for user management.
+@UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-
-  /**
-   * @route POST /api/v1/users
-   * @description Create a new user
-   * @access Public
-   */
-  @Post()
-  async create(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
-    return this.usersService.createUser(createUserDto);
-  }
-
   /**
    * @route GET /api/v1/users
    * @description Retrieve all users
@@ -38,7 +27,7 @@ export class UsersController {
    */
   @Get()
   async findAll(): Promise<UserSafeDto[] | []> {
-    return this.usersService.findAll();
+    return this.usersService.getUsers();
   }
 
   /**
@@ -50,7 +39,7 @@ export class UsersController {
   async findOne(
     @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
   ): Promise<UserSafeDto | null> {
-    const user = await this.usersService.findOne(userId);
+    const user = await this.usersService.getUserById(userId);
     return user;
   }
 
@@ -63,9 +52,9 @@ export class UsersController {
   async remove(
     @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
     @Query('hardDelete') hardDelete: string,
-  ) {
+  ): Promise<{ message: string }> {
     const isHardDelete = hardDelete === 'true';
-    return this.usersService.remove(userId, isHardDelete);
+    return this.usersService.removeUser(userId, isHardDelete);
   }
 
   /**
@@ -76,8 +65,8 @@ export class UsersController {
   @Patch(':id')
   update(
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
-    @Body(new ValidationPipe()) updateUserDto: UpdateUserDto,
-  ) {
-    return this.usersService.update(id, updateUserDto);
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<UserSafeDto> {
+    return this.usersService.updateUser(id, updateUserDto);
   }
 }

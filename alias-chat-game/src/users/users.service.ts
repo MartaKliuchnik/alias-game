@@ -55,7 +55,7 @@ export class UsersService {
    * @returns {Promise<UserSafeDto[]>} - A promise that resolves to an array of UserSafeDto objects.
    * @throws {InternalServerErrorException} - If an error occurs during the database operation.
    */
-  async findAll(): Promise<UserSafeDto[]> {
+  async getUsers(): Promise<UserSafeDto[]> {
     try {
       const users = await this.userModel.find().exec();
 
@@ -74,7 +74,7 @@ export class UsersService {
    * @throws {NotFoundException} - If no user is found with the given ID.
    * @throws {InternalServerErrorException} - If an unexpected error occurs during the database operation.
    */
-  async findOne(userId: Types.ObjectId): Promise<UserSafeDto> {
+  async getUserById(userId: Types.ObjectId): Promise<UserSafeDto> {
     try {
       const user = await this.findUserById(userId);
       return this.mapToSafeDto(user);
@@ -98,7 +98,7 @@ export class UsersService {
    * @throws {ConflictException} - If the new username is already in use.
    * @throws {InternalServerErrorException} - If an unexpected error occurs during the database operation.
    */
-  async update(userId: Types.ObjectId, updateUserDto: UpdateUserDto) {
+  async updateUser(userId: Types.ObjectId, updateUserDto: UpdateUserDto) {
     try {
       const user = await this.findUserById(userId);
 
@@ -135,7 +135,7 @@ export class UsersService {
    * @returns {Promise<{ message: string }>} - A promise that resolves to an object containing a success message.
    * @throws {NotFoundException} - If no user is found with the given ID.
    */
-  async remove(userId: Types.ObjectId, isHardDelete: boolean) {
+  async removeUser(userId: Types.ObjectId, isHardDelete: boolean) {
     const user = await this.findUserById(userId);
 
     if (isHardDelete) {
@@ -242,6 +242,14 @@ export class UsersService {
     return bcrypt.compare(password, hashedPassword);
   }
 
+  /**
+   * Validates user credentials.
+   * @param {string} username - The username of the user attempting to authenticate.
+   * @param {string} password - The plain text password to validate against the stored hash.
+   * @returns {Promise<UserSafeDto>} - A promise that resolves to the updated user's safe DTO.
+   * @throws {NotFoundException} - If no user is found with the given username.
+   * @throws {BadRequestException} - If the provided password is invalid.
+   */
   public async checkAuth(
     username: string,
     password: string,
