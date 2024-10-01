@@ -6,6 +6,7 @@
 2. [System requirements](#system-requirements)
 3. [Base URL](#base-url)
 4. [API Documentation](#api-documentation)
+
    4.1 [User Management](#user-management)
 
    - User data model.
@@ -36,6 +37,7 @@
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/describer**
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/leader**
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chat**
+   
    4.4 [Chat Management](#chat-management)
 
    - Chat data model.
