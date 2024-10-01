@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Team } from './schemas/team.schema';
@@ -9,53 +9,120 @@ import { SetTeamLeaderDto } from './dto/set-team-leader.dto';
 
 @Injectable()
 export class TeamsService {
-  constructor(@InjectModel(Team.name) private teamModel: Model<Team>) {}
+  constructor(@InjectModel(Team.name) private teamModel: Model<Team>) { }
 
-  create(roomId: number, createTeamDto: CreateTeamDto) {
-    return `This action adds a team to a ${roomId}room`;
+  async create(roomId: string, createTeamDto: CreateTeamDto): Promise<Team> {
+    const createdTeam = new this.teamModel({ ...createTeamDto, roomId });
+    return createdTeam.save();
   }
 
-  findAll(roomId: number) {
-    return `This action returns all teams in ${roomId} room`;
+  findAll(roomId: string) {
+    return this.teamModel.find({ roomId }).exec();
   }
 
-  findOne(roomId: number, teamId: number) {
-    return `This action returns a #${teamId} team in ${roomId} room`;
+  async findOne(roomId: string, teamId: string) {
+    const team = await this.teamModel.findOne({ _id: teamId, roomId }).exec();
+    if (!team) {
+      throw new NotFoundException(`Team ${teamId} in room ${roomId} not found`);
+    }
+    return team;
   }
 
-  update(roomId: number, teamId: number, updateTeamDto: UpdateTeamDto) {
-    return `This action updates a #${teamId} team in ${roomId} room`;
+  async update(roomId: string, teamId: string, updateTeamDto: UpdateTeamDto) {
+    const updatedTeam = await this.teamModel
+      .findOneAndUpdate({ _id: teamId, roomId }, updateTeamDto, { new: true })
+      .exec();
+
+    if (!updatedTeam) {
+      throw new NotFoundException(`Team ${teamId} in room ${roomId} not found`);
+    }
+
+    return updatedTeam;
   }
 
-  remove(roomId: number, teamId: number) {
-    return `This action removes a #${teamId} team from ${roomId} room`;
+  async remove(roomId: string, teamId: string) {
+    const result = await this.teamModel
+      .deleteOne({ _id: teamId, roomId })
+      .exec();
+    if (result.deletedCount === 0) {
+      throw new NotFoundException(`Team ${teamId} in room ${roomId} not found`);
+    }
   }
 
-  findAllTeamPlayers(roomId: number, teamId: number) {
-    return `This action returns all players in ${teamId} team in ${roomId} room`;
+  async findAllTeamPlayers(roomId: string, teamId: string) {
+    const team = await this.findOne(roomId, teamId);
+    return team.players;
   }
 
-  addPlayer(roomId: number, teamId: number, userId: number) {
-    return `This action adds a #${userId} user in #${teamId} team in ${roomId} room`;
+  async addPlayer(roomId: string, teamId: string, userId: string) {
+    const team = await this.teamModel
+      .findOneAndUpdate(
+        { _id: teamId, roomId },
+        { $addToSet: { players: userId } },
+        { new: true },
+      )
+      .exec();
+
+    if (!team) {
+      throw new NotFoundException(`Team ${teamId} in room ${roomId} not found`);
+    }
+
+    return team;
   }
 
-  removePlayer(roomId: number, teamId: number, userId: number) {
-    return `This action removes a #${userId} user in #${teamId} team from ${roomId} room`;
+  async removePlayer(roomId: string, teamId: string, userId: string) {
+    const team = await this.teamModel
+      .findOneAndUpdate(
+        { _id: teamId, roomId },
+        { $pull: { players: userId } },
+        { new: true },
+      )
+      .exec();
+
+    if (!team) {
+      throw new NotFoundException(`Team ${teamId} in room ${roomId} not found`);
+    }
+
+    return team;
   }
 
-  setDescriber(
-    roomId: number,
-    teamId: number,
+  async setDescriber(
+    roomId: string,
+    teamId: string,
     setDescriberDto: SetDescriberDto,
   ) {
-    return `This action sets user as the describer in team #${teamId} in room #${roomId}`;
+    const team = await this.teamModel
+      .findOneAndUpdate(
+        { _id: teamId, roomId },
+        { describer: setDescriberDto.userId },
+        { new: true },
+      )
+      .exec();
+
+    if (!team) {
+      throw new NotFoundException(`Team ${teamId} in room ${roomId} not found`);
+    }
+
+    return team;
   }
 
-  setTeamLeader(
-    roomId: number,
-    teamId: number,
+  async setTeamLeader(
+    roomId: string,
+    teamId: string,
     setTeamLeaderDto: SetTeamLeaderDto,
   ) {
-    return `This action sets user as the leader of team #${teamId} in room #${roomId}`;
+    const team = await this.teamModel
+      .findOneAndUpdate(
+        { _id: teamId, roomId },
+        { teamLeader: setTeamLeaderDto.userId },
+        { new: true },
+      )
+      .exec();
+
+    if (!team) {
+      throw new NotFoundException(`Team ${teamId} in room ${roomId} not found`);
+    }
+
+    return team;
   }
 }
