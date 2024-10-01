@@ -13,6 +13,6 @@ export class LeaderboardController {
    */
   @Get()
   findAll() {
-    return this.leaderboardService.findAll();
+    return this.leaderboardService.getLeaderboard();
   }
 }

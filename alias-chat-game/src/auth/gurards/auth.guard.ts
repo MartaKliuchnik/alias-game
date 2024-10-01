@@ -19,9 +19,10 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      this.jwtService.verify(token, { secret: 'AliasSecret' });
+      const authToken = token.replace(/bearer/gim, '').trim(); // -H "Authorization: Bearer access_token" \
+      this.jwtService.verify(authToken, { secret: 'AliasSecret' });
       return true;
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException('Invalid token');
     }
   }
