@@ -13,9 +13,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UserSafeDto } from './dto/user-safe.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import {
-  ArchievedUserDocument,
+  ArchivedUserDocument,
   ArchivedUser,
-} from './schemas/archieved-user.schema';
+} from './schemas/archived-user.schema';
 
 // UsersService responsible for handling user-related operations.
 @Injectable()
@@ -23,7 +23,7 @@ export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(ArchivedUser.name)
-    private archievedUserModel: Model<ArchievedUserDocument>,
+    private archivedUserModel: Model<ArchivedUserDocument>,
   ) {}
 
   /**
@@ -45,8 +45,12 @@ export class UsersService {
 
     const hashedPassword = await this.hashPassword(password);
 
-    const newUser = new this.userModel({ username, hashedPassword });
-    const savedUser = await newUser.save();
+    // const newUser = new this.userModel({ username, hashedPassword });
+    // const savedUser = await newUser.save();
+    const savedUser = await this.userModel.create({
+      username,
+      hashedPassword,
+    });
     return { userId: savedUser._id.toString(), user: savedUser };
   }
 
@@ -145,11 +149,11 @@ export class UsersService {
     }
 
     // Perform a soft delete
-    const archievedUser = new this.archievedUserModel({
+    await this.archivedUserModel.create({
       ...user.toObject(),
       deletedAt: new Date(),
     });
-    await archievedUser.save();
+
     await this.userModel.deleteOne({ _id: userId });
     return {
       message: 'User account soft deleted and moved to archive successfully.',

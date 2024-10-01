@@ -6,7 +6,7 @@ import { User, UserSchema } from './schemas/user.schema';
 import {
   ArchivedUser,
   ArchivedUserSchema,
-} from './schemas/archieved-user.schema';
+} from './schemas/archived-user.schema';
 import { JwtModule } from '@nestjs/jwt';
 
 /**
