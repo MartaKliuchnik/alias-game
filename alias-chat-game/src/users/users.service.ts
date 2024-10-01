@@ -243,18 +243,19 @@ export class UsersService {
   }
 
   /**
-   * Authenticates a user by validating the provided username and password.
-   * @param {string} username - The username of the user to authenticate.
-   * @param {string} password - The plain text password provided by the user.
-   * @returns {Promise<UserSafeDto>} - A promise that resolves to the UserSafeDto.
-   * @throws {NotFoundException} - If a user with the provided username is not found.
-   * @throws {BadRequestException} - If the provided password is incorrect.
+   * Validates user credentials.
+   * @param {string} username - The username of the user attempting to authenticate.
+   * @param {string} password - The plain text password to validate against the stored hash.
+   * @returns {Promise<UserSafeDto>} - A promise that resolves to the updated user's safe DTO.
+   * @throws {NotFoundException} - If no user is found with the given username.
+   * @throws {BadRequestException} - If the provided password is invalid.
    */
   public async checkAuth(
     username: string,
     password: string,
   ): Promise<UserSafeDto> {
     const user = await this.userModel.findOne({ username }).exec();
+
     if (!user) {
       throw new NotFoundException('User not found.');
     }

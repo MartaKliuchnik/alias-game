@@ -16,6 +16,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '../auth/gurards/auth.guard';
 
 // UsersController handles CRUD operations for user management.
+@UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -24,7 +25,6 @@ export class UsersController {
    * @description Retrieve all users
    * @access Private (Authenticated user)
    */
-  @UseGuards(AuthGuard)
   @Get()
   async findAll(): Promise<UserSafeDto[] | []> {
     return this.usersService.getUsers();
@@ -35,7 +35,6 @@ export class UsersController {
    * @description Retrieve a specified user by id
    * @access Private (Authenticated user)
    */
-  @UseGuards(AuthGuard)
   @Get(':userId')
   async findOne(
     @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
@@ -49,12 +48,11 @@ export class UsersController {
    * @description Delete a specified user by id (supports hard/soft delete)
    * @access Private (Authenticated user)
    */
-  @UseGuards(AuthGuard)
   @Delete(':userId')
   async remove(
     @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
     @Query('hardDelete') hardDelete: string,
-  ) {
+  ): Promise<{ message: string }> {
     const isHardDelete = hardDelete === 'true';
     return this.usersService.removeUser(userId, isHardDelete);
   }
@@ -64,12 +62,11 @@ export class UsersController {
    * @description Update the specified user
    * @access Private (Authenticated user)
    */
-  @UseGuards(AuthGuard)
   @Patch(':id')
   update(
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
     @Body() updateUserDto: UpdateUserDto,
-  ) {
+  ): Promise<UserSafeDto> {
     return this.usersService.updateUser(id, updateUserDto);
   }
 }
