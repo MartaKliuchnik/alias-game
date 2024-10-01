@@ -11,7 +11,7 @@ import { RoomsModule } from './rooms/rooms.module';
 import { TeamsModule } from './teams/teams.module';
 import { ChatsModule } from './chats/chats.module';
 import { AuthModule } from './auth/auth.module';
-import { LeaderboardModule } from './leaderboard/leaderboard.module';
+import { leaderboardsModule } from './leaderboards/leaderboards.module';
 
 @Module({
   imports: [
@@ -33,7 +33,7 @@ import { LeaderboardModule } from './leaderboard/leaderboard.module';
     MessagesModule,
     ChatsModule,
     AuthModule,
-    LeaderboardModule,
+    leaderboardsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
