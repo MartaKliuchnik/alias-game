@@ -17,7 +17,7 @@ import { Types } from 'mongoose';
 
 @Controller('rooms/:roomId/teams')
 export class TeamsController {
-  constructor(private readonly teamsService: TeamsService) {}
+  constructor(private readonly teamsService: TeamsService) { }
 
   // Add a team to a room
   @Post() // api/v1/rooms/{roomId}/teams

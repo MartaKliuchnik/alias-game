@@ -70,7 +70,6 @@ export class TeamsService {
     };
   }
    
-
   /**
    * Updates a team with the given ID using the provided updateTeamDto.
    * @param {Types.ObjectId} teamId - The ID of the team to be updated.
