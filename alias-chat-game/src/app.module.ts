@@ -11,7 +11,8 @@ import { RoomsModule } from './rooms/rooms.module';
 import { TeamsModule } from './teams/teams.module';
 import { ChatsModule } from './chats/chats.module';
 import { AuthModule } from './auth/auth.module';
-import { LeaderboardModule } from './leaderboard/leaderboard.module';
+import { LeaderboardsModule } from './leaderboards/leaderboards.module';
+import { InitializationService } from './initialization/initialization.service';
 
 @Module({
   imports: [
@@ -33,9 +34,9 @@ import { LeaderboardModule } from './leaderboard/leaderboard.module';
     MessagesModule,
     ChatsModule,
     AuthModule,
-    LeaderboardModule,
+    LeaderboardsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, InitializationService],
 })
 export class AppModule {}

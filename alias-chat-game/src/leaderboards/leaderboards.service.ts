@@ -2,25 +2,25 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { UserSafeDto } from 'src/users/dto/user-safe.dto';
 import { UsersService } from '../users/users.service';
 
-// LeaderboardService is responsible for retrieving the top players' leaderboard.
+// leaderboardsService is responsible for retrieving the top players' leaderboards.
 @Injectable()
-export class LeaderboardService {
+export class LeaderboardsService {
   constructor(private readonly usersService: UsersService) {}
 
   /**
-   * Retrieves the top 10 users from the leaderboard, ordered by score.
+   * Retrieves the top 10 users from the leaderboards, ordered by score.
    * @returns {Promise<UserSafeDto[]>} - A promise that resolves to an array of UserSafeDto objects.
    * @throws {InternalServerErrorException} - If an error occurs during the database operation.
    */
-  async getLeaderboard(): Promise<UserSafeDto[]> {
+  async getLeaderboards(): Promise<UserSafeDto[]> {
     try {
       const users = await this.usersService.getUsers();
 
-      const leaderboard = users.sort((a, b) => b.score - a.score).slice(0, 10);
-      return leaderboard;
+      const leaderboards = users.sort((a, b) => b.score - a.score).slice(0, 10);
+      return leaderboards;
     } catch {
       throw new InternalServerErrorException(
-        'An unexpected error occurred while retrieving the leaderboard.',
+        'An unexpected error occurred while retrieving the leaderboards.',
       );
     }
   }
