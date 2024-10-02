@@ -126,4 +126,49 @@ describe('WordsController', () => {
       });
     });
   });
+
+  describe('checkAnswer', () => {
+    describe('when checkAnswer is called', () => {
+      let response: { correct: boolean };
+      const wordId = wordStub().wordId;
+      const answer = 'someAnswer';
+
+      beforeEach(async () => {
+        wordsService.checkAnswer = jest.fn().mockResolvedValue(true); // Mocking the service method
+        response = await wordsController.checkAnswer(wordId, answer);
+      });
+
+      test('then it should call wordsService.checkAnswer', () => {
+        expect(wordsService.checkAnswer).toHaveBeenCalledWith(wordId, answer);
+      });
+
+      test('then it should return correct answer status', () => {
+        expect(response).toEqual({ correct: true });
+      });
+    });
+  });
+
+  describe('checkDescription', () => {
+    describe('when checkDescription is called', () => {
+      let response: { correct: boolean };
+      const wordId = wordStub().wordId;
+      const description = 'some description';
+
+      beforeEach(async () => {
+        wordsService.checkDescription = jest.fn().mockResolvedValue(false); // Mocking the service method
+        response = await wordsController.checkDescription(wordId, description);
+      });
+
+      test('then it should call wordsService.checkDescription', () => {
+        expect(wordsService.checkDescription).toHaveBeenCalledWith(
+          wordId,
+          description,
+        );
+      });
+
+      test('then it should return correct description status', () => {
+        expect(response).toEqual({ correct: false });
+      });
+    });
+  });
 });

@@ -205,4 +205,57 @@ describe('WordsService', () => {
       expect(result).toEqual(wordStub());
     });
   });
+
+  describe('checkAnswer', () => {
+    it('should return true if the answer matches the word or similar words', async () => {
+      const wordId = wordStub().wordId;
+      const answer = 'bicycles';
+
+      wordModel.findById = jest.fn().mockReturnValue({
+        exec: jest.fn().mockResolvedValue(wordStub()),
+      });
+      const result = await wordsService.checkAnswer(wordId, answer);
+
+      expect(result).toBe(true);
+    });
+
+    it('should return false if the answer does not match the word or similar words', async () => {
+      const wordId = wordStub().wordId;
+      const answer = 'wrongAnswer';
+
+      wordModel.findById = jest.fn().mockReturnValue({
+        exec: jest.fn().mockResolvedValue(wordStub()),
+      }); // Mock the findById method
+      const result = await wordsService.checkAnswer(wordId, answer);
+
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('checkDescription', () => {
+    it('should return false if the description contains the word or similar words', async () => {
+      const wordId = wordStub().wordId;
+      const description = 'This is a bicycle that you pedal to move.';
+
+      wordModel.findById = jest.fn().mockReturnValue({
+        exec: jest.fn().mockResolvedValue(wordStub()),
+      });
+      const result = await wordsService.checkDescription(wordId, description);
+
+      expect(result).toBe(false);
+    });
+
+    it('should return true if the description does not contain the word or similar words', async () => {
+      const wordId = wordStub().wordId;
+      const description =
+        'This is a mode of transportation that you pedal to move.';
+
+      wordModel.findById = jest.fn().mockReturnValue({
+        exec: jest.fn().mockResolvedValue(wordStub()),
+      }); // Mock the findById method
+      const result = await wordsService.checkDescription(wordId, description);
+
+      expect(result).toBe(true);
+    });
+  });
 });
