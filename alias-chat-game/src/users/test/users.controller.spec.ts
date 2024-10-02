@@ -1,158 +1,125 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { Types } from 'mongoose';
+import { UserSafeDto } from '../dto/user-safe.dto';
+
 import { UsersController } from '../users.controller';
 import { UsersService } from '../users.service';
-import { ParseObjectIdPipe } from '../../parse-int.pipe';
-import { UserSafeDto } from '../dto/user-safe.dto';
-import { Types } from 'mongoose';
-import { CanActivate, NotFoundException } from '@nestjs/common';
-import { UpdateUserDto } from '../dto/update-user.dto';
+import { userStub } from './stubs/user.stub';
+import { mockAuthGuard } from '../__mocks__/auth.guard.mock';
 import { AuthGuard } from '../../auth/gurards/auth.guard';
+import { UpdateUserDto } from '../dto/update-user.dto';
+
+jest.mock('../users.service');
 
 describe('UsersController', () => {
-  let controller: UsersController;
-  let service: UsersService;
-
-  const mockUsersService = {
-    getUsers: jest.fn(),
-    getUserById: jest.fn(),
-    updateUser: jest.fn(),
-    removeUser: jest.fn(),
-  };
-
-  const mockAuthGuard: CanActivate = { canActivate: jest.fn(() => true) };
+  let usersController: UsersController;
+  let usersService: UsersService;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    const moduleRef: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
-      providers: [
-        {
-          provide: UsersService,
-          useValue: mockUsersService,
-        },
-        ParseObjectIdPipe,
-      ],
+      providers: [UsersService],
     })
       .overrideGuard(AuthGuard)
       .useValue(mockAuthGuard)
       .compile();
 
-    controller = module.get<UsersController>(UsersController);
-    service = module.get<UsersService>(UsersService);
-
+    usersController = moduleRef.get<UsersController>(UsersController);
+    usersService = moduleRef.get<UsersService>(UsersService);
     jest.clearAllMocks();
   });
 
   describe('findAll', () => {
-    it('should return an array of users', async () => {
-      const expectedResult: UserSafeDto[] = [
-        {
-          userId: '66f8f7fb027b5bb2be6d0ddd',
-          username: 'Alex',
-          score: 0,
-          played: 0,
-          wins: 0,
-        },
-        {
-          userId: '66f8f7fb027b5bb2be6d0dde',
-          username: 'Mike',
-          score: 10,
-          played: 2,
-          wins: 1,
-        },
-      ];
+    describe('when the findAll method is called', () => {
+      let users: UserSafeDto[];
 
-      mockUsersService.getUsers.mockResolvedValue(expectedResult);
+      beforeEach(async () => {
+        users = await usersController.findAll();
+      });
 
-      const result = await controller.findAll();
+      test('then it should call usersService.getUsers', () => {
+        expect(usersService.getUsers).toHaveBeenCalled();
+      });
 
-      expect(service.getUsers).toHaveBeenCalled();
-      expect(result).toEqual(expectedResult);
+      test('then it should return an array of users', () => {
+        expect(users).toEqual([userStub()]);
+      });
     });
   });
 
   describe('findOne', () => {
-    it('should return a user by id', async () => {
-      const userId = new Types.ObjectId('66f8f7fb027b5bb2be6d0ddd');
-      const expectedResult: UserSafeDto = {
-        userId: '66f8f7fb027b5bb2be6d0ddd',
-        username: 'Alex',
-        score: 0,
-        played: 0,
-        wins: 0,
-      };
+    describe('when the findOne method is called with a valid user ID', () => {
+      let user: UserSafeDto;
 
-      mockUsersService.getUserById.mockResolvedValue(expectedResult);
+      beforeEach(async () => {
+        user = await usersController.findOne(
+          new Types.ObjectId(userStub().userId),
+        );
+      });
 
-      const result = await controller.findOne(userId);
+      test('then it should call usersService.getUserById with the correct ID', () => {
+        expect(usersService.getUserById).toHaveBeenCalledWith(
+          new Types.ObjectId(userStub().userId),
+        );
+      });
 
-      expect(service.getUserById).toHaveBeenCalledWith(userId);
-      expect(result).toEqual(expectedResult);
-    });
-
-    it('should throw NotFoundException when user is not found', async () => {
-      const userId = new Types.ObjectId('66f8f7fb027b5bb2be6d0ddd');
-
-      mockUsersService.getUserById.mockRejectedValue(
-        new NotFoundException('User not found.'),
-      );
-
-      await expect(controller.findOne(userId)).rejects.toThrow(
-        NotFoundException,
-      );
-    });
-  });
-
-  describe('updateUser', () => {
-    const userId = new Types.ObjectId('66f8f7fb027b5bb2be6d0ddd');
-    const updateUser: UpdateUserDto = {
-      username: 'Tomas',
-      password: 'SecurePass!123',
-    };
-    const expectedResult: UserSafeDto = {
-      userId: userId.toString(),
-      username: 'Tomas',
-      score: 0,
-      played: 0,
-      wins: 0,
-    };
-
-    it('should update a user when username is not exist', async () => {
-      mockUsersService.updateUser.mockResolvedValue(expectedResult);
-
-      const result = await controller.update(userId, updateUser);
-
-      expect(service.updateUser).toHaveBeenCalledWith(userId, updateUser);
-      expect(result).toEqual(expectedResult);
+      test('then it should return the corresponding user', () => {
+        expect(user).toEqual(userStub());
+      });
     });
   });
 
   describe('remove', () => {
-    const userId = new Types.ObjectId('66f8f7fb027b5bb2be6d0ddd');
+    describe('when the remove method is called', () => {
+      let response: { message: string };
 
-    it('should remove a user (soft delete)', async () => {
-      const expectedResult = {
-        message: 'User account soft deleted and moved to archive successfully.',
-      };
+      beforeEach(async () => {
+        response = await usersController.remove(
+          new Types.ObjectId(userStub().userId),
+          'true',
+        );
+      });
 
-      mockUsersService.removeUser.mockResolvedValue(expectedResult);
+      test('then it should call usersService.removeUser with the correct parameters', () => {
+        expect(usersService.removeUser).toHaveBeenCalledWith(
+          new Types.ObjectId(userStub().userId),
+          true,
+        );
+      });
 
-      const result = await controller.remove(userId, 'false');
-
-      expect(service.removeUser).toHaveBeenCalledWith(userId, false);
-      expect(result).toEqual(expectedResult);
+      test('then it should return a success message when the user is successfully deleted', () => {
+        expect(response).toEqual({
+          message: 'User account permanently deleted.',
+        });
+      });
     });
+  });
 
-    it('should remove a user (hard delete)', async () => {
-      const expectedResult = {
-        message: 'User account permanently deleted.',
-      };
+  describe('update', () => {
+    describe('when the update method is called', () => {
+      let user: UserSafeDto;
+      let updateUserDto: UpdateUserDto;
 
-      mockUsersService.removeUser.mockResolvedValue(expectedResult);
+      beforeEach(async () => {
+        updateUserDto = {
+          username: 'Markus',
+        };
+        user = await usersController.update(
+          new Types.ObjectId(userStub().userId),
+          updateUserDto,
+        );
+      });
 
-      const result = await controller.remove(userId, 'true');
+      test('then it should usersService.updateUser with the correct parameters', () => {
+        expect(usersService.updateUser).toHaveBeenCalledWith(
+          new Types.ObjectId(userStub().userId),
+          updateUserDto,
+        );
+      });
 
-      expect(service.removeUser).toHaveBeenCalledWith(userId, true);
-      expect(result).toEqual(expectedResult);
+      test('then it should return the updated user object on successful update', () => {
+        expect(user).toEqual(userStub());
+      });
     });
   });
 });

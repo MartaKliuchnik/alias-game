@@ -6,8 +6,10 @@ import { User, UserSchema } from './schemas/user.schema';
 import {
   ArchivedUser,
   ArchivedUserSchema,
-} from './schemas/archieved-user.schema';
+} from './schemas/archived-user.schema';
 import { JwtModule } from '@nestjs/jwt';
+import { RoomsModule } from 'src/rooms/rooms.module';
+import { TeamsModule } from 'src/teams/teams.module';
 
 /**
  * UsersModule sets up the User and ArchivedUser models,
@@ -23,6 +25,8 @@ import { JwtModule } from '@nestjs/jwt';
       secret: 'AliasSecret',
       signOptions: { expiresIn: '1h' },
     }),
+    RoomsModule,
+    TeamsModule,
   ],
   controllers: [UsersController],
   providers: [UsersService],

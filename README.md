@@ -6,7 +6,7 @@
 2. [System requirements](#system-requirements)
 3. [Base URL](#base-url)
 4. [API Documentation](#api-documentation)
-  
+
    4.1 [User Management](#user-management)
 
    - User data model.
@@ -16,16 +16,16 @@
    - Endpoint **/api/v1/auth/logout**
    - Endpoint **/api/v1/users**
    - Endpoint **/api/v1/users/{userId}**
-   - Endpoint **/api/v1/leaderboard**
+   - Endpoint **/api/v1/leaderboards**
 
    4.2 [Room Management](#room-management)
 
-    - Room data model
-    - Endpoint **POST /api/v1/room**
-    - Endpoint **PATCH /api/v1/room/:roomId**
-    - Endpoint **GET /api/v1/rooms**
-    - Endpoint **GET /api/v1/rooms/:roomId**
-    - Endpoint **DELETE /api/v1/rooms/:roomId**
+   - Room data model
+   - Endpoint **POST /api/v1/room**
+   - Endpoint **PATCH /api/v1/room/:roomId**
+   - Endpoint **GET /api/v1/rooms**
+   - Endpoint **GET /api/v1/rooms/:roomId**
+   - Endpoint **DELETE /api/v1/rooms/:roomId**
 
    4.3 [Team Management](#team-management)
 
@@ -54,7 +54,6 @@
      **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}/user/{userId}/messages**
 
    4.6 [Word Management](#word-management)
-    
    - Word data model
    - Endpoint **POST /api/v1/word**
    - Endpoint **GET /api/v1/words**
@@ -62,24 +61,32 @@
    - Endpoint **PATCH /api/v1/words/:wordId**
    - Endpoint **DELETE /api/v1/words/:wordId**
 
-
 ## Description
 
-Alias is a word-guessing game where players form teams. Each team takes turns where one member describes a word and others guess it. The game includes a chat for players to communicate and a system to check for similar words.
+Alias is a word-guessing game where players form teams. Each team takes turns
+where one member describes a word and others guess it. The game includes a chat
+for players to communicate and a system to check for similar words.
 
 ### Objective
+
 Teams try to guess as many words as possible from their teammates' descriptions.
 
 ### Turns
+
 Each turn is timed. Describers cannot use the word or its derivatives.
 
 ### Scoring
-Points are awarded for each correct guess. Similar words are checked for validation.
+
+Points are awarded for each correct guess. Similar words are checked for
+validation.
 
 ### End Game
-The game concludes after a predetermined number of rounds, with the highest-scoring team winning.
+
+The game concludes after a predetermined number of rounds, with the
+highest-scoring team winning.
 
 ## System Requirements
+
 - **Programming language**: JavaScript, TypeScript
 - **Backend**: Node.js framework - Nest.js
 - **Frontend framework**: React.js
@@ -159,8 +166,7 @@ curl -X POST http://localhost:8080/api/v1/auth/register \
 Status code: **201 Created**
 
 Description: The user has been successfully registered. The response includes a
-success message and the data with the userId of the newly created
-user.
+success message and the data with the userId of the newly created user.
 
 ```
 {
@@ -290,8 +296,8 @@ Status code: **500 Internal Server Error**
 
 Description: The server encountered an unexpected condition that prevented it
 from processing the request. This issue may occur during token creation or other
-parts of the login process, preventing the user from receiving a valid access
-or refresh token.
+parts of the login process, preventing the user from receiving a valid access or
+refresh token.
 
 ```
 {
@@ -391,7 +397,8 @@ Endpoint
   invalidating the refresh token, and optionally clearing any session data.
   After logging out, the user must authenticate again to access protected
   resources.
-- Authentication: Requires the user to provide a valid access token in the request headers to authorize the logout operation.
+- Authentication: Requires the user to provide a valid access token in the
+  request headers to authorize the logout operation.
 
 **Request Body**
 
@@ -415,8 +422,8 @@ curl -X POST http://localhost:8080/api/v1/auth/login \
 Status code: **200 OK**
 
 Description: The logout request was successful. The refresh token is
-invalidated, and the user is logged out from the system. The user should
-delete any stored tokens.
+invalidated, and the user is logged out from the system. The user should delete
+any stored tokens.
 
 ```
 {
@@ -487,7 +494,7 @@ found.
     },
     {
         "userId": 2,
-        "username": "JaneDoe",        
+        "username": "JaneDoe",
         "score": 1800,
         "played": 25,
         "wins": 15
@@ -624,7 +631,8 @@ Endpoint
 - URL Path: **_/api/v1/users/{userId}_**
 - Description: This endpoint allows a user to delete their own account. It
   supports both soft and hard deletes.
-  - Soft Delete: Marks the user account as inactive by moving it to an archived collection.
+  - Soft Delete: Marks the user account as inactive by moving it to an archived
+    collection.
   - Hard Delete: Permanently removes the user's account and all associated data.
     This action requires special authorization by an admin using a password
     validation step in the request body.
@@ -865,17 +873,16 @@ request.
 }
 ```
 
-#### 10. Retrieve leaderboard
+#### 10. Retrieve leaderboards
 
 Endpoint
 
 - URL Path: **_/api/v1/leaderboard_**
 - Description: This endpoint retrieves the top players (10) based on their game
-  statistics, including score. The response contains a ranked list of
-  players, providing insights into the performance of the best players in the
-  game.
+  statistics, including score. The response contains a ranked list of players,
+  providing insights into the performance of the best players in the game.
 - Authentication: This endpoint does not require authentication. Any user can
-  access the leaderboard.
+  access the leaderboards.
 
 **Example Request**
 
@@ -892,7 +899,7 @@ curl -X GET http://localhost:8080/api/v1/leaderboard \
 Status Code: **200 OK**
 
 Description: This status indicates that the request was successful, and the
-server returns an array of user objects (the leaderboard data), or an empty
+server returns an array of user objects (the leaderboards data), or an empty
 array if no users are found.
 
 ```
@@ -959,7 +966,8 @@ The request body must be in JSON format and include the following fields:
 
 **Example Request**
 
-Description: A `POST` request to the room creation endpoint. It includes a room name, an array of created teams and turn time. 
+Description: A `POST` request to the room creation endpoint. It includes a room
+name, an array of created teams and turn time.
 
 ```
 curl -X POST http://localhost:8080/api/v1/room \
@@ -994,7 +1002,8 @@ success message and the data of the created room.
 
 Status code: **400 Bad Request**
 
-Description: The request was invalid because one or more of the provided fields did not meet the required format or were missing.
+Description: The request was invalid because one or more of the provided fields
+did not meet the required format or were missing.
 
 ```
 {
@@ -1030,8 +1039,8 @@ Endpoint
 
 - URL Path: **_/api/v1/room/:roomId_**
 - Description: This endpoint joins a user to specific room. It accepts userId in
-  the request body and returns a response indicating the result of the
-  joining process.
+  the request body and returns a response indicating the result of the joining
+  process.
 - Authentication: Authentication is required for this endpoint.
 
 **Example Responses**
@@ -1057,7 +1066,8 @@ success message and the data of the room.
 
 Status code: **400 Bad Request**
 
-Description: The request was invalid because one or more of the provided fields did not meet the required format or were missing.
+Description: The request was invalid because one or more of the provided fields
+did not meet the required format or were missing.
 
 ```
 {
@@ -1121,8 +1131,8 @@ curl -X GET http://localhost:8080/api/v1/rooms \
 
 Status code: **200 OK**
 
-Description: The array of rooms has been successfully returned. The response includes a
-success message and the array of rooms.
+Description: The array of rooms has been successfully returned. The response
+includes a success message and the array of rooms.
 
 ```
 {
@@ -1135,7 +1145,7 @@ success message and the array of rooms.
         "teams": [ObjectId, ObjectId],
         "createdAt": "Date/time",
         "turnTime": 30
-    }, 
+    },
     {
         "_id": "12456789",
         "name": "test_room2",
@@ -1348,7 +1358,8 @@ Information about users.
 #### 2. GET `api/v1/v1/rooms/{roomId}/teams`
 
 - Description: Method to get all the room's teams.
-- Authentication: This endpoint requires the user to be authenticated with a valid access token
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token
 
 **Request Body**
 
@@ -1367,7 +1378,8 @@ curl -X GET http://localhost:8080/api/v1/rooms/{roomId}/teams \
 
 Status code: **200 OK**
 
-Description: The request was successful, and the response contains an array of team objects.
+Description: The request was successful, and the response contains an array of
+team objects.
 
 ```
 [
@@ -1404,7 +1416,8 @@ Description: The request was successful, and the response contains an array of t
 
 Status Code: **401 Unauthorized**
 
-Description: The request lacks proper authentication credentials or the provided token is invalid. Ensure that the correct authentication token is provided.
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
@@ -1414,7 +1427,8 @@ Description: The request lacks proper authentication credentials or the provided
 
 Status Code: **403 Forbidden**
 
-Description: The user does not have the required permissions to access the teams in this room.
+Description: The user does not have the required permissions to access the teams
+in this room.
 
 ```
 {
@@ -1434,7 +1448,8 @@ Description: The specified room cannot be found.
 
 Status code: **500 Internal Server Error**
 
-Description: The server encountered an unexpected error while processing the request.
+Description: The server encountered an unexpected error while processing the
+request.
 
 ```
 {
@@ -1444,8 +1459,8 @@ Description: The server encountered an unexpected error while processing the req
 
 #### 3. POST `api/v1/rooms/{roomId}/teams`
 
-Description: Method to create a new team in the specified room.
-Authentication: This endpoint requires the user to be authenticated with a valid access token.
+Description: Method to create a new team in the specified room. Authentication:
+This endpoint requires the user to be authenticated with a valid access token.
 
 **Request Body:**
 
@@ -1478,7 +1493,8 @@ curl -X POST http://localhost:8080/api/v1/rooms/{roomId}/teams \
 
 Status code: **201 Created**
 
-Description: The team was successfully created, and the response contains the created team object.
+Description: The team was successfully created, and the response contains the
+created team object.
 
 ```
 {
@@ -1499,7 +1515,8 @@ Description: The team was successfully created, and the response contains the cr
 
 Status Code: **400 Bad Request**
 
-Description: The request body is missing required fields or contains invalid data.
+Description: The request body is missing required fields or contains invalid
+data.
 
 ```
 {
@@ -1509,7 +1526,8 @@ Description: The request body is missing required fields or contains invalid dat
 
 Status Code: **401 Unauthorized**
 
-Description: The request lacks proper authentication credentials or the provided token is invalid. Ensure that the correct authentication token is provided.
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
@@ -1519,7 +1537,8 @@ Description: The request lacks proper authentication credentials or the provided
 
 Status Code: **403 Forbidden**
 
-Description: The user does not have the required permissions to create a team in this room.
+Description: The user does not have the required permissions to create a team in
+this room.
 
 ```
 {
@@ -1539,7 +1558,8 @@ Description: The specified room cannot be found.
 
 Status code: **500 Internal Server Error**
 
-Description: The server encountered an unexpected error while processing the request.
+Description: The server encountered an unexpected error while processing the
+request.
 
 ```
 {
@@ -1550,7 +1570,8 @@ Description: The server encountered an unexpected error while processing the req
 #### 4. GET `api/v1/rooms/{roomId}/teams/{teamId}`
 
 Description: Method to retrieve a specific team by its ID in the specified room.
-Authentication: This endpoint requires the user to be authenticated with a valid access token.
+Authentication: This endpoint requires the user to be authenticated with a valid
+access token.
 
 **Request body**
 
@@ -1558,7 +1579,8 @@ Empty
 
 **Example Request**
 
-Description: A `GET` request to retrieve details of a specific team in a specific room.
+Description: A `GET` request to retrieve details of a specific team in a
+specific room.
 
 ```
 curl -X GET http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId} \
@@ -1569,7 +1591,8 @@ curl -X GET http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId} \
 
 Status code: **200 OK**
 
-Description: The request was successful, and the response contains the details of the requested team.
+Description: The request was successful, and the response contains the details
+of the requested team.
 
 ```
 {
@@ -1590,7 +1613,8 @@ Description: The request was successful, and the response contains the details o
 
 Status Code: **401 Unauthorized**
 
-Description: The request lacks proper authentication credentials or the provided token is invalid. Ensure that the correct authentication token is provided.
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
@@ -1600,7 +1624,8 @@ Description: The request lacks proper authentication credentials or the provided
 
 Status Code: **403 Forbidden**
 
-Description: The user does not have the required permissions to access the team in this room.
+Description: The user does not have the required permissions to access the team
+in this room.
 
 ```
 {
@@ -1620,7 +1645,8 @@ Description: The specified team cannot be found in the specified room.
 
 Status code: **500 Internal Server Error**
 
-Description: The server encountered an unexpected error while processing the request.
+Description: The server encountered an unexpected error while processing the
+request.
 
 ```
 {
@@ -1630,17 +1656,23 @@ Description: The server encountered an unexpected error while processing the req
 
 #### 5. PUT `api/v1/rooms/{roomId}/teams/{teamId}`
 
-Description: Method to update the details of a specific team in the specified room.
-Authentication: This endpoint requires the user to be authenticated with a valid access token.
+Description: Method to update the details of a specific team in the specified
+room. Authentication: This endpoint requires the user to be authenticated with a
+valid access token.
 
 **Request Body**
 
 - name (string, optional): The updated name of the team.
-- players (array of strings, optional): An updated array of player IDs to be added to the team.
-- describer (string, optional): The updated ID of the user who will describe the selected word.
-- teamLeader (string, optional): The updated ID of the user who will lead the team.
-- selectedWord (string, optional): The updated ID of the word selected for the game.
-- tryedWords (array of strings, optional): An updated array of words that have been tried by the team.
+- players (array of strings, optional): An updated array of player IDs to be
+  added to the team.
+- describer (string, optional): The updated ID of the user who will describe the
+  selected word.
+- teamLeader (string, optional): The updated ID of the user who will lead the
+  team.
+- selectedWord (string, optional): The updated ID of the word selected for the
+  game.
+- tryedWords (array of strings, optional): An updated array of words that have
+  been tried by the team.
 
 **Example Request**
 
@@ -1667,7 +1699,8 @@ curl -X PUT http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId} \
 
 Status code: **200 OK**
 
-Description: The team was successfully updated, and the response contains the updated team object.
+Description: The team was successfully updated, and the response contains the
+updated team object.
 
 ```
 {
@@ -1688,7 +1721,8 @@ Description: The team was successfully updated, and the response contains the up
 
 Status Code: **400 Bad Request**
 
-Description: The request body is missing required fields or contains invalid data.
+Description: The request body is missing required fields or contains invalid
+data.
 
 ```
 {
@@ -1698,7 +1732,8 @@ Description: The request body is missing required fields or contains invalid dat
 
 Status Code: **401 Unauthorized**
 
-Description: The request lacks proper authentication credentials or the provided token is invalid. Ensure that the correct authentication token is provided.
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
@@ -1708,7 +1743,8 @@ Description: The request lacks proper authentication credentials or the provided
 
 Status Code: **403 Forbidden**
 
-Description: The user does not have the required permissions to update the team in this room.
+Description: The user does not have the required permissions to update the team
+in this room.
 
 ```
 {
@@ -1728,7 +1764,8 @@ Description: The specified team or room cannot be found.
 
 Status code: **500 Internal Server Error**
 
-Description: The server encountered an unexpected error while processing the request.
+Description: The server encountered an unexpected error while processing the
+request.
 
 ```
 {
@@ -1739,7 +1776,8 @@ Description: The server encountered an unexpected error while processing the req
 #### 6. DELETE `api/v1/rooms/{roomId}/teams/{teamId}`
 
 Description: Method to delete a specific team in the specified room.
-Authentication: This endpoint requires the user to be authenticated with a valid access token.
+Authentication: This endpoint requires the user to be authenticated with a valid
+access token.
 
 **Request body:**
 
@@ -1758,11 +1796,13 @@ curl -X DELETE http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId} \
 
 Status code: **204 No Content**
 
-Description: The request was successful, and the team has been deleted. No content is returned in the response.
+Description: The request was successful, and the team has been deleted. No
+content is returned in the response.
 
 Status Code: **401 Unauthorized**
 
-Description: The request lacks proper authentication credentials or the provided token is invalid. Ensure that the correct authentication token is provided.
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
@@ -1772,7 +1812,8 @@ Description: The request lacks proper authentication credentials or the provided
 
 Status Code: **403 Forbidden**
 
-Description: The user does not have the required permissions to delete the team in this room.
+Description: The user does not have the required permissions to delete the team
+in this room.
 
 ```
 {
@@ -1792,7 +1833,8 @@ Description: The specified team or room cannot be found.
 
 Status code: **500 Internal Server Error**
 
-Description: The server encountered an unexpected error while processing the request.
+Description: The server encountered an unexpected error while processing the
+request.
 
 ```
 {
@@ -1802,8 +1844,9 @@ Description: The server encountered an unexpected error while processing the req
 
 #### 7. GET `api/v1/rooms/{roomId}/teams/{teamId}/players`
 
-Description: Method to get all players in a specific team within a specified room.
-Authentication: This endpoint requires the user to be authenticated with a valid access token.
+Description: Method to get all players in a specific team within a specified
+room. Authentication: This endpoint requires the user to be authenticated with a
+valid access token.
 
 **Request Body**
 
@@ -1811,7 +1854,8 @@ Empty
 
 **Example Request**
 
-Description: A `GET` request to retrieve a list of all players in a specific team of a specific room.
+Description: A `GET` request to retrieve a list of all players in a specific
+team of a specific room.
 
 ```
 curl -X GET http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/players \
@@ -1822,7 +1866,8 @@ curl -X GET http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/players \
 
 Status code: **200 OK**
 
-Description: The request was successful, and the response contains an array of player objects.
+Description: The request was successful, and the response contains an array of
+player objects.
 
 ```
 [
@@ -1845,7 +1890,8 @@ Description: The request was successful, and the response contains an array of p
 
 Status Code: **401 Unauthorized**
 
-Description: The request lacks proper authentication credentials or the provided token is invalid. Ensure that the correct authentication token is provided.
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
@@ -1855,7 +1901,8 @@ Description: The request lacks proper authentication credentials or the provided
 
 Status Code: **403 Forbidden**
 
-Description: The user does not have the required permissions to access the players in this team.
+Description: The user does not have the required permissions to access the
+players in this team.
 
 ```
 {
@@ -1865,7 +1912,8 @@ Description: The user does not have the required permissions to access the playe
 
 Status Code: **404 Not Found**
 
-Description: The specified room or team cannot be found, or there are no players associated with the team.
+Description: The specified room or team cannot be found, or there are no players
+associated with the team.
 
 ```
 {
@@ -1875,7 +1923,8 @@ Description: The specified room or team cannot be found, or there are no players
 
 Status code: **500 Internal Server Error**
 
-Description: The server encountered an unexpected error while processing the request.
+Description: The server encountered an unexpected error while processing the
+request.
 
 ```
 {
@@ -1885,8 +1934,9 @@ Description: The server encountered an unexpected error while processing the req
 
 #### 8. POST `api/v1/rooms/{roomId}/teams/{teamId}/players/{userId}`
 
-Description: Method to add a player (specified by userId) to a team in a particular room.
-Authentication: This endpoint requires the user to be authenticated with a valid access token.
+Description: Method to add a player (specified by userId) to a team in a
+particular room. Authentication: This endpoint requires the user to be
+authenticated with a valid access token.
 
 **Request Body**
 
@@ -1894,7 +1944,8 @@ Empty
 
 **Example Request**
 
-Description: A `POST` request to add a player (specified by userId) to a team in a specific room.
+Description: A `POST` request to add a player (specified by userId) to a team in
+a specific room.
 
 ```
 curl -X POST http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/players/{userId} \
@@ -1915,7 +1966,8 @@ Description: The player was successfully added to the specified team.
 
 Status Code: **400 Bad Request**
 
-Description: The request was malformed, possibly due to incorrect or missing parameters.
+Description: The request was malformed, possibly due to incorrect or missing
+parameters.
 
 ```
 {
@@ -1925,7 +1977,8 @@ Description: The request was malformed, possibly due to incorrect or missing par
 
 Status Code: **401 Unauthorized**
 
-Description: The request lacks proper authentication credentials or the provided token is invalid.
+Description: The request lacks proper authentication credentials or the provided
+token is invalid.
 
 ```
 {
@@ -1935,7 +1988,8 @@ Description: The request lacks proper authentication credentials or the provided
 
 Status Code: **403 Forbidden**
 
-Description: The user does not have sufficient permissions to add players to this team.
+Description: The user does not have sufficient permissions to add players to
+this team.
 
 ```
 {
@@ -1955,7 +2009,8 @@ Description: The specified room, team, or user cannot be found.
 
 Status Code: **500 Internal Server Error**
 
-Description: The server encountered an unexpected error while processing the request.
+Description: The server encountered an unexpected error while processing the
+request.
 
 ```
 {
@@ -1965,8 +2020,9 @@ Description: The server encountered an unexpected error while processing the req
 
 #### 9. DELETE `api/v1/rooms/{roomId}/teams/{teamId}/players/{userId}`
 
-Description: Method to remove a player (specified by userId) from a team in a particular room.
-Authentication: This endpoint requires the user to be authenticated with a valid access token.
+Description: Method to remove a player (specified by userId) from a team in a
+particular room. Authentication: This endpoint requires the user to be
+authenticated with a valid access token.
 
 **Request Body**
 
@@ -1974,7 +2030,8 @@ Empty
 
 **Example Request**
 
-Description: A `DELETE` request to remove a player (specified by userId) from a team in a specific room.
+Description: A `DELETE` request to remove a player (specified by userId) from a
+team in a specific room.
 
 ```
 curl -X DELETE http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/players/{userId} \
@@ -1995,7 +2052,8 @@ Description: The player was successfully removed from the specified team.
 
 Status Code: **400 Bad Request**
 
-Description: The request was malformed, possibly due to incorrect or missing parameters.
+Description: The request was malformed, possibly due to incorrect or missing
+parameters.
 
 ```
 {
@@ -2005,7 +2063,8 @@ Description: The request was malformed, possibly due to incorrect or missing par
 
 Status Code: **401 Unauthorized**
 
-Description: The request lacks proper authentication credentials or the provided token is invalid.
+Description: The request lacks proper authentication credentials or the provided
+token is invalid.
 
 ```
 {
@@ -2015,7 +2074,8 @@ Description: The request lacks proper authentication credentials or the provided
 
 Status Code: **403 Forbidden**
 
-Description: The user does not have sufficient permissions to remove players from this team.
+Description: The user does not have sufficient permissions to remove players
+from this team.
 
 ```
 {
@@ -2025,7 +2085,8 @@ Description: The user does not have sufficient permissions to remove players fro
 
 Status Code: **404 Not Found**
 
-Description: The specified room, team, or user cannot be found, or the player is not part of the team.
+Description: The specified room, team, or user cannot be found, or the player is
+not part of the team.
 
 ```
 {
@@ -2035,7 +2096,8 @@ Description: The specified room, team, or user cannot be found, or the player is
 
 Status Code: **500 Internal Server Error**
 
-Description: The server encountered an unexpected error while processing the request.
+Description: The server encountered an unexpected error while processing the
+request.
 
 ```
 {
@@ -2045,16 +2107,20 @@ Description: The server encountered an unexpected error while processing the req
 
 #### 10. PUT `/api/v1/rooms/{roomId}/teams/{teamId}/describer`
 
-Description: This method sets a specific player (from the list of players in the team) as the describer of the team. The describer is responsible for explaining or describing selected words during the game.
-Authentication: This endpoint requires the user to be authenticated with a valid access token.
+Description: This method sets a specific player (from the list of players in the
+team) as the describer of the team. The describer is responsible for explaining
+or describing selected words during the game. Authentication: This endpoint
+requires the user to be authenticated with a valid access token.
 
 **Request Body**
 
-userId (string): The ID of the player to be set as the describer. This player must be part of the players array in the team.
+userId (string): The ID of the player to be set as the describer. This player
+must be part of the players array in the team.
 
 **Example Request**
 
-Description: A `PUT` request to set a player (specified by userId) as the describer in a specific team within a room.
+Description: A `PUT` request to set a player (specified by userId) as the
+describer in a specific team within a room.
 
 ```
 curl -X PUT http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/describer \
@@ -2091,7 +2157,8 @@ Description: The describer was successfully updated.
 
 Status Code: **400 Bad Request**
 
-Description: The request body is invalid, or the specified user is not part of the team.
+Description: The request body is invalid, or the specified user is not part of
+the team.
 
 ```
 {
@@ -2101,7 +2168,8 @@ Description: The request body is invalid, or the specified user is not part of t
 
 Status Code: **401 Unauthorized**
 
-Description: The request lacks proper authentication credentials or the provided token is invalid.
+Description: The request lacks proper authentication credentials or the provided
+token is invalid.
 
 ```
 {
@@ -2111,7 +2179,8 @@ Description: The request lacks proper authentication credentials or the provided
 
 Status Code: **403 Forbidden**
 
-Description: The user does not have sufficient permissions to update the describer.
+Description: The user does not have sufficient permissions to update the
+describer.
 
 ```
 {
@@ -2121,7 +2190,8 @@ Description: The user does not have sufficient permissions to update the describ
 
 Status Code: **404 Not Found**
 
-Description: The specified room or team cannot be found, or the player is not part of the team.
+Description: The specified room or team cannot be found, or the player is not
+part of the team.
 
 ```
 {
@@ -2131,7 +2201,8 @@ Description: The specified room or team cannot be found, or the player is not pa
 
 Status Code: **500 Internal Server Error**
 
-Description: The server encountered an unexpected error while processing the request.
+Description: The server encountered an unexpected error while processing the
+request.
 
 ```
 {
@@ -2141,16 +2212,21 @@ Description: The server encountered an unexpected error while processing the req
 
 #### 11. PUT `/api/v1/rooms/{roomId}/teams/{teamId}/teamLeader`
 
-Description: This method sets a specific player (from the list of players in the team) as the team leader. The team leader may have additional responsibilities, such as managing the team or making strategic decisions during the game.
-Authentication: This endpoint requires the user to be authenticated with a valid access token.
+Description: This method sets a specific player (from the list of players in the
+team) as the team leader. The team leader may have additional responsibilities,
+such as managing the team or making strategic decisions during the game.
+Authentication: This endpoint requires the user to be authenticated with a valid
+access token.
 
 **Request Body**
 
-userId (string): The ID of the player to be set as the team leader. This player must be part of the players array in the team.
+userId (string): The ID of the player to be set as the team leader. This player
+must be part of the players array in the team.
 
 **Example Request**
 
-Description: A `PUT` request to set a player (specified by userId) as the team leader in a specific team within a room.
+Description: A `PUT` request to set a player (specified by userId) as the team
+leader in a specific team within a room.
 
 ```
 curl -X PUT http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/teamLeader \
@@ -2187,7 +2263,8 @@ Description: The team leader was successfully updated.
 
 Status Code: **400 Bad Request**
 
-Description: The request body is invalid, or the specified user is not part of the team.
+Description: The request body is invalid, or the specified user is not part of
+the team.
 
 ```
 {
@@ -2197,7 +2274,8 @@ Description: The request body is invalid, or the specified user is not part of t
 
 Status Code: **401 Unauthorized**
 
-Description: The request lacks proper authentication credentials or the provided token is invalid.
+Description: The request lacks proper authentication credentials or the provided
+token is invalid.
 
 ```
 {
@@ -2207,7 +2285,8 @@ Description: The request lacks proper authentication credentials or the provided
 
 Status Code: **403 Forbidden**
 
-Description: The user does not have sufficient permissions to update the team leader.
+Description: The user does not have sufficient permissions to update the team
+leader.
 
 ```
 {
@@ -2217,7 +2296,8 @@ Description: The user does not have sufficient permissions to update the team le
 
 Status Code: **404 Not Found**
 
-Description: The specified room or team cannot be found, or the player is not part of the team.
+Description: The specified room or team cannot be found, or the player is not
+part of the team.
 
 ```
 {
@@ -2227,7 +2307,8 @@ Description: The specified room or team cannot be found, or the player is not pa
 
 Status Code: **500 Internal Server Error**
 
-Description: The server encountered an unexpected error while processing the request.
+Description: The server encountered an unexpected error while processing the
+request.
 
 ```
 {
@@ -2242,8 +2323,8 @@ Description: The server encountered an unexpected error while processing the req
 Information about the word
 
 | Column Name  | Data Type | Description                     |
-|:-------------|:----------|:--------------------------------|
-| _id          | ObjectId  | Unique identifier for each word |
+| :----------- | :-------- | :------------------------------ |
+| \_id         | ObjectId  | Unique identifier for each word |
 | word         | string    | Word name                       |
 | similarWords | string[]  | An array of similar words       |
 
@@ -2252,9 +2333,9 @@ Information about the word
 Endpoint
 
 - URL Path: **_/api/v1/word_**
-- Description: This endpoint creates a new word. It accepts word details in
-  the request body and returns a response indicating the result of the
-  creating process.
+- Description: This endpoint creates a new word. It accepts word details in the
+  request body and returns a response indicating the result of the creating
+  process.
 - Authentication: Authentication is required for this endpoint.
 
 **Request Body**
@@ -2266,7 +2347,8 @@ The request body must be in JSON format and include the following fields:
 
 **Example Request**
 
-Description: A `POST` request to the word creation endpoint. It includes a word name and an array of similar words.
+Description: A `POST` request to the word creation endpoint. It includes a word
+name and an array of similar words.
 
 ```
 
@@ -2299,7 +2381,8 @@ success message and the data of the created word.
 
 Status code: **400 Bad Request**
 
-Description: The request was invalid because one or more of the provided fields did not meet the required format or were missing.
+Description: The request was invalid because one or more of the provided fields
+did not meet the required format or were missing.
 
 ```
 {
@@ -2352,8 +2435,8 @@ curl -X GET http://localhost:8080/api/v1/words \
 
 Status code: **200 OK**
 
-Description: The array of words has been successfully returned. The response includes a
-success message and the array of words.
+Description: The array of words has been successfully returned. The response
+includes a success message and the array of words.
 
 ```
 {
@@ -2363,7 +2446,7 @@ success message and the array of words.
         "_id": "12456789",
         "word": "apple",
         "similarWords": ["", ""]
-    }, 
+    },
     {
         "_id": "12458942",
         "word": "car",
