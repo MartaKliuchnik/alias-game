@@ -7,6 +7,7 @@ import Room from './components/Room/Room';
 import HomePage from './components/HomePage/HomePage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Profile from './components/Profile/Profile';
+import Discussion from './components/Discussion/Discussion';
 
 export default function App() {
 	return (
@@ -16,9 +17,16 @@ export default function App() {
 				<Route path='/' element={<Register />} />
 				<Route path='login' element={<Login />} />
 				<Route path='leaderboard' element={<LeaderBoard />} />
-				<Route path='room' element={<Room name={"DEMO"}/>} />
+				<Route path='room' element={<Room name={"DEMO"} />} />
 				<Route path='home' element={<HomePage />} />
 				<Route path='profile' element={<Profile />} />
+				<Route path='discussion' element={<Discussion
+					teamName={"TestTeam"}
+					users={[
+						{ username: 'User1' },
+						{ username: 'User2' },
+						{ username: 'User3' }
+					]} />} />
 			</Routes>
 		</main>
 	);
