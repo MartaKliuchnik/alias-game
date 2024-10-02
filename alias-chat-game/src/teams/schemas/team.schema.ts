@@ -18,10 +18,10 @@ export class Team {
   @Prop({ type: [Types.ObjectId], ref: 'users', required: true })
   players: Types.ObjectId[];
 
-  @Prop({ type: Types.ObjectId, required: true })
+  @Prop({ type: Types.ObjectId })
   chatId: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'users', required: true })
+  @Prop({ type: Types.ObjectId, ref: 'users' })
   describer: Types.ObjectId;
 
   @Prop({ type: Boolean, default: false })
@@ -30,7 +30,7 @@ export class Team {
   @Prop({ type: [String], default: [] })
   tryedWords: string[];
 
-  @Prop({ type: Types.ObjectId, ref: 'users', required: true })
+  @Prop({ type: Types.ObjectId, ref: 'users' })
   teamLeader: Types.ObjectId;
 }
 

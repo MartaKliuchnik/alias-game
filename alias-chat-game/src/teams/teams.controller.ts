@@ -5,23 +5,21 @@ import {
   Body,
   Param,
   Delete,
-  ParseIntPipe,
+  //ParseIntPipe,
   Put,
 } from '@nestjs/common';
 import { TeamsService } from './teams.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
-import { SetDescriberDto } from './dto/set-describer.dto';
-import { SetTeamLeaderDto } from './dto/set-team-leader.dto';
 
-@Controller('teams')
+@Controller('rooms/:roomId/teams')
 export class TeamsController {
   constructor(private readonly teamsService: TeamsService) {}
 
   // Add a team to a room
   @Post() // api/v1/rooms/{roomId}/teams
   create(
-    @Param('roomId', ParseIntPipe) roomId: number,
+    @Param('roomId') roomId: string,
     @Body() createTeamDto: CreateTeamDto,
   ) {
     return this.teamsService.create(roomId, createTeamDto);
@@ -29,15 +27,15 @@ export class TeamsController {
 
   // Get all teams in a room
   @Get() // api/v1/rooms/{roomId}/teams
-  findAllTeams(@Param('roomId', ParseIntPipe) roomId: number) {
+  findAllTeams(@Param('roomId') roomId: string) {
     return this.teamsService.findAll(roomId);
   }
 
   // Get a specific team by ID
   @Get(':teamId') // api/v1/rooms/{roomId}/teams/{teamId}
   findOneTeam(
-    @Param('roomId', ParseIntPipe) roomId: number,
-    @Param('teamId', ParseIntPipe) teamId: number,
+    @Param('roomId') roomId: string,
+    @Param('teamId') teamId: string,
   ) {
     return this.teamsService.findOne(roomId, teamId);
   }
@@ -45,8 +43,8 @@ export class TeamsController {
   // Update a team by ID
   @Put(':teamId') // api/v1/rooms/{roomId}/teams/{teamId}
   updateTeam(
-    @Param('roomId', ParseIntPipe) roomId: number,
-    @Param('teamId', ParseIntPipe) teamId: number,
+    @Param('roomId') roomId: string,
+    @Param('teamId') teamId: string,
     @Body() updateTeamDto: UpdateTeamDto,
   ) {
     return this.teamsService.update(roomId, teamId, updateTeamDto);
@@ -54,18 +52,15 @@ export class TeamsController {
 
   // Delete a team by ID
   @Delete(':teamId') // api/v1/rooms/{roomId}/teams/{teamId}
-  removeTeam(
-    @Param('roomId', ParseIntPipe) roomId: number,
-    @Param('teamId', ParseIntPipe) teamId: number,
-  ) {
+  removeTeam(@Param('roomId') roomId: string, @Param('teamId') teamId: string) {
     return this.teamsService.remove(roomId, teamId);
   }
 
   // Get all players in a team
   @Get(':teamId/players') // api/v1/rooms/{roomId}/teams/{teamId}/players
   findAllTeamPlayers(
-    @Param('roomId', ParseIntPipe) roomId: number,
-    @Param('teamId', ParseIntPipe) teamId: number,
+    @Param('roomId') roomId: string,
+    @Param('teamId') teamId: string,
   ) {
     return this.teamsService.findAllTeamPlayers(roomId, teamId);
   }
@@ -73,9 +68,9 @@ export class TeamsController {
   // Add a player to a team
   @Post(':teamId/players/:userId') // api/v1/rooms/{roomId}/teams/{teamId}/players/{userId}
   addPlayer(
-    @Param('roomId', ParseIntPipe) roomId: number,
-    @Param('teamId', ParseIntPipe) teamId: number,
-    @Param('userId', ParseIntPipe) userId: number,
+    @Param('roomId') roomId: string,
+    @Param('teamId') teamId: string,
+    @Param('userId') userId: string,
   ) {
     return this.teamsService.addPlayer(roomId, teamId, userId);
   }
@@ -83,30 +78,19 @@ export class TeamsController {
   // Remove a player from a team
   @Delete(':teamId') // /api/v1/rooms/{roomId}/teams/{teamId}/players/{userId}
   removePlayer(
-    @Param('roomId', ParseIntPipe) roomId: number,
-    @Param('teamId', ParseIntPipe) teamId: number,
-    @Param('userId', ParseIntPipe) userId: number,
+    @Param('roomId') roomId: string,
+    @Param('teamId') teamId: string,
+    @Param('userId') userId: string,
   ) {
     return this.teamsService.removePlayer(roomId, teamId, userId);
   }
 
-  // Set a player as the team describer
-  @Put(':teamId/describer') // PUT /api/v1/rooms/{roomId}/teams/{teamId}/describer
-  setDescriber(
-    @Param('roomId', ParseIntPipe) roomId: number,
-    @Param('teamId', ParseIntPipe) teamId: number,
-    @Body() setDescriberDto: SetDescriberDto,
+  // Define a describer and leader in one round
+  @Put(':teamId/describerAndLeader') //api/v1/rooms/{roomId}/teams/{teamId}/describerAndLeader
+  defineDescriberAndLeader(
+    @Param('roomId') roomId: string,
+    @Param('teamId') teamId: string,
   ) {
-    return this.teamsService.setDescriber(roomId, teamId, setDescriberDto);
-  }
-
-  // Set a player as the team leader
-  @Put(':teamId/teamLeader') // PUT /api/v1/rooms/{roomId}/teams/{teamId}/describer
-  setTeamLeader(
-    @Param('roomId', ParseIntPipe) roomId: number,
-    @Param('teamId', ParseIntPipe) teamId: number,
-    @Body() setTeamLeaderDto: SetTeamLeaderDto,
-  ) {
-    return this.teamsService.setTeamLeader(roomId, teamId, setTeamLeaderDto);
+    return this.teamsService.defineDescriberAndLeader(roomId, teamId);
   }
 }

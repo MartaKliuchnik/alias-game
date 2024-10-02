@@ -8,10 +8,6 @@ import {
 import { Types } from 'mongoose';
 
 export class CreateTeamDto {
-  @IsMongoId()
-  @IsNotEmpty({ message: 'Room ID is required' })
-  roomId: Types.ObjectId;
-
   @IsString()
   @IsNotEmpty({ message: 'Team name is required' })
   name: string;
