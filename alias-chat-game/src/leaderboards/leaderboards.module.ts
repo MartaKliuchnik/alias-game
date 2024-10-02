@@ -9,4 +9,4 @@ import { UsersModule } from 'src/users/users.module';
   controllers: [LeaderboardsController],
   providers: [LeaderboardsService],
 })
-export class leaderboardsModule {}
+export class LeaderboardsModule {}

@@ -13,6 +13,7 @@ import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { SetDescriberDto } from './dto/set-describer.dto';
 import { SetTeamLeaderDto } from './dto/set-team-leader.dto';
+import { Types } from 'mongoose';
 
 @Controller('teams')
 export class TeamsController {
@@ -21,7 +22,7 @@ export class TeamsController {
   // Add a team to a room
   @Post() // api/v1/rooms/{roomId}/teams
   create(
-    @Param('roomId', ParseIntPipe) roomId: number,
+    @Param('roomId') roomId: Types.ObjectId,
     @Body() createTeamDto: CreateTeamDto,
   ) {
     return this.teamsService.create(roomId, createTeamDto);
@@ -45,11 +46,10 @@ export class TeamsController {
   // Update a team by ID
   @Put(':teamId') // api/v1/rooms/{roomId}/teams/{teamId}
   updateTeam(
-    @Param('roomId', ParseIntPipe) roomId: number,
-    @Param('teamId', ParseIntPipe) teamId: number,
+    @Param('teamId') teamId: Types.ObjectId,
     @Body() updateTeamDto: UpdateTeamDto,
   ) {
-    return this.teamsService.update(roomId, teamId, updateTeamDto);
+    return this.teamsService.update(teamId, updateTeamDto);
   }
 
   // Delete a team by ID
@@ -68,16 +68,6 @@ export class TeamsController {
     @Param('teamId', ParseIntPipe) teamId: number,
   ) {
     return this.teamsService.findAllTeamPlayers(roomId, teamId);
-  }
-
-  // Add a player to a team
-  @Post(':teamId/players/:userId') // api/v1/rooms/{roomId}/teams/{teamId}/players/{userId}
-  addPlayer(
-    @Param('roomId', ParseIntPipe) roomId: number,
-    @Param('teamId', ParseIntPipe) teamId: number,
-    @Param('userId', ParseIntPipe) userId: number,
-  ) {
-    return this.teamsService.addPlayer(roomId, teamId, userId);
   }
 
   // Remove a player from a team
