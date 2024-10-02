@@ -30,7 +30,7 @@ export default function Login() {
 	return (
 		<div className='container my-5'>
 			{success ? (
-				navigate('/room')
+				navigate('/home')
 			) : (
 				<section className='row justify-content-center'>
 					<div className='col-lg-4 col-md-6'>
