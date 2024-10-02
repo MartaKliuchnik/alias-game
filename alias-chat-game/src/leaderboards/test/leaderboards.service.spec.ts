@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { LeaderboardService } from '../leaderboard.service';
+import { LeaderboardsService } from '../leaderboards.service';
 import { UsersService } from '../../users/users.service';
 
-describe('LeaderboardService', () => {
-  let service: LeaderboardService;
+describe('LeaderboardsService', () => {
+  let service: LeaderboardsService;
 
   const mockUsersService = {
     getUsers: jest.fn(),
@@ -12,7 +12,7 @@ describe('LeaderboardService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        LeaderboardService,
+        LeaderboardsService,
         {
           provide: UsersService,
           useValue: mockUsersService,
@@ -20,7 +20,7 @@ describe('LeaderboardService', () => {
       ],
     }).compile();
 
-    service = module.get<LeaderboardService>(LeaderboardService);
+    service = module.get<LeaderboardsService>(LeaderboardsService);
   });
 
   it('should be defined', () => {

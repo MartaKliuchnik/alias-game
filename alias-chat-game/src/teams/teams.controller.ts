@@ -5,7 +5,7 @@ import {
   Body,
   Param,
   Delete,
-  ParseIntPipe,
+  //ParseIntPipe,
   Put,
 } from '@nestjs/common';
 import { TeamsService } from './teams.service';
@@ -13,6 +13,7 @@ import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { SetDescriberDto } from './dto/set-describer.dto';
 import { SetTeamLeaderDto } from './dto/set-team-leader.dto';
+import { Types } from 'mongoose';
 
 @Controller('rooms/:roomId/teams')
 export class TeamsController {
@@ -49,7 +50,7 @@ export class TeamsController {
     @Param('teamId') teamId: string,
     @Body() updateTeamDto: UpdateTeamDto,
   ) {
-    return this.teamsService.update(roomId, teamId, updateTeamDto);
+    return this.teamsService.update(teamId, updateTeamDto);
   }
 
   // Delete a team by ID
@@ -87,23 +88,12 @@ export class TeamsController {
     return this.teamsService.removePlayer(roomId, teamId, userId);
   }
 
-  // Set a player as the team describer
-  @Put(':teamId/describer') // PUT /api/v1/rooms/{roomId}/teams/{teamId}/describer
-  setDescriber(
+  // Define a describer and leader in one round
+  @Put(':teamId/describerAndLeader') //api/v1/rooms/{roomId}/teams/{teamId}/describerAndLeader
+  defineDescriberAndLeader(
     @Param('roomId') roomId: string,
     @Param('teamId') teamId: string,
-    @Body() setDescriberDto: SetDescriberDto,
   ) {
-    return this.teamsService.setDescriber(roomId, teamId, setDescriberDto);
-  }
-
-  // Set a player as the team leader
-  @Put(':teamId/teamLeader') // PUT /api/v1/rooms/{roomId}/teams/{teamId}/describer
-  setTeamLeader(
-    @Param('roomId') roomId: string,
-    @Param('teamId') teamId: string,
-    @Body() setTeamLeaderDto: SetTeamLeaderDto,
-  ) {
-    return this.teamsService.setTeamLeader(roomId, teamId, setTeamLeaderDto);
+    return this.teamsService.defineDescriberAndLeader(roomId, teamId);
   }
 }

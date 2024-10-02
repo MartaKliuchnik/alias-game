@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 
-export type ArchievedUserDocument = HydratedDocument<ArchivedUser>;
+export type ArchivedUserDocument = HydratedDocument<ArchivedUser>;
 
 @Schema({
   collection: 'archivedUsers',
