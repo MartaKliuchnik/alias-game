@@ -11,6 +11,9 @@ import {
 import { TeamsService } from './teams.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
+import { SetDescriberDto } from './dto/set-describer.dto';
+import { SetTeamLeaderDto } from './dto/set-team-leader.dto';
+import { Types } from 'mongoose';
 
 @Controller('rooms/:roomId/teams')
 export class TeamsController {
@@ -47,7 +50,7 @@ export class TeamsController {
     @Param('teamId') teamId: string,
     @Body() updateTeamDto: UpdateTeamDto,
   ) {
-    return this.teamsService.update(roomId, teamId, updateTeamDto);
+    return this.teamsService.update(teamId, updateTeamDto);
   }
 
   // Delete a team by ID

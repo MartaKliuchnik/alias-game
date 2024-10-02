@@ -5,32 +5,28 @@ import {
   Patch,
   Param,
   Delete,
-  Post,
-  ValidationPipe,
   Query,
+  UseGuards,
+  Post,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UserSafeDto } from './dto/user-safe.dto';
-import { ParseObjectIdPipe } from 'src/parse-int.pipe';
+import { ParseObjectIdPipe } from '../parse-int.pipe';
 import { Types } from 'mongoose';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthGuard } from '../auth/gurards/auth.guard';
+import { RoomsService } from 'src/rooms/rooms.service';
+import { TeamsService } from 'src/teams/teams.service';
 
 // UsersController handles CRUD operations for user management.
+@UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
-
-  /**
-   * @route POST /api/v1/users
-   * @description Create a new user
-   * @access Public
-   */
-  @Post()
-  async create(@Body(new ValidationPipe()) createUserDto: CreateUserDto) {
-    return this.usersService.createUser(createUserDto);
-  }
-
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly roomsService: RoomsService,
+    private readonly teamsService: TeamsService,
+  ) {}
   /**
    * @route GET /api/v1/users
    * @description Retrieve all users
@@ -38,7 +34,7 @@ export class UsersController {
    */
   @Get()
   async findAll(): Promise<UserSafeDto[] | []> {
-    return this.usersService.findAll();
+    return this.usersService.getUsers();
   }
 
   /**
@@ -50,7 +46,7 @@ export class UsersController {
   async findOne(
     @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
   ): Promise<UserSafeDto | null> {
-    const user = await this.usersService.findOne(userId);
+    const user = await this.usersService.getUserById(userId);
     return user;
   }
 
@@ -63,9 +59,9 @@ export class UsersController {
   async remove(
     @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
     @Query('hardDelete') hardDelete: string,
-  ) {
+  ): Promise<{ message: string }> {
     const isHardDelete = hardDelete === 'true';
-    return this.usersService.remove(userId, isHardDelete);
+    return this.usersService.removeUser(userId, isHardDelete);
   }
 
   /**
@@ -73,11 +69,36 @@ export class UsersController {
    * @description Update the specified user
    * @access Private (Authenticated user)
    */
-  @Patch(':id')
+  @Patch(':userId')
   update(
-    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
-    @Body(new ValidationPipe()) updateUserDto: UpdateUserDto,
+    @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<UserSafeDto> {
+    return this.usersService.updateUser(userId, updateUserDto);
+  }
+
+  /**
+   * @route POST /api/v1/users/{userId}/room/join
+   * @description Add the specified user in the room
+   * @access Private (Authenticated user)
+   */
+  @Post(':userId/room/join')
+  async joinRoom(@Param('userId', ParseObjectIdPipe) userId: Types.ObjectId) {
+    const room = await this.roomsService.addUserToRoom(userId);
+    return room;
+  }
+
+  /**
+   * @route POST /api/v1/users/{userId}/team/join/{teamId}
+   * @description Add the specified user in the team
+   * @access Private (Authenticated user)
+   */
+  @Post(':userId/team/join/:teamId')
+  async joinTeam(
+    @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
+    @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
   ) {
-    return this.usersService.update(id, updateUserDto);
+    const team = await this.teamsService.addPlayerToTeam(userId, teamId);
+    return team;
   }
 }

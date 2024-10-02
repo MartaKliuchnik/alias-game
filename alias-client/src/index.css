@@ -1,0 +1,15 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0 auto;
+	background-color: linear-gradient(
+		180deg,
+		rgba(255, 255, 255, 1) 0%,
+		#f0f0f0 100%
+	);
+	font-family: 'Arial', sans-serif;
+}
