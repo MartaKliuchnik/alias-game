@@ -154,11 +154,21 @@ export class RoomsService {
    * @returns {Promise<RoomDocument | null>} - The updated room document after adding the teams, or null if the room is not found.
    * @throws {NotFoundException} - If the room with the specified ID is not found.
    */
-  async updateTeam(roomId: Types.ObjectId, teamIds: Types.ObjectId[]) {
+  async updateTeam(
+    roomId: Types.ObjectId,
+    teamIds: Types.ObjectId[],
+  ): Promise<RoomDocument | null> {
     return this.roomModel.findByIdAndUpdate(
       roomId,
       { $addToSet: { teams: { $each: teamIds } } },
       { new: true },
     );
+  }
+
+  /**
+   * Deletes all rooms from the database.
+   */
+  async deleteAllRooms(): Promise<void> {
+    await this.roomModel.deleteMany({}); // This will delete all documents in the rooms collection
   }
 }
