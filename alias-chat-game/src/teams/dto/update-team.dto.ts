@@ -16,6 +16,10 @@ export class UpdateTeamDto {
   describer?: Types.ObjectId;
 
   @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
   @IsMongoId({ message: 'Team leader must be a valid user ID' })
   teamLeader?: Types.ObjectId;
 
