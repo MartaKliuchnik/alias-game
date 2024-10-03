@@ -24,6 +24,7 @@ export class InitializationService implements OnModuleInit {
    * Creates default rooms if they do not already exist in the database.
    */
   private async createDefaultRooms() {
+    await this.roomsService.deleteAllRooms();
     const initialRooms: CreateRoomDto[] = [
       { name: 'Room1', teams: [], turnTime: 60 },
       { name: 'Room2', teams: [], turnTime: 60 },
