@@ -16,6 +16,7 @@ import { UpdateWordDto } from './dto/update-word.dto';
 import { Word } from './schemas/word.schema';
 import { Types } from 'mongoose';
 import { AuthGuard } from 'src/auth/gurards/auth.guard';
+import { ParseObjectIdPipe } from 'src/parse-id.pipe';
 
 @Controller('words')
 export class WordsController {
@@ -36,28 +37,30 @@ export class WordsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: Types.ObjectId): Promise<Word> {
+  findOne(@Param('id', ParseObjectIdPipe) id: Types.ObjectId): Promise<Word> {
     return this.wordsService.findOne(id);
   }
 
   @Patch(':id')
   update(
-    @Param('id') id: Types.ObjectId,
+    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
     @Body() updateWordDto: UpdateWordDto,
   ): Promise<Word> {
     return this.wordsService.update(id, updateWordDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: Types.ObjectId): Promise<{ message: string }> {
+  remove(
+    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
+  ): Promise<{ message: string }> {
     return this.wordsService.remove(id);
   }
 
   @Post('random')
   @UseGuards(AuthGuard)
   async getRandomWord(
-    @Body('roomId') roomId: Types.ObjectId,
-    @Body('teamId') teamId: Types.ObjectId,
+    @Body('roomId', ParseObjectIdPipe) roomId: Types.ObjectId,
+    @Body('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
     @Req() request: any, // Get the request to access JWT payload
   ): Promise<{ word: Word; tryedWords: Types.ObjectId[] }> {
     return this.wordsService.getRandomWord(roomId, teamId, request.userId);
@@ -65,7 +68,7 @@ export class WordsController {
 
   @Post(':id/check-answer')
   async checkAnswer(
-    @Param('id') wordId: Types.ObjectId,
+    @Param('id', ParseObjectIdPipe) wordId: Types.ObjectId,
     @Body('answer') answer: string,
   ): Promise<{ correct: boolean }> {
     const isCorrect = await this.wordsService.checkAnswer(wordId, answer);
@@ -74,7 +77,7 @@ export class WordsController {
 
   @Post(':id/check-description')
   async checkDescription(
-    @Param('id') wordId: Types.ObjectId,
+    @Param('id', ParseObjectIdPipe) wordId: Types.ObjectId,
     @Body('description') description: string,
   ): Promise<{ correct: boolean }> {
     const isCorrect = await this.wordsService.checkDescription(
