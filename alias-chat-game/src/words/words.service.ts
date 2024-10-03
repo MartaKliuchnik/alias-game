@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
@@ -10,11 +11,15 @@ import { CreateWordDto } from './dto/create-word.dto';
 import { UpdateWordDto } from './dto/update-word.dto';
 import * as levenshtein from 'fast-levenshtein';
 import * as natural from 'natural';
+import { TeamsService } from 'src/teams/teams.service';
+import { UpdateTeamDto } from 'src/teams/dto/update-team.dto';
 
 @Injectable()
 export class WordsService {
-  // eslint-disable-next-line prettier/prettier
-  constructor(@InjectModel(Word.name) private wordModel: Model<WordDocument>) { }
+  constructor(
+    @InjectModel(Word.name) private wordModel: Model<WordDocument>,
+    private teamsService: TeamsService,
+  ) {}
 
   async create(createWordDto: CreateWordDto): Promise<WordDocument> {
     const existingWord = await this.wordModel.findOne({
@@ -75,31 +80,57 @@ export class WordsService {
   }
 
   /**
-   * Retrieves a random word that has not been tried yet.
+   * Retrieves a random word that has not been tried yet by the describer.
    *
-   * @param tryedWords - An array of ObjectIds representing words that have already been tried.
+   * @param roomId - The ID of the room where the team is located.
+   * @param teamId - The ID of the team requesting a new word.
+   * @param userId - The ID of the user requesting the word, used to verify if they are the describer.
    * @returns A promise that resolves to an object containing a random word and the updated list of tried words.
-   * @throws NotFoundException if no unused words are found.
+   * @throws NotFoundException if the team is not found or no unused words are available.
+   * @throws UnauthorizedException if the user is not the describer of the team.
    */
   async getRandomWord(
-    tryedWords: Types.ObjectId[],
+    roomId: Types.ObjectId,
+    teamId: Types.ObjectId,
+    userId: Types.ObjectId,
   ): Promise<{ word: WordDocument; tryedWords: Types.ObjectId[] }> {
-    // Find words that are not in the list of tried words
+    const team = await this.teamsService.findOne(roomId, teamId);
+
+    if (!team) {
+      throw new NotFoundException(
+        `Team ${teamId} in room ${roomId} not found.`,
+      );
+    }
+
+    // Verify if the requesting user is the describer of the team
+    if (team.describer !== userId) {
+      throw new UnauthorizedException('Only the describer can get a new word.');
+    }
+
+    const tryedWords = team.tryedWords;
     const unusedWords = await this.wordModel
       .find({
         _id: { $nin: tryedWords },
       })
       .exec();
 
+    // If there are no unused words available, throw a NotFoundException
     if (unusedWords.length === 0) {
       throw new NotFoundException('No unused words found.');
     }
 
-    // Select a random word from the unused words
+    // Select a random word from the list of unused words
     const randomIndex = Math.floor(Math.random() * unusedWords.length);
     const randomWord = unusedWords[randomIndex];
 
     tryedWords.push(randomWord._id);
+
+    const updateTeamDto: UpdateTeamDto = {
+      selectedWord: randomWord._id,
+      tryedWords: tryedWords,
+    };
+
+    await this.teamsService.update(teamId, updateTeamDto);
 
     return {
       word: randomWord,

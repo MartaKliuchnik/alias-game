@@ -50,6 +50,7 @@ export class TeamsController {
     @Body() updateTeamDto: UpdateTeamDto,
   ) {
     return this.teamsService.update(teamId, updateTeamDto);
+    return this.teamsService.update(teamId, updateTeamDto);
   }
 
   // Delete a team by ID
@@ -77,6 +78,7 @@ export class TeamsController {
     @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
   ) {
     return this.teamsService.addPlayerToTeam(userId, teamId);
+    return this.teamsService.addPlayerToTeam(userId, teamId);
   }
 
   // Remove a player from a team
@@ -90,7 +92,7 @@ export class TeamsController {
   }
 
   // Define a describer and leader in one round
-  @Put(':teamId/describerAndLeader') //api/v1/rooms/{roomId}/teams/{teamId}/describerAndLeader
+  @Put(':teamId/roles') //api/v1/rooms/{roomId}/teams/{teamId}/roles
   defineDescriberAndLeader(
     @Param('roomId', ParseObjectIdPipe) roomId: Types.ObjectId,
     @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
