@@ -2,12 +2,10 @@ import { useEffect, useState } from 'react';
 import mockLeaderboard from '../../data/mockLeader';
 import { Link } from 'react-router-dom';
 
-export default function LeaderBoard() {
+export default function LeaderBoardPage() {
 	const [users, setUsers] = useState([]);
 
 	useEffect(() => {
-		console.log(mockLeaderboard);
-
 		setUsers(mockLeaderboard);
 	}, []);
 

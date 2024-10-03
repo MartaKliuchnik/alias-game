@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-export default function Login() {
+export default function RegisterPage() {
 	const userRef = useRef();
 	const errRef = useRef();
 	const navigate = useNavigate();
@@ -30,12 +30,19 @@ export default function Login() {
 	return (
 		<div className='container my-5'>
 			{success ? (
-				navigate('/home')
+				navigate('/login')
 			) : (
-				<section className='row justify-content-center'>
+				<section
+					className='row justify-content-center gap-5'
+					style={{ marginTop: '8rem' }}
+				>
 					<div className='col-lg-4 col-md-6'>
 						<div className='card shadow-sm p-4'>
-							<h2 className='text-center'>Log In</h2>
+							<h2 className='text-center'>Welcome to Alias Game</h2>
+							<p className='text-center'>
+								Already have an Account? <Link to='/login'>Log In</Link>
+							</p>
+
 							<p
 								ref={errRef}
 								className={errMsg ? 'alert alert-danger' : 'offscreen'}
@@ -46,7 +53,9 @@ export default function Login() {
 
 							<form onSubmit={handleSubmit}>
 								<div className='mb-3'>
-									<label htmlFor='username'>Username</label>
+									<label htmlFor='username' className='form-label'>
+										Username
+									</label>
 									<input
 										type='text'
 										id='username'
@@ -61,7 +70,9 @@ export default function Login() {
 								</div>
 
 								<div className='mb-3'>
-									<label htmlFor='password'>Password</label>
+									<label htmlFor='password' className='form-label'>
+										Password
+									</label>
 									<input
 										type='password'
 										id='password'
@@ -74,9 +85,26 @@ export default function Login() {
 								</div>
 
 								<button className='btn btn-lg btn-secondary w-100'>
-									Log In
+									Create Account
 								</button>
 							</form>
+						</div>
+					</div>
+					<div className='col-lg-6 col-md-8 mt-5 mt-lg-0'>
+						<div className='p-4'>
+							<h3 className='text-center mb-5'>About Alias Game</h3>
+							<p>
+								Alias is a fun and interactive word-guessing game where players
+								form teams to compete. One teammate describes a word while the
+								others try to guess it. The game promotes quick thinking and
+								team coordination, and includes a chat feature for easy
+								communication.
+							</p>
+							<p className='text-black fw-bold'>
+								Ready to test your skills and have some fun? Register now and
+								start playing with friends or challenge others in this exciting
+								word-guessing game!
+							</p>
 						</div>
 					</div>
 				</section>
