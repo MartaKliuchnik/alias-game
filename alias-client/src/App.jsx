@@ -21,7 +21,8 @@ export default function App() {
 				<Route path='home' element={<HomePage />} />
 				<Route path='profile' element={<Profile />} />
 				<Route path='discussion' element={<Discussion
-					teamName={"TestTeam"}
+					teamName={'TestTeam'}
+					description={'Description for word team has to guess.'}
 					users={[
 						{ username: 'User1' },
 						{ username: 'User2' },

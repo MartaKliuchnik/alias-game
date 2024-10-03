@@ -2,23 +2,23 @@ import { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Timer = ({ startTime, onTimeOut }) => {
-    const [time, setTime] = useState(startTime);
-  
-    useEffect(() => {
-      if (time === 0) {
-        onTimeOut(); // Call action when time is out
-        return; // Exit effect if time is 0
-      }
-  
-      const timerId = setInterval(() => {
-        setTime((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
-      }, 1000);
-  
-      return () => clearInterval(timerId); // Clean up the timer
-    }, [time, onTimeOut]);
-  
-    return <div className="text-white">Timer {time} sec</div>;
-  };
+  const [time, setTime] = useState(startTime);
+
+  useEffect(() => {
+    if (time === 0) {
+      onTimeOut(); // Call action when time is out
+      return; // Exit effect if time is 0
+    }
+
+    const timerId = setInterval(() => {
+      setTime((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
+    }, 1000);
+
+    return () => clearInterval(timerId); // Clean up the timer
+  }, [time, onTimeOut]);
+
+  return <div className="text-white">Timer {time} sec</div>;
+};
 
 // UserCard Component
 const UserCard = ({ username }) => (
@@ -40,7 +40,7 @@ const TeamList = ({ teamName, users }) => (
 );
 
 // Main Component
-export default function Discussion ({teamName, users}) {
+export default function Discussion({ teamName, users, description }) {
   return (
     <div className="container py-5">
       <div className="row">
@@ -48,19 +48,25 @@ export default function Discussion ({teamName, users}) {
         <div className="col-md-3">
           {/* Timer */}
           <div className="mb-4 bg-dark p-3 rounded">
-            <Timer startTime={60} onTimeOut={()=>{}}/>
+            <Timer startTime={60} onTimeOut={() => { }} />
           </div>
           {/* Team List */}
           <div className="bg-dark p-3 rounded">
             <TeamList teamName={teamName} users={users} />
           </div>
         </div>
-        
-        {/* Right column: Description and Chat*/}
-        <div className="col-md-9">
-          <div className="bg-dark text-white p-5 rounded">
-            <h5>Description</h5>
-            <p>This is the description area. You can add any relevant text or details here.</p>
+
+        {/* Right column: Description and Chat */}
+        <div className="col-md-9 d-flex flex-column">
+          {/* Description */}
+          <div className="bg-dark text-white p-3 rounded mb-2">
+            <h6 className="mb-1">Description</h6>
+            <p className="mb-0">{description}</p>
+          </div>
+
+          {/* Empty Block for Chat */}
+          <div className="bg-secondary rounded flex-grow-1">
+            {/* Insert Chat component */}
           </div>
         </div>
       </div>
