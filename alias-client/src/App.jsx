@@ -25,19 +25,14 @@ export default function App() {
 				<Route path='room' element={<Room name={'DEMO'} />} />
 				<Route path='home' element={<HomePage />} />
 				<Route path='profile' element={<Profile />} />
-				<Route
-					path='discussion'
-					element={
-						<Discussion
-							teamName={'TestTeam'}
-							users={[
-								{ username: 'User1' },
-								{ username: 'User2' },
-								{ username: 'User3' },
-							]}
-						/>
-					}
-				/>
+				<Route path='discussion' element={<Discussion
+					teamName={'TestTeam'}
+					description={'Description for word team has to guess.'}
+					users={[
+						{ username: 'User1' },
+						{ username: 'User2' },
+						{ username: 'User3' }
+					]} />} />
 			</Routes>
 		</main>
 	);
