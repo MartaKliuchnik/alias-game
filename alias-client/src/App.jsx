@@ -1,23 +1,28 @@
 import { Route, Routes } from 'react-router-dom';
-import Navbar from './components/Navbar/Navbar';
-import Register from './components/Register/Register';
-import Login from './components/Login/Login';
-import LeaderBoard from './components/LeaderBoard/LeaderBoard';
-import Room from './components/Room/Room';
-import HomePage from './components/HomePage/HomePage';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Navbar from './components/Navbar/Navbar';
+import HomePage from './components/HomePage/HomePage';
+import LoginPage from './pages/LoginPage/LoginPage';
+import LeaderBoardPage from './pages/LeaderBoardPage/LeaderBoardPage';
+import RegisterPage from './pages/RegisterPage/RegisterPage';
+import LeaderPage from './pages/LeaderPage/LeaderPage';
+import TeamsResultPage from './pages/TeamsResultPage/TeamsResultPage';
+import Room from './components/room/room';
 import Profile from './components/Profile/Profile';
 import Discussion from './components/Discussion/Discussion';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default function App() {
 	return (
 		<main>
 			<Navbar />
 			<Routes>
-				<Route path='/' element={<Register />} />
-				<Route path='login' element={<Login />} />
-				<Route path='leaderboard' element={<LeaderBoard />} />
-				<Route path='room' element={<Room name={"DEMO"} />} />
+				<Route path='/' element={<RegisterPage />} />
+				<Route path='login' element={<LoginPage />} />
+				<Route path='leaderboard' element={<LeaderBoardPage />} />
+				<Route path='leader' element={<LeaderPage />} />
+				<Route path='teams-result' element={<TeamsResultPage />} />
+				<Route path='room' element={<Room name={'DEMO'} />} />
 				<Route path='home' element={<HomePage />} />
 				<Route path='profile' element={<Profile />} />
 				<Route path='discussion' element={<Discussion
