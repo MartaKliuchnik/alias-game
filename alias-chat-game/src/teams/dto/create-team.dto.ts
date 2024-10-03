@@ -12,6 +12,10 @@ export class CreateTeamDto {
   @IsNotEmpty({ message: 'Team name is required' })
   name: string;
 
+  @IsString()
+  @IsMongoId({ message: 'Must be a valid room ID' })
+  roomId: Types.ObjectId;
+
   @IsArray()
   @ArrayMinSize(2, { message: 'There must be at least 2 players' })
   @IsMongoId({ each: true, message: 'Each player must be a valid user ID' })

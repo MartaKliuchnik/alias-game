@@ -11,8 +11,7 @@ import {
 import { TeamsService } from './teams.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
-import { SetDescriberDto } from './dto/set-describer.dto';
-import { SetTeamLeaderDto } from './dto/set-team-leader.dto';
+import { ParseObjectIdPipe } from 'src/parse-id.pipe';
 import { Types } from 'mongoose';
 
 @Controller('rooms/:roomId/teams')
@@ -22,7 +21,7 @@ export class TeamsController {
   // Add a team to a room
   @Post() // api/v1/rooms/{roomId}/teams
   create(
-    @Param('roomId') roomId: string,
+    @Param('roomId', ParseObjectIdPipe) roomId: Types.ObjectId,
     @Body() createTeamDto: CreateTeamDto,
   ) {
     return this.teamsService.create(roomId, createTeamDto);
@@ -30,15 +29,15 @@ export class TeamsController {
 
   // Get all teams in a room
   @Get() // api/v1/rooms/{roomId}/teams
-  findAllTeams(@Param('roomId') roomId: string) {
+  findAllTeams(@Param('roomId', ParseObjectIdPipe) roomId: Types.ObjectId) {
     return this.teamsService.findAll(roomId);
   }
 
   // Get a specific team by ID
   @Get(':teamId') // api/v1/rooms/{roomId}/teams/{teamId}
   findOneTeam(
-    @Param('roomId') roomId: string,
-    @Param('teamId') teamId: string,
+    @Param('roomId', ParseObjectIdPipe) roomId: Types.ObjectId,
+    @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
   ) {
     return this.teamsService.findOne(roomId, teamId);
   }
@@ -46,8 +45,8 @@ export class TeamsController {
   // Update a team by ID
   @Put(':teamId') // api/v1/rooms/{roomId}/teams/{teamId}
   updateTeam(
-    @Param('roomId') roomId: string,
-    @Param('teamId') teamId: string,
+    @Param('roomId', ParseObjectIdPipe) roomId: Types.ObjectId,
+    @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
     @Body() updateTeamDto: UpdateTeamDto,
   ) {
     return this.teamsService.update(teamId, updateTeamDto);
@@ -55,15 +54,18 @@ export class TeamsController {
 
   // Delete a team by ID
   @Delete(':teamId') // api/v1/rooms/{roomId}/teams/{teamId}
-  removeTeam(@Param('roomId') roomId: string, @Param('teamId') teamId: string) {
+  removeTeam(
+    @Param('roomId', ParseObjectIdPipe) roomId: Types.ObjectId,
+    @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
+  ) {
     return this.teamsService.remove(roomId, teamId);
   }
 
   // Get all players in a team
   @Get(':teamId/players') // api/v1/rooms/{roomId}/teams/{teamId}/players
   findAllTeamPlayers(
-    @Param('roomId') roomId: string,
-    @Param('teamId') teamId: string,
+    @Param('roomId', ParseObjectIdPipe) roomId: Types.ObjectId,
+    @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
   ) {
     return this.teamsService.findAllTeamPlayers(roomId, teamId);
   }
@@ -71,19 +73,18 @@ export class TeamsController {
   // Add a player to a team
   @Post(':teamId/players/:userId') // api/v1/rooms/{roomId}/teams/{teamId}/players/{userId}
   addPlayer(
-    @Param('roomId') roomId: string,
-    @Param('teamId') teamId: string,
-    @Param('userId') userId: string,
+    @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
+    @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
   ) {
-    return this.teamsService.addPlayer(roomId, teamId, userId);
+    return this.teamsService.addPlayerToTeam(userId, teamId);
   }
 
   // Remove a player from a team
   @Delete(':teamId') // /api/v1/rooms/{roomId}/teams/{teamId}/players/{userId}
   removePlayer(
-    @Param('roomId') roomId: string,
-    @Param('teamId') teamId: string,
-    @Param('userId') userId: string,
+    @Param('roomId', ParseObjectIdPipe) roomId: Types.ObjectId,
+    @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
+    @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
   ) {
     return this.teamsService.removePlayer(roomId, teamId, userId);
   }
@@ -91,8 +92,8 @@ export class TeamsController {
   // Define a describer and leader in one round
   @Put(':teamId/describerAndLeader') //api/v1/rooms/{roomId}/teams/{teamId}/describerAndLeader
   defineDescriberAndLeader(
-    @Param('roomId') roomId: string,
-    @Param('teamId') teamId: string,
+    @Param('roomId', ParseObjectIdPipe) roomId: Types.ObjectId,
+    @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
   ) {
     return this.teamsService.defineDescriberAndLeader(roomId, teamId);
   }

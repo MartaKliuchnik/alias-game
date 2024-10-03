@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import {useCookies} from "react-cookie";
 
-export default function Login() {
+export default function LoginPage() {
 	const userRef = useRef();
 	const errRef = useRef();
 	const navigate = useNavigate();
