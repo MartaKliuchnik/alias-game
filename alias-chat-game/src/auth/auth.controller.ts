@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  UnauthorizedException,
-  Headers,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
@@ -14,7 +7,7 @@ import { AuthGuard } from './gurards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post('register') // /api/v1/auth/register
   async register(@Body() createUserDto: CreateUserDto) {
@@ -33,10 +26,8 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Post('logout') // /api/v1/auth/logout
-  async logout(@Headers('Authorization') authHeader: string) {
-    if (!authHeader) {
-      throw new UnauthorizedException('Authorization header is missing');
-    }
-    return this.authService.logout(authHeader);
+  async logout(@Req() request: Request & { userId: string }) {
+    const userId = request.userId; // The userId is now extracted from the AuthGuard
+    return this.authService.logout(userId);
   }
 }

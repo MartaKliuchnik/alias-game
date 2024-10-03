@@ -1,9 +1,4 @@
-import {
-  IsString,
-  IsNotEmpty,
-  Length,
-  IsStrongPassword,
-} from 'class-validator';
+import { IsString, IsNotEmpty, Length } from 'class-validator';
 
 export class LoginDto {
   @IsString()
@@ -13,6 +8,5 @@ export class LoginDto {
 
   @IsString()
   @IsNotEmpty({ message: 'Password is required' })
-  @IsStrongPassword()
   password: string;
 }

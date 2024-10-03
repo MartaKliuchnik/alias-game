@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { Team } from './schemas/team.schema';
+import { Team, TeamDocument } from './schemas/team.schema';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { SetDescriberDto } from './dto/set-describer.dto';
@@ -15,7 +15,7 @@ import { SetTeamLeaderDto } from './dto/set-team-leader.dto';
 export class TeamsService {
   private readonly MAX_USERS_IN_TEAM = 3;
   constructor(@InjectModel(Team.name) private teamModel: Model<Team>) {}
-  
+
   /**
    * Creates a new team within a specified room.
    * @param {Types.ObjectId} roomId - The ID of the room where the team will be created.
@@ -23,21 +23,24 @@ export class TeamsService {
    * @returns {Promise<TeamDocument>} - The newly created team document.
    * @throws {InternalServerErrorException} - If an error occurs during the database operation.
    */
-  async create(roomId: string, createTeamDto: CreateTeamDto): Promise<Team> {
+  async create(
+    roomId: Types.ObjectId,
+    createTeamDto: CreateTeamDto,
+  ): Promise<TeamDocument> {
     const createdTeam = new this.teamModel({ ...createTeamDto, roomId });
     return createdTeam.save();
   }
-  
+
   /**
    * Retrieves a team by its ID.
    * @param {Types.ObjectId} teamId - The ID of the team to retrieve.
    * @returns {Promise<TeamDocument | null>} - The team document if found, or null if not found.
    * @throws {NotFoundException} - If the specified team is not found.
    */
-  async findTeamById(teamId: Types.ObjectId) {
+  async findTeamById(teamId: Types.ObjectId): Promise<TeamDocument | null> {
     return await this.teamModel.findById(teamId);
   }
-  
+
   /**
    * Adds a user to a specified team. If the team is full, an error is thrown.
    * @param {Types.ObjectId} userId - The ID of the user to be added to the team.
@@ -46,7 +49,10 @@ export class TeamsService {
    * @throws {NotFoundException} - If the specified team is not found.
    * @throws {BadRequestException} - If the team is already full.
    */
-  async addPlayerToTeam(userId: Types.ObjectId, teamId: Types.ObjectId) {
+  async addPlayerToTeam(
+    userId: Types.ObjectId,
+    teamId: Types.ObjectId,
+  ): Promise<object> {
     const team = await this.findTeamById(teamId);
     if (!team) {
       throw new NotFoundException('Team not found.');
@@ -69,14 +75,17 @@ export class TeamsService {
       teamId: team._id,
     };
   }
-   
+
   /**
    * Updates a team with the given ID using the provided updateTeamDto.
    * @param {Types.ObjectId} teamId - The ID of the team to be updated.
    * @param {UpdateTeamDto} updateTeamDto - An object containing the fields to be updated.
    * @returns {Promise<TeamDocument | null>} - The updated team document, or null if the team is not found.
    */
-  async update(teamId: Types.ObjectId, updateTeamDto: UpdateTeamDto) {
+  async update(
+    teamId: Types.ObjectId,
+    updateTeamDto: UpdateTeamDto,
+  ): Promise<TeamDocument | null> {
     return this.teamModel
       .findByIdAndUpdate(teamId, updateTeamDto, {
         new: true,
@@ -84,11 +93,11 @@ export class TeamsService {
       .exec();
   }
 
-  findAll(roomId: string) {
+  findAll(roomId: Types.ObjectId) {
     return this.teamModel.find({ roomId }).exec();
   }
 
-  async findOne(roomId: string, teamId: string) {
+  async findOne(roomId: Types.ObjectId, teamId: Types.ObjectId) {
     const team = await this.teamModel.findOne({ _id: teamId, roomId }).exec();
     if (!team) {
       throw new NotFoundException(`Team ${teamId} in room ${roomId} not found`);
@@ -96,9 +105,7 @@ export class TeamsService {
     return team;
   }
 
- 
-
-  async remove(roomId: string, teamId: string) {
+  async remove(roomId: Types.ObjectId, teamId: Types.ObjectId) {
     const result = await this.teamModel
       .deleteOne({ _id: teamId, roomId })
       .exec();
@@ -107,13 +114,16 @@ export class TeamsService {
     }
   }
 
-  async findAllTeamPlayers(roomId: string, teamId: string) {
+  async findAllTeamPlayers(roomId: Types.ObjectId, teamId: Types.ObjectId) {
     const team = await this.findOne(roomId, teamId);
     return team.players;
   }
 
-
-  async removePlayer(roomId: string, teamId: string, userId: string) {
+  async removePlayer(
+    roomId: Types.ObjectId,
+    teamId: Types.ObjectId,
+    userId: Types.ObjectId,
+  ) {
     const team = await this.teamModel
       .findOneAndUpdate(
         { _id: teamId, roomId },
@@ -138,7 +148,10 @@ export class TeamsService {
    * @param teamId - The ID of the team for which to define the next describer and leader.
    * @returns The updated team with new describer and leader.
    */
-  async defineDescriberAndLeader(roomId: string, teamId: string) {
+  async defineDescriberAndLeader(
+    roomId: Types.ObjectId,
+    teamId: Types.ObjectId,
+  ) {
     const team = await this.teamModel.findOne({ _id: teamId, roomId }).exec();
 
     if (!team) {
@@ -163,8 +176,8 @@ export class TeamsService {
   }
 
   private async setDescriber(
-    roomId: string,
-    teamId: string,
+    roomId: Types.ObjectId,
+    teamId: Types.ObjectId,
     setDescriberDto: SetDescriberDto,
   ) {
     const team = await this.teamModel
@@ -183,8 +196,8 @@ export class TeamsService {
   }
 
   private async setTeamLeader(
-    roomId: string,
-    teamId: string,
+    roomId: Types.ObjectId,
+    teamId: Types.ObjectId,
     setTeamLeaderDto: SetTeamLeaderDto,
   ) {
     const team = await this.teamModel

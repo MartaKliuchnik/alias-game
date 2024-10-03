@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Auth } from './schemas/auth.schema';
@@ -47,22 +43,9 @@ export class AuthService {
     };
   }
 
-  async logout(token: string): Promise<{ message: string }> {
-    const userId = this.extractUserIdFromToken(token);
-
+  async logout(userId: string): Promise<{ message: string }> {
     await this.authModel.deleteOne({ userId }).exec();
     return { message: 'User logged out successfully, refresh token deleted.' };
-  }
-
-  private extractUserIdFromToken(token: string): string {
-    const decoded = this.jwtService.verify(token, { secret: 'AliasSecret' });
-    const userId = decoded.userId;
-
-    if (!userId) {
-      throw new UnauthorizedException('Invalid token');
-    }
-
-    return userId;
   }
 
   async refresh(refreshTokenDto: RefreshTokenDto): Promise<any> {
