@@ -1,7 +1,7 @@
-import mockTeam from '../../data/mockTeam';
+import mockTeams from '../../data/mockTeams';
 
-export default function TeamResultPage() {
-	const success = false;
+export default function TeamsResultPage() {
+	const success = true;
 	const answerCorrect = 'bike';
 	const wrongAnswer = 'car';
 
@@ -11,15 +11,16 @@ export default function TeamResultPage() {
 				className='row justify-content-center align-items-stretch gap-5'
 				style={{ marginTop: '8rem' }}
 			>
-				{/* Section for showing the table with updated scores */}
+				{/* Section for showing the table with updated scores for teams */}
 				<div className='col-lg-5 col-md-6 d-flex'>
 					<div className='card shadow d-flex h-100'>
 						<div className='card-body'>
-							<h2 className='text-center mb-4'>Results {mockTeam.name}</h2>
+							<h2 className='text-center mb-4'>Team Leaderboard</h2>
 							{success ? (
 								<p className='text-success text-center'>
 									Congratulations! Each player has earned +10 points for
-									providing the correct word.
+									providing the correct word. The leaderboard below reflects the
+									updated team scores for this round.
 								</p>
 							) : (
 								<p className='text-danger text-center'>
@@ -35,7 +36,7 @@ export default function TeamResultPage() {
 												#
 											</th>
 											<th scope='col' className='text-center'>
-												Username
+												Team
 											</th>
 											<th scope='col ' className='text-center'>
 												Score
@@ -43,13 +44,13 @@ export default function TeamResultPage() {
 										</tr>
 									</thead>
 									<tbody>
-										{mockTeam?.players.map((user, index) => (
-											<tr key={user.userID}>
+										{mockTeams.map((team, index) => (
+											<tr key={team._id}>
 												<th scope='row' className='text-center'>
 													{index + 1}
 												</th>
-												<td className='text-center'>{user.username}</td>
-												<td className='text-center'>{user.score}</td>
+												<td className='text-center'>{team.name}</td>
+												<td className='text-center'>{team.teamScore}</td>
 											</tr>
 										))}
 									</tbody>

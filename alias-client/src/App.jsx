@@ -6,7 +6,7 @@ import LoginPage from './pages/LoginPage/LoginPage';
 import LeaderBoardPage from './pages/LeaderBoardPage/LeaderBoardPage';
 import RegisterPage from './pages/RegisterPage/RegisterPage';
 import LeaderPage from './pages/LeaderPage/LeaderPage';
-import TeamResultPage from './pages/TeamResultPage/TeamResultPage';
+import TeamsResultPage from './pages/TeamsResultPage/TeamsResultPage';
 import Room from './components/room/room';
 import Profile from './components/Profile/Profile';
 import Discussion from './components/Discussion/Discussion';
@@ -21,7 +21,7 @@ export default function App() {
 				<Route path='login' element={<LoginPage />} />
 				<Route path='leaderboard' element={<LeaderBoardPage />} />
 				<Route path='leader' element={<LeaderPage />} />
-				<Route path='team-result' element={<TeamResultPage />} />
+				<Route path='teams-result' element={<TeamsResultPage />} />
 				<Route path='room' element={<Room name={'DEMO'} />} />
 				<Route path='home' element={<HomePage />} />
 				<Route path='profile' element={<Profile />} />
