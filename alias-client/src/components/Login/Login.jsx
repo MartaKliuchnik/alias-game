@@ -1,10 +1,13 @@
 import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+import {useCookies} from "react-cookie";
 
 export default function Login() {
 	const userRef = useRef();
 	const errRef = useRef();
 	const navigate = useNavigate();
+	const [cookies, setCookie] = useCookies(['access_token', 'refresh_token']);
 
 	const [user, setUser] = useState('');
 	const [pwd, setPwd] = useState('');
@@ -25,6 +28,25 @@ export default function Login() {
 		setUser('');
 		setPwd('');
 		setSuccess(true);
+
+		try {
+			const res = await axios.post('http://localhost:8080/api/v1/auth/login', {
+				username: user,
+				password: pwd
+			});
+			const {access_token, refresh_token} = res.data;
+
+			setCookie('access_token', access_token, { path: '/', sameSite: 'strict', httpOnly: true, secure: true });
+			setCookie('refresh_token', refresh_token, { path: '/', sameSite: 'strict', httpOnly: true, secure: true });
+
+			setUser('');
+			setPwd('');
+			setSuccess(true);
+
+			console.log('success');
+		} catch (error) {
+			console.error('Error', error)
+		}
 	};
 
 	return (
