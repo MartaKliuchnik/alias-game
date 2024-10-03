@@ -27,8 +27,8 @@ export class Team {
   @Prop({ type: Boolean, default: false })
   isTurn: boolean;
 
-  @Prop({ type: [String], default: [] })
-  tryedWords: string[];
+  @Prop({ type: [Types.ObjectId], ref: 'words', default: [] })
+  tryedWords: Types.ObjectId[];
 
   @Prop({ type: Types.ObjectId, ref: 'users', default: null }) // Keep default as null, delete required: true
   teamLeader: Types.ObjectId;

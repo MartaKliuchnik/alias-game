@@ -44,7 +44,7 @@ export class AuthService {
   }
 
   async logout(userId: string): Promise<{ message: string }> {
-    await this.authModel.deleteOne({ userId }).exec();
+    await this.authModel.deleteOne({ userId });
     return { message: 'User logged out successfully, refresh token deleted.' };
   }
 
