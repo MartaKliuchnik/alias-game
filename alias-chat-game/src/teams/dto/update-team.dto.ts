@@ -1,4 +1,5 @@
 import { IsOptional, IsArray, IsMongoId, IsString } from 'class-validator';
+import { Types } from 'mongoose';
 
 export class UpdateTeamDto {
   @IsOptional()
@@ -8,21 +9,22 @@ export class UpdateTeamDto {
   @IsOptional()
   @IsArray()
   @IsMongoId({ each: true, message: 'Each player must be a valid user ID' })
-  player?: string[];
+  players?: Types.ObjectId[];
 
   @IsOptional()
   @IsMongoId({ message: 'Describer must be a valid user ID' })
-  describer?: string;
+  describer?: Types.ObjectId;
 
   @IsOptional()
   @IsMongoId({ message: 'Team leader must be a valid user ID' })
-  teamLeader?: string;
+  teamLeader?: Types.ObjectId;
 
   @IsOptional()
   @IsMongoId({ message: 'Selected word must be a valid word ID' })
-  selectedWord?: string;
+  selectedWord?: Types.ObjectId;
 
   @IsOptional()
   @IsArray()
-  tryedWords?: string[];
+  @IsMongoId({ each: true, message: 'Each word must be a valid word ID' })
+  tryedWords?: Types.ObjectId[];
 }

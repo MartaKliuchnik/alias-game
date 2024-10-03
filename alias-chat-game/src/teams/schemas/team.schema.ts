@@ -15,22 +15,22 @@ export class Team {
   @Prop({ type: Types.ObjectId, ref: 'words' })
   selectedWord: Types.ObjectId;
 
-  @Prop({ type: [Types.ObjectId], ref: 'users', required: true })
+  @Prop({ type: [Types.ObjectId], ref: 'users', default: [] }) // Keep default as an empty array, delete required: true
   players: Types.ObjectId[];
 
-  @Prop({ type: Types.ObjectId })
+  @Prop({ type: Types.ObjectId, default: null }) // Keep default as null, delete required: true;
   chatId: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'users' })
+  @Prop({ type: Types.ObjectId, ref: 'users', default: null }) // Keep default as null, delete required: true
   describer: Types.ObjectId;
 
   @Prop({ type: Boolean, default: false })
   isTurn: boolean;
 
-  @Prop({ type: [String], default: [] })
-  tryedWords: string[];
+  @Prop({ type: [Types.ObjectId], ref: 'words', default: [] })
+  tryedWords: Types.ObjectId[];
 
-  @Prop({ type: Types.ObjectId, ref: 'users' })
+  @Prop({ type: Types.ObjectId, ref: 'users', default: null }) // Keep default as null, delete required: true
   teamLeader: Types.ObjectId;
 }
 

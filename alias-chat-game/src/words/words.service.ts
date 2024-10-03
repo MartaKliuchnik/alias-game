@@ -90,10 +90,10 @@ export class WordsService {
    * @throws UnauthorizedException if the user is not the describer of the team.
    */
   async getRandomWord(
-    roomId: string,
-    teamId: string,
-    userId: string,
-  ): Promise<{ word: WordDocument; tryedWords: string[] }> {
+    roomId: Types.ObjectId,
+    teamId: Types.ObjectId,
+    userId: Types.ObjectId,
+  ): Promise<{ word: WordDocument; tryedWords: Types.ObjectId[] }> {
     const team = await this.teamsService.findOne(roomId, teamId);
 
     if (!team) {
@@ -103,7 +103,7 @@ export class WordsService {
     }
 
     // Verify if the requesting user is the describer of the team
-    if (team.describer.toString() !== userId) {
+    if (team.describer !== userId) {
       throw new UnauthorizedException('Only the describer can get a new word.');
     }
 
@@ -123,14 +123,14 @@ export class WordsService {
     const randomIndex = Math.floor(Math.random() * unusedWords.length);
     const randomWord = unusedWords[randomIndex];
 
-    tryedWords.push(randomWord._id.toString());
+    tryedWords.push(randomWord._id);
 
     const updateTeamDto: UpdateTeamDto = {
-      selectedWord: randomWord._id.toString(),
+      selectedWord: randomWord._id,
       tryedWords: tryedWords,
     };
 
-    await this.teamsService.update(roomId, teamId, updateTeamDto);
+    await this.teamsService.update(teamId, updateTeamDto);
 
     return {
       word: randomWord,

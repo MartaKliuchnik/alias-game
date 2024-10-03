@@ -56,10 +56,10 @@ export class WordsController {
   @Post('random')
   @UseGuards(AuthGuard)
   async getRandomWord(
-    @Body('roomId') roomId: string,
-    @Body('teamId') teamId: string,
+    @Body('roomId') roomId: Types.ObjectId,
+    @Body('teamId') teamId: Types.ObjectId,
     @Req() request: any, // Get the request to access JWT payload
-  ): Promise<{ word: Word; tryedWords: string[] }> {
+  ): Promise<{ word: Word; tryedWords: Types.ObjectId[] }> {
     return this.wordsService.getRandomWord(roomId, teamId, request.userId);
   }
 
