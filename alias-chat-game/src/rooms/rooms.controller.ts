@@ -11,6 +11,8 @@ import {
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
+import { ParseObjectIdPipe } from 'src/parse-id.pipe';
+import { Types } from 'mongoose';
 
 @Controller('rooms')
 export class RoomsController {
@@ -22,7 +24,10 @@ export class RoomsController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateRoomDto: UpdateRoomDto) {
+  async update(
+    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
+    @Body() updateRoomDto: UpdateRoomDto,
+  ) {
     return this.roomsService.update(id, updateRoomDto);
   }
 
@@ -32,13 +37,13 @@ export class RoomsController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
     return this.roomsService.findOne(id);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  async delete(@Param('id') id: string) {
+  async delete(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
     return this.roomsService.delete(id);
   }
 }

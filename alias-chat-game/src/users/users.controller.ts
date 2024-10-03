@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserSafeDto } from './dto/user-safe.dto';
-import { ParseObjectIdPipe } from '../parse-int.pipe';
+import { ParseObjectIdPipe } from '../parse-id.pipe';
 import { Types } from 'mongoose';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '../auth/gurards/auth.guard';

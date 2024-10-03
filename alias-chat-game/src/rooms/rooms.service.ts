@@ -40,7 +40,7 @@ export class RoomsService {
     return this.roomModel.find().exec();
   }
 
-  async findOne(id: string) {
+  async findOne(id: Types.ObjectId) {
     this.validateId(id);
     const room = await this.roomModel.findById(id).exec();
     if (!room) {
@@ -49,7 +49,7 @@ export class RoomsService {
     return room;
   }
 
-  async update(id: string, updateRoomDto: UpdateRoomDto) {
+  async update(id: Types.ObjectId, updateRoomDto: UpdateRoomDto) {
     this.validateId(id);
     const updatedRoom = await this.roomModel
       .findByIdAndUpdate(id, updateRoomDto, { new: true })
@@ -60,7 +60,7 @@ export class RoomsService {
     return updatedRoom;
   }
 
-  async delete(id: string) {
+  async delete(id: Types.ObjectId) {
     this.validateId(id);
     const deletedRoom = await this.roomModel.findByIdAndDelete(id).exec();
     if (!deletedRoom) {
@@ -68,7 +68,7 @@ export class RoomsService {
     }
   }
 
-  private validateId(id: string) {
+  private validateId(id: Types.ObjectId) {
     if (!mongoose.isValidObjectId(id))
       throw new BadRequestException('Invalid ID');
   }
