@@ -4,11 +4,13 @@ import {
   Body,
   UnauthorizedException,
   Headers,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { AuthGuard } from './gurards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -29,8 +31,9 @@ export class AuthController {
     return this.authService.refresh(refreshTokenDto);
   }
 
+  @UseGuards(AuthGuard)
   @Post('logout') // /api/v1/auth/logout
-  async logout(@Headers('Authorization') authHeader) {
+  async logout(@Headers('Authorization') authHeader: string) {
     if (!authHeader) {
       throw new UnauthorizedException('Authorization header is missing');
     }

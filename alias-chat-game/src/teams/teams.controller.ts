@@ -86,7 +86,7 @@ export class TeamsController {
   }
 
   // Define a describer and leader in one round
-  @Put(':teamId/describerAndLeader') //api/v1/rooms/{roomId}/teams/{teamId}/describerAndLeader
+  @Put(':teamId/roles') //api/v1/rooms/{roomId}/teams/{teamId}/roles
   defineDescriberAndLeader(
     @Param('roomId') roomId: string,
     @Param('teamId') teamId: string,
