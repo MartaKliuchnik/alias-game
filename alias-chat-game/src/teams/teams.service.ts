@@ -127,7 +127,7 @@ export class TeamsService {
   }
 
   findAll(roomId: Types.ObjectId) {
-    return this.teamModel.find({ roomId }).exec();
+    return this.teamModel.find({ roomId }).sort({ teamScore: -1 }).exec();
   }
 
   async findOne(roomId: Types.ObjectId, teamId: Types.ObjectId) {

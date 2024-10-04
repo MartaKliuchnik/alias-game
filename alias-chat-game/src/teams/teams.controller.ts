@@ -74,14 +74,14 @@ export class TeamsController {
       roomId,
       teamId,
     );
+
     const players = await Promise.all(
       playerIds.map(async (id: Types.ObjectId) => {
         const player = await this.usersService.getUserById(id);
         return player;
       }),
     );
-
-    return players;
+    return players.sort((a, b) => b.score - a.score);
   }
 
   // Add a player to a team
@@ -90,7 +90,6 @@ export class TeamsController {
     @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
     @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
   ) {
-    return this.teamsService.addPlayerToTeam(userId, teamId);
     return this.teamsService.addPlayerToTeam(userId, teamId);
   }
 
