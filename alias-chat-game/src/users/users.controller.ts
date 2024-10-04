@@ -121,7 +121,7 @@ export class UsersController {
    * @description Remove the specified user from the team
    * @access Private (Authenticated user)
    */
-  @Delete(':userId/team/join/:teamId')
+  @Delete(':userId/team/leave/:teamId')
   async leaveTeam(
     @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
     @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,

@@ -1,15 +1,15 @@
 // import { useCookies } from 'react-cookie';
 
-export async function joinTeam(userId, teamId) {
+async function joinTeam(userId, teamId) {
     try {
         // Get the token from cookies
-        const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmY5MmUzNmNkOGVkM2QwNjBjYzJmOTkiLCJpYXQiOjE3Mjc5NjE2NjQsImV4cCI6MTcyNzk2NTI2NH0.Q6pc4Y3VumJ7zEoa4Fm3Yq3OUVGj2TGWKOrIREM_9t8";
+        const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmY5MmUzNmNkOGVkM2QwNjBjYzJmOTkiLCJpYXQiOjE3MjgwMjA5NjAsImV4cCI6MTcyODAyNDU2MH0.YKebLzRew4yj_VE7mLIjRC77Pnhrj1_J8v2o1ViaR94";
 
         const response = await fetch(`http://localhost:8080/api/v1/users/${userId}/team/join/${teamId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `${authToken}`, 
+                'Authorization': `${authToken}`,
             },
         });
 
@@ -25,16 +25,16 @@ export async function joinTeam(userId, teamId) {
     }
 }
 
-export async function leaveTeam(userId, teamId) {
+async function leaveTeam(userId, teamId) {
     try {
         // Get the token from cookies
-        const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmY5MmUzNmNkOGVkM2QwNjBjYzJmOTkiLCJpYXQiOjE3Mjc5NjE2NjQsImV4cCI6MTcyNzk2NTI2NH0.Q6pc4Y3VumJ7zEoa4Fm3Yq3OUVGj2TGWKOrIREM_9t8";
+        const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmY5MmUzNmNkOGVkM2QwNjBjYzJmOTkiLCJpYXQiOjE3MjgwMjA5NjAsImV4cCI6MTcyODAyNDU2MH0.YKebLzRew4yj_VE7mLIjRC77Pnhrj1_J8v2o1ViaR94";
 
         const response = await fetch(`http://localhost:8080/api/v1/users/${userId}/team/leave/${teamId}`, {
-            method: 'POST',
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `${authToken}`, 
+                'Authorization': `${authToken}`,
             },
         });
 
@@ -50,4 +50,7 @@ export async function leaveTeam(userId, teamId) {
     }
 }
 
-joinTeam('66f92e36cd8ed3d060cc2f99', '66fe9b4cdb4275ef20f39e8a').then(res => console.log(res)).catch(err => console.error(err));
+export { joinTeam, leaveTeam };
+
+// joinTeam('66f92e36cd8ed3d060cc2f99', '66ff7af7a44932697d2e40db').then(res => console.log(res)).catch(err => console.error(err));
+// leaveTeam('66f92e36cd8ed3d0e60cc2f99', '66ff7af7a44932697d2e40db').then(res => console.log(res)).catch(err => console.error(err));
