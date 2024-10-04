@@ -1,19 +1,59 @@
 import { useNavigate } from 'react-router-dom';
-import mockTeams from '../../data/mockTeamsDataFinalPage';
+import { useEffect, useState } from 'react';
+import { getTeamsFromRoom } from '../../fetchers/getTeamsFromRoom';
+import { getPlayersFromRoom } from '../../fetchers/getPlayersFromRoom';
+import Spinner from '../../components/Spinner/Spinner';
+import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
 
 export default function FinalPage() {
 	const navigate = useNavigate();
+	const roomId = '66fd2f7f8f5e247f23fbf293'; // Example roomId from DB aliasChat2
 
-	const testWinningTeam = mockTeams.reduce((prev, current) =>
-		current.teamScore > prev.teamScore ? current : prev
-	);
-	const testAllPlayers = mockTeams.flatMap((team) => team.players);
+	const [teams, setTeams] = useState([]);
+	const [players, setPlayers] = useState([]);
+	const [loading, setLoading] = useState(true); // To handle loading state
+	const [error, setError] = useState(null); // To handle error state
+
+	useEffect(() => {
+		const fetchTeamsAndPlayers = async () => {
+			try {
+				// Fetch all teams in the room
+				const teams = await getTeamsFromRoom(roomId);
+				setTeams(teams); // Store the fetched teams
+
+				// Fetch players for each team in parallel
+				const teamIds = teams.map((team) => team._id);
+				const playersData = await Promise.all(
+					teamIds.map((teamId) => getPlayersFromRoom(roomId, teamId))
+				);
+
+				// Combine all player data
+				setPlayers(playersData.flat()); // Store the fetched players
+				setLoading(false);
+			} catch (err) {
+				setError(err.message || 'Failed to retrieve teams and players.');
+				setLoading(false); // Ensure to stop loading even on error
+			}
+		};
+
+		fetchTeamsAndPlayers();
+	}, [roomId]);
+
+	// Conditional rendering based on loading, error, and teams state
+	if (loading) {
+		return <Spinner />;
+	}
+	if (error) {
+		return <ErrorMessage error={error} />;
+	}
 
 	return (
 		<div className='container my-8'>
 			<div className='row justify-content-center mt-5 mb-4'>
+				{/* in case that the first team gets the
+					hightest result */}
 				<h2 className='display-4 text-success text-center'>
-					Congratulations, {testWinningTeam.name} has won!
+					Congratulations, {teams[0].name} has won!
 				</h2>
 				<div className='text-center'>
 					<p className='lead'>
@@ -46,7 +86,7 @@ export default function FinalPage() {
 								</tr>
 							</thead>
 							<tbody>
-								{mockTeams.map((team, index) => (
+								{teams.map((team, index) => (
 									<tr key={team._id}>
 										<th className='text-center' scope='row'>
 											{index + 1}
@@ -73,7 +113,7 @@ export default function FinalPage() {
 								</tr>
 							</thead>
 							<tbody>
-								{testAllPlayers.map((player, index) => (
+								{players.map((player, index) => (
 									<tr key={player.userID}>
 										<th className='text-center' scope='row'>
 											{index + 1}

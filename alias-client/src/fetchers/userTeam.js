@@ -1,10 +1,7 @@
 // import { useCookies } from 'react-cookie';
 
-async function joinTeam(userId, teamId) {
+async function joinTeam(userId, teamId, authToken) {
     try {
-        // Get the token from cookies
-        const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmY5MmUzNmNkOGVkM2QwNjBjYzJmOTkiLCJpYXQiOjE3MjgwMjA5NjAsImV4cCI6MTcyODAyNDU2MH0.YKebLzRew4yj_VE7mLIjRC77Pnhrj1_J8v2o1ViaR94";
-
         const response = await fetch(`http://localhost:8080/api/v1/users/${userId}/team/join/${teamId}`, {
             method: 'POST',
             headers: {
@@ -25,11 +22,8 @@ async function joinTeam(userId, teamId) {
     }
 }
 
-async function leaveTeam(userId, teamId) {
+async function leaveTeam(userId, teamId, authToken) {
     try {
-        // Get the token from cookies
-        const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmY5MmUzNmNkOGVkM2QwNjBjYzJmOTkiLCJpYXQiOjE3MjgwMjA5NjAsImV4cCI6MTcyODAyNDU2MH0.YKebLzRew4yj_VE7mLIjRC77Pnhrj1_J8v2o1ViaR94";
-
         const response = await fetch(`http://localhost:8080/api/v1/users/${userId}/team/leave/${teamId}`, {
             method: 'DELETE',
             headers: {

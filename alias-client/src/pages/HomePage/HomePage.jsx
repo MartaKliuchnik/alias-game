@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
+import { joinRoom } from '../../fetchers/userRoom';
 
-export default function HomePage() {
+export default function HomePage({ setRoom, getIdFromToken, getTokens }) {
     const navigate = useNavigate();
 
     const handleProfileClick = () => {
@@ -11,7 +12,13 @@ export default function HomePage() {
         navigate('/login');
     };
 
-    const handleStartGameClick = () => {
+    const handleStartGameClick = async () => {
+        const userId = getIdFromToken();
+        const accessToken = getTokens().access_token;
+        console.log(userId, accessToken);
+        const room = await joinRoom(userId, accessToken);
+        console.log(room);
+        setRoom(room);
         navigate('/room');
     };
 
