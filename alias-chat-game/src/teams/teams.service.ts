@@ -32,6 +32,37 @@ export class TeamsService {
   }
 
   /**
+   * Deletes all teams from database.
+   * @returns {Promise<{ message: string }>} - A message indicating the result of the deletion operation.
+   */
+  async deleteAllTeams(): Promise<{ message: string }> {
+    const { deletedCount } = await this.teamModel.deleteMany({}).exec();
+    return {
+      message:
+        deletedCount > 0
+          ? `Successfully deleted ${deletedCount} teams from the database.`
+          : 'No teams found to delete.',
+    };
+  }
+
+  /**
+   * Deletes all teams from a specific room.
+   * @param {Types.ObjectId} roomId - The ID of the room from which to delete all teams.
+   * @returns {Promise<{ message: string }>} - A message indicating the result of the deletion operation.
+   */
+  async deleteAllTeamsFromRoom(
+    roomId: Types.ObjectId,
+  ): Promise<{ message: string }> {
+    const { deletedCount } = await this.teamModel.deleteMany({ roomId }).exec();
+    return {
+      message:
+        deletedCount > 0
+          ? `Successfully deleted ${deletedCount} team(s) from room ${roomId}.`
+          : `No teams found in room ${roomId}.`,
+    };
+  }
+
+  /**
    * Retrieves a team by its ID.
    * @param {Types.ObjectId} teamId - The ID of the team to retrieve.
    * @returns {Promise<TeamDocument | null>} - The team document if found, or null if not found.
@@ -127,7 +158,7 @@ export class TeamsService {
   }
 
   findAll(roomId: Types.ObjectId) {
-    return this.teamModel.find({ roomId }).exec();
+    return this.teamModel.find({ roomId }).sort({ teamScore: -1 }).exec();
   }
 
   async findOne(roomId: Types.ObjectId, teamId: Types.ObjectId) {
@@ -140,10 +171,10 @@ export class TeamsService {
     return team;
   }
 
+  // Delete a specific team in the specified room
+  // api/v1/rooms/{roomId}/teams/{teamId}
   async remove(roomId: Types.ObjectId, teamId: Types.ObjectId) {
-    const result = await this.teamModel
-      .deleteOne({ _id: teamId, roomId })
-      .exec();
+    const result = await this.teamModel.deleteOne({ _id: teamId, roomId });
     if (result.deletedCount === 0) {
       throw new NotFoundException(`Team ${teamId} in room ${roomId} not found`);
     }
