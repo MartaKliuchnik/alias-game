@@ -36,6 +36,14 @@ export class TeamsController {
     return this.teamsService.findAll(roomId);
   }
 
+  // Deletes all teams from a specific room.
+  @Delete() // /api/v1/rooms/{roomId}/teams
+  async deleteAllTeams(
+    @Param('roomId', ParseObjectIdPipe) roomId: Types.ObjectId,
+  ): Promise<{ message: string }> {
+    return await this.teamsService.deleteAllTeamsFromRoom(roomId);
+  }
+
   // Get a specific team by ID
   @Get(':teamId') // api/v1/rooms/{roomId}/teams/{teamId}
   findOneTeam(

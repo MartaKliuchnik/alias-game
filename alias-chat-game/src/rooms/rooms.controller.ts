@@ -46,4 +46,9 @@ export class RoomsController {
   async delete(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
     return this.roomsService.delete(id);
   }
+
+  @Delete()
+  async deleteAllRooms(): Promise<{ message: string }> {
+    return this.roomsService.deleteAllRooms();
+  }
 }
