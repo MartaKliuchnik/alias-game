@@ -1,9 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { LeaderboardsService } from '../leaderboards.service';
 import { UsersService } from '../../users/users.service';
+import { userStub } from '../../users/test/stubs/user.stub';
+import { InternalServerErrorException } from '@nestjs/common';
 
 describe('LeaderboardsService', () => {
-  let service: LeaderboardsService;
+  let laderboardsService: LeaderboardsService;
 
   const mockUsersService = {
     getUsers: jest.fn(),
@@ -20,10 +22,36 @@ describe('LeaderboardsService', () => {
       ],
     }).compile();
 
-    service = module.get<LeaderboardsService>(LeaderboardsService);
+    laderboardsService = module.get<LeaderboardsService>(LeaderboardsService);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  describe('getLeaderboards', () => {
+    it('should return a list of users from the leaderboard', async () => {
+      mockUsersService.getUsers = jest.fn().mockResolvedValue([userStub()]);
+
+      const result = await laderboardsService.getLeaderboards();
+
+      expect(mockUsersService.getUsers).toHaveBeenCalled();
+      expect(result).toEqual([userStub()]);
+    });
+
+    it('should return an empty array if users are not found', async () => {
+      mockUsersService.getUsers = jest.fn().mockResolvedValue([]);
+
+      const result = await laderboardsService.getLeaderboards();
+
+      expect(mockUsersService.getUsers).toHaveBeenCalled();
+      expect(result).toEqual([]);
+    });
+
+    it('should throw InternalServerErrorException if a general error occurs', async () => {
+      mockUsersService.getUsers = jest.fn().mockResolvedValue({
+        exec: jest.fn().mockRejectedValue(new Error('Database error')),
+      });
+
+      await expect(laderboardsService.getLeaderboards()).rejects.toThrow(
+        InternalServerErrorException,
+      );
+    });
   });
 });
