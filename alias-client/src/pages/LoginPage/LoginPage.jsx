@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
-import {useCookies} from "react-cookie";
+import { useCookies } from "react-cookie";
 
 export default function LoginPage() {
 	const userRef = useRef();
@@ -24,25 +24,18 @@ export default function LoginPage() {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		console.log(user, pwd);
-		setUser('');
-		setPwd('');
-		setSuccess(true);
-
 		try {
 			const res = await axios.post('http://localhost:8080/api/v1/auth/login', {
 				username: user,
 				password: pwd
 			});
-			const {access_token, refresh_token} = res.data;
+			const { access_token, refresh_token } = res.data.data;
 
 			setCookie('access_token', access_token, { path: '/', sameSite: 'strict', httpOnly: true, secure: true });
 			setCookie('refresh_token', refresh_token, { path: '/', sameSite: 'strict', httpOnly: true, secure: true });
-
 			setUser('');
 			setPwd('');
 			setSuccess(true);
-
 			console.log('success');
 		} catch (error) {
 			console.error('Error', error)
@@ -95,7 +88,7 @@ export default function LoginPage() {
 									/>
 								</div>
 
-								<button className='btn btn-lg btn-secondary w-100'>
+								<button type='submit' className='btn btn-lg btn-secondary w-100'>
 									Log In
 								</button>
 							</form>
