@@ -4,8 +4,11 @@ import { useCookies } from "react-cookie";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import TeamCard from './TeamCard';
 import { leaveRoom } from '../../fetchers/userRoom';
+import { getTeamsFromRoom } from '../../fetchers/getTeamsFromRoom';
+import { getPlayersFromRoom } from '../../fetchers/getPlayersFromRoom';
+import { joinTeam, leaveTeam } from '../../fetchers/userTeam';
 
-export default function Room({ roomObj, setRoom }) {
+export default function Room({ roomObj, setRoom, setTeam }) {
   const navigate = useNavigate();
   const [cookies] = useCookies(['access_token']);
 
@@ -35,49 +38,52 @@ export default function Room({ roomObj, setRoom }) {
     navigate('/home');
   };
 
-  const initialTeams = [
-    { id: 1, name: 'Team 1', users: [], isFull: false },
-    { id: 2, name: 'Team 2', users: [], isFull: false },
-    { id: 3, name: 'Team 3', users: [], isFull: false },
-  ];
-
-  const [teams, setTeams] = useState(initialTeams);
   const maxUsers = 4;
+  const [teams, setTeams] = useState([]);
 
-  // useEffect(() => {
-  //   // Function to load teams when the component is mounted
-  //   const loadTeams = async () => {
-  //     try {
-  //       const authToken = cookies.access_token;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const loadTeams = async () => {
+    try {
+      const authToken = cookies.access_token;
 
-  //       if (!authToken) {
-  //         console.error('No access token found.');
-  //         navigate('/login');
-  //         return;
-  //       }
+      if (!authToken) {
+        console.error('No access token found.');
+        navigate('/login');
+        return;
+      }
 
-  //       const teamIds = [1, 2, 3];
+      let fetchedTeams = await getTeamsFromRoom(roomObj._id);
+      fetchedTeams = await Promise.all(fetchedTeams.map(
+        async team => {
+          const players = await getPlayersFromRoom(team.roomId, team._id)
+          team.players = players;
+          return team;
+        }))
+      setTeams(fetchedTeams);
+    } catch (error) {
+      console.error('Failed to load teams:', error);
+    }
+  };
 
-  //       const fetchedTeams = await Promise.all(
-  //         teamIds.map((teamId) => getTeam(roomObj._id, teamId, authToken))
-  //       );
-  //       setTeams(fetchedTeams); // Set the fetched teams to state
-  //     } catch (error) {
-  //       console.error('Failed to load teams:', error);
-  //     }
-  //   };
+  useEffect(() => {
+    // Load teams initially
+    loadTeams();
 
-  //   loadTeams(); // Call the function to load teams
-  // }, [cookies, roomObj._id, navigate]);
+    // Set up the interval to call loadTeams every 30 seconds
+    const intervalId = setInterval(() => {
+      loadTeams();
+    }, 2000);
+    return () => clearInterval(intervalId);
+  }, [cookies, roomObj._id, navigate, loadTeams]);
 
   const addUserToTeam = (teamId, username) => {
     setTeams((prevTeams) =>
       prevTeams.map((team) => {
-        if (team.id === teamId && team.users.length < maxUsers) {
+        if (team.id === teamId && team.players.length < maxUsers) {
           return {
             ...team,
-            users: [...team.users, username],
-            isFull: team.users.length + 1 >= maxUsers,
+            players: [...team.players, username],
+            isFull: team.players.length + 1 >= maxUsers,
           };
         }
         return team;
@@ -89,10 +95,10 @@ export default function Room({ roomObj, setRoom }) {
     setTeams((prevTeams) =>
       prevTeams.map((team) => {
         if (team.id === teamId) {
-          const updatedUsers = team.users.filter((user) => user !== username);
+          const updatedUsers = team.players.filter((user) => user !== username);
           return {
             ...team,
-            users: updatedUsers,
+            players: updatedUsers,
             isFull: updatedUsers.length >= maxUsers,
           };
         }
@@ -101,7 +107,7 @@ export default function Room({ roomObj, setRoom }) {
     );
   };
 
-  const totalUsers = teams.reduce((acc, team) => acc + team.users.length, 0);
+  const totalUsers = teams.reduce((acc, team) => acc + team.players.length, 0);
 
   return (
     <div className="container text-black py-5">

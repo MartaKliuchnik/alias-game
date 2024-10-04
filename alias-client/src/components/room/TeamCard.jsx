@@ -5,7 +5,7 @@ export default function TeamCard({ team, onAddUser, onRemoveUser }) {
     if (!team.isFull) {
       const username = prompt('Enter new username:');
       if (username) {
-        onAddUser(team.id, username);
+        onAddUser(team._id, username);
       }
     }
   };
@@ -15,12 +15,12 @@ export default function TeamCard({ team, onAddUser, onRemoveUser }) {
       <div className="card-body">
         <h5 className="card-title">{team.name}</h5>
         <ul className="list-group list-group-flush">
-          {team.users.map((user, index) => (
+          {team.players.map((user, index) => (
             <UserCard
               key={index}
               index={index}
-              username={user}
-              teamId={team.id}
+              username={user.username}
+              teamId={team._id}
               onRemoveUser={onRemoveUser}
             />
           ))}
