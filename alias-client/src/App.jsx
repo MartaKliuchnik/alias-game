@@ -60,7 +60,7 @@ export default function App() {
         <Route path='describer' element={<DescriberPage />} />
         <Route path='leader' element={<LeaderPage />} />
         <Route path='teams-result' element={<TeamsResultPage />} />
-        <Route path="room" element={<Room roomObj={room} setRoom={setRoom} setTeam={setTeam} />} />
+        <Route path="room" element={<Room roomObj={room} setRoom={setRoom} setTeam={setTeam} getIdFromToken={getIdFromToken} />} />
         <Route path="home" element={<HomePage setRoom={setRoom} getIdFromToken={getIdFromToken} getTokens={getTokens} />} />
         <Route path='profile' element={<Profile />} />
         <Route path='final-page' element={<FinalPage />} />

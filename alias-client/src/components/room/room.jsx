@@ -8,7 +8,7 @@ import { getTeamsFromRoom } from '../../fetchers/getTeamsFromRoom';
 import { getPlayersFromRoom } from '../../fetchers/getPlayersFromRoom';
 import { joinTeam, leaveTeam } from '../../fetchers/userTeam';
 
-export default function Room({ roomObj, setRoom, setTeam }) {
+export default function Room({ roomObj, setRoom, setTeam, getIdFromToken }) {
   const navigate = useNavigate();
   const [cookies] = useCookies(['access_token']);
 
@@ -66,45 +66,34 @@ export default function Room({ roomObj, setRoom, setTeam }) {
   };
 
   useEffect(() => {
-    // Load teams initially
     loadTeams();
-
-    // Set up the interval to call loadTeams every 30 seconds
     const intervalId = setInterval(() => {
       loadTeams();
     }, 2000);
     return () => clearInterval(intervalId);
-  }, [cookies, roomObj._id, navigate, loadTeams]);
+  }, [cookies, roomObj._id, navigate]);
 
-  const addUserToTeam = (teamId, username) => {
-    setTeams((prevTeams) =>
-      prevTeams.map((team) => {
-        if (team.id === teamId && team.players.length < maxUsers) {
-          return {
-            ...team,
-            players: [...team.players, username],
-            isFull: team.players.length + 1 >= maxUsers,
-          };
-        }
-        return team;
-      })
-    );
+  const addUserToTeam = (teamId) => {
+    const userId = getIdFromToken();
+    teams.forEach(async (team) => {
+      if (team._id === teamId && team.players.length < maxUsers) {
+        const teamToJoin = await joinTeam(userId, teamId, cookies.access_token);
+        console.log(teamToJoin);
+        setTeam(teamToJoin);
+      }
+      return team;
+    })
   };
 
-  const removeUserFromTeam = (teamId, username) => {
-    setTeams((prevTeams) =>
-      prevTeams.map((team) => {
-        if (team.id === teamId) {
-          const updatedUsers = team.players.filter((user) => user !== username);
-          return {
-            ...team,
-            players: updatedUsers,
-            isFull: updatedUsers.length >= maxUsers,
-          };
-        }
-        return team;
-      })
-    );
+  const removeUserFromTeam = (teamId) => {
+    const userId = getIdFromToken();
+    teams.forEach(async (team) => {
+      if (team._id === teamId) {
+        await leaveTeam(userId, teamId, cookies.access_token);
+        setTeam({});
+      }
+      return team;
+    })
   };
 
   const totalUsers = teams.reduce((acc, team) => acc + team.players.length, 0);
@@ -117,17 +106,18 @@ export default function Room({ roomObj, setRoom, setTeam }) {
         <button className="btn btn-secondary" onClick={handleBackClick}>BACK</button>
       </div>
 
-      <div className="row">
-        {teams.map((team) => (
-          <div key={team.id} className="col-md-4 mb-4">
-            <TeamCard
-              team={team}
-              onAddUser={addUserToTeam}
-              onRemoveUser={removeUserFromTeam}
-            />
-          </div>
-        ))}
-      </div>
+      {/* <div className="row"> */}
+      {teams.map((team) => (
+        <div key={team.id} className="col-md-4 mb-4">
+          <TeamCard
+            team={team}
+            isFull={team.players.length >= maxUsers}
+            onAddUser={addUserToTeam}
+            onRemoveUser={removeUserFromTeam}
+          />
+        </div>
+      ))}
+      {/* </div> */}
     </div>
   );
 }
