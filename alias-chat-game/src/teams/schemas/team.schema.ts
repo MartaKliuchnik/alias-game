@@ -24,6 +24,9 @@ export class Team {
   @Prop({ type: Types.ObjectId, ref: 'users', default: null }) // Keep default as null, delete required: true
   describer: Types.ObjectId;
 
+  @Prop({ type: String, default: null })
+  description: string;
+
   @Prop({ type: Boolean, default: false })
   isTurn: boolean;
 

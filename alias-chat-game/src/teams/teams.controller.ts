@@ -50,7 +50,6 @@ export class TeamsController {
     @Body() updateTeamDto: UpdateTeamDto,
   ) {
     return this.teamsService.update(teamId, updateTeamDto);
-    return this.teamsService.update(teamId, updateTeamDto);
   }
 
   // Delete a team by ID
