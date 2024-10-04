@@ -89,6 +89,20 @@ export class UsersController {
   }
 
   /**
+   * @route POST /api/v1/users/{userId}/room/leave/:roomId
+   * @description Remove the specified user from the room
+   * @access Private (Authenticated user)
+   */
+  @Delete(':userId/room/leave/:roomId')
+  async leaveRoom(
+    @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
+    @Param('roomId', ParseObjectIdPipe) roomId: Types.ObjectId,
+  ) {
+    const room = await this.roomsService.removeUserFromRoom(userId, roomId);
+    return room;
+  }
+
+  /**
    * @route POST /api/v1/users/{userId}/team/join/{teamId}
    * @description Add the specified user in the team
    * @access Private (Authenticated user)
@@ -99,6 +113,20 @@ export class UsersController {
     @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
   ) {
     const team = await this.teamsService.addPlayerToTeam(userId, teamId);
+    return team;
+  }
+
+  /**
+   * @route POST /api/v1/users/{userId}/team/leave/{teamId}
+   * @description Remove the specified user from the team
+   * @access Private (Authenticated user)
+   */
+  @Delete(':userId/team/join/:teamId')
+  async leaveTeam(
+    @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
+    @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
+  ) {
+    const team = await this.teamsService.removePlayerFromTeam(userId, teamId);
     return team;
   }
 }

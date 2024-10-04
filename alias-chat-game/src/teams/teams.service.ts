@@ -14,7 +14,7 @@ import { SetTeamLeaderDto } from './dto/set-team-leader.dto';
 @Injectable()
 export class TeamsService {
   private readonly MAX_USERS_IN_TEAM = 3;
-  constructor(@InjectModel(Team.name) private teamModel: Model<Team>) {}
+  constructor(@InjectModel(Team.name) private teamModel: Model<Team>) { }
 
   /**
    * Creates a new team within a specified room.
@@ -71,6 +71,37 @@ export class TeamsService {
 
     return {
       message: 'Player added to the team successfully.',
+      roomId: team.roomId,
+      teamId: team._id,
+    };
+  }
+
+  /**
+   * Removes a user from a specified team.
+   * @param {Types.ObjectId} userId - The ID of the user to be removed from the team.
+   * @param {Types.ObjectId} teamId - The ID of the team from which the user will be removed.
+   * @returns {Promise<Object>} - An object containing a success message, the room ID, and the team ID.
+   * @throws {NotFoundException} - If the specified team is not found.
+   * @throws {BadRequestException} - If the team doesn't have user.
+   */
+  async removePlayerFromTeam(
+    userId: Types.ObjectId,
+    teamId: Types.ObjectId,
+  ): Promise<object> {
+    const team = await this.findTeamById(teamId);
+    if (!team) {
+      throw new NotFoundException('Team not found.');
+    }
+
+    if (team.players.includes(userId)) {
+      team.players = team.players.filter((id) => id !== userId);
+      await this.update(teamId, { players: team.players });
+    } else {
+      throw new BadRequestException('User is not in the team.');
+    }
+
+    return {
+      message: 'Player removed from the team successfully.',
       roomId: team.roomId,
       teamId: team._id,
     };
