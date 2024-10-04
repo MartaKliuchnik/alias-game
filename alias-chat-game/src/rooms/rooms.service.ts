@@ -20,7 +20,7 @@ export class RoomsService {
   constructor(
     @InjectModel(Room.name) private roomModel: Model<RoomDocument>,
     private readonly teamsService: TeamsService,
-  ) { }
+  ) {}
 
   async create(createRoomDto: CreateRoomDto) {
     const createdRoom = new this.roomModel(createRoomDto);
@@ -142,7 +142,9 @@ export class RoomsService {
         throw new NotFoundException('Room does not exist.');
       }
       if (room.joinedUsers.includes(userId)) {
-        room.joinedUsers = room.joinedUsers.filter((id) => id !== userId);
+        room.joinedUsers = room.joinedUsers.filter(
+          (id) => id.toString() !== userId.toString(),
+        );
       }
       await room.save();
       return room;

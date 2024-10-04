@@ -1,9 +1,9 @@
 // import { useCookies } from 'react-cookie';
 
-export async function joinRoom(userId) {
+async function joinRoom(userId) {
     try {
         // Get the token from cookies
-        const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmY5MmUzNmNkOGVkM2QwNjBjYzJmOTkiLCJpYXQiOjE3Mjc5NjE2NjQsImV4cCI6MTcyNzk2NTI2NH0.Q6pc4Y3VumJ7zEoa4Fm3Yq3OUVGj2TGWKOrIREM_9t8";
+        const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmY5MmUzNmNkOGVkM2QwNjBjYzJmOTkiLCJpYXQiOjE3MjgwMjA2MjUsImV4cCI6MTcyODAyNDIyNX0.zzyh1W8CWiLzlBIpqzTCynjVP8S5bVokPDSRiDvIJg8";
 
         const response = await fetch(`http://localhost:8080/api/v1/users/${userId}/room/join`, {
             method: 'POST',
@@ -25,13 +25,13 @@ export async function joinRoom(userId) {
     }
 }
 
-export async function leaveRoom(userId, roomId) {
+async function leaveRoom(userId, roomId) {
     try {
         // Get the token from cookies
-        const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmY5MmUzNmNkOGVkM2QwNjBjYzJmOTkiLCJpYXQiOjE3Mjc5NjE2NjQsImV4cCI6MTcyNzk2NTI2NH0.Q6pc4Y3VumJ7zEoa4Fm3Yq3OUVGj2TGWKOrIREM_9t8";
+        const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmY5MmUzNmNkOGVkM2QwNjBjYzJmOTkiLCJpYXQiOjE3MjgwMjA2MjUsImV4cCI6MTcyODAyNDIyNX0.zzyh1W8CWiLzlBIpqzTCynjVP8S5bVokPDSRiDvIJg8";
 
         const response = await fetch(`http://localhost:8080/api/v1/users/${userId}/room/leave/${roomId}`, {
-            method: 'POST',
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `${authToken}`,
@@ -50,4 +50,6 @@ export async function leaveRoom(userId, roomId) {
     }
 }
 
-joinRoom('66f92e36cd8ed3d060cc2f99').then(res => console.log(res)).catch(err => console.error(err));
+export { joinRoom, leaveRoom };
+// joinRoom('66f92e36cd8ed3d060cc2f99').then(res => console.log(res)).catch(err => console.error(err));
+// leaveRoom('66f92e36cd8ed3d060cc2f99', '66ff7af7a44932697d2e40d9').then(res => console.log(res)).catch(err => console.error(err));
