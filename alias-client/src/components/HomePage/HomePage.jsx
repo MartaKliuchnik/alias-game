@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
 
 export default function HomePage() {
+    const [cookies] = useCookies(['access_token', 'refresh_token']);
     const navigate = useNavigate();
 
     const handleProfileClick = () => {
