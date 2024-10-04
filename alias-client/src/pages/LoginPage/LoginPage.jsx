@@ -22,6 +22,10 @@ export default function LoginPage() {
 		setErrMsg('');
 	}, [user, pwd]);
 
+	useEffect(() => {
+		console.log(cookies);
+	}, [cookies]);
+
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
@@ -31,8 +35,8 @@ export default function LoginPage() {
 			});
 			const { access_token, refresh_token } = res.data.data;
 
-			setCookie('access_token', access_token, { path: '/', sameSite: 'strict', httpOnly: true, secure: true });
-			setCookie('refresh_token', refresh_token, { path: '/', sameSite: 'strict', httpOnly: true, secure: true });
+			setCookie('access_token', access_token, { path: '/', sameSite: 'strict' });
+			setCookie('refresh_token', refresh_token, { path: '/', sameSite: 'strict' });
 			setUser('');
 			setPwd('');
 			setSuccess(true);
