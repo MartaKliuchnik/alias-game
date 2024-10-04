@@ -96,12 +96,6 @@ export class WordsService {
   ): Promise<{ word: WordDocument; tryedWords: Types.ObjectId[] }> {
     const team = await this.teamsService.findOne(roomId, teamId);
 
-    if (!team) {
-      throw new NotFoundException(
-        `Team ${teamId} in room ${roomId} not found.`,
-      );
-    }
-
     // Verify if the requesting user is the describer of the team
     if (team.describer !== userId) {
       throw new UnauthorizedException('Only the describer can get a new word.');
