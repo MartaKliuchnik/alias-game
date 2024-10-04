@@ -77,6 +77,39 @@ export class TeamsService {
   }
 
   /**
+   * Removes a user from a specified team.
+   * @param {Types.ObjectId} userId - The ID of the user to be removed from the team.
+   * @param {Types.ObjectId} teamId - The ID of the team from which the user will be removed.
+   * @returns {Promise<Object>} - An object containing a success message, the room ID, and the team ID.
+   * @throws {NotFoundException} - If the specified team is not found.
+   * @throws {BadRequestException} - If the team doesn't have user.
+   */
+  async removePlayerFromTeam(
+    userId: Types.ObjectId,
+    teamId: Types.ObjectId,
+  ): Promise<object> {
+    const team = await this.findTeamById(teamId);
+    if (!team) {
+      throw new NotFoundException('Team not found.');
+    }
+
+    if (team.players.includes(userId)) {
+      team.players = team.players.filter(
+        (id) => id.toString() !== userId.toString(),
+      );
+      await this.update(teamId, { players: team.players });
+    } else {
+      throw new BadRequestException('User is not in the team.');
+    }
+
+    return {
+      message: 'Player removed from the team successfully.',
+      roomId: team.roomId,
+      teamId: team._id,
+    };
+  }
+
+  /**
    * Updates a team with the given ID using the provided updateTeamDto.
    * @param {Types.ObjectId} teamId - The ID of the team to be updated.
    * @param {UpdateTeamDto} updateTeamDto - An object containing the fields to be updated.

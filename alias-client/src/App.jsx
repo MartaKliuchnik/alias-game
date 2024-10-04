@@ -28,6 +28,7 @@ export default function App() {
         <Route path="room" element={<Room name={"DEMO"} />} />
         <Route path="home" element={<HomePage />} />
         <Route path="profile" element={<Profile />} />
+          
         <Route
           path="discussion"
           element={

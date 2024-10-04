@@ -20,7 +20,7 @@ export class RoomsService {
   constructor(
     @InjectModel(Room.name) private roomModel: Model<RoomDocument>,
     private readonly teamsService: TeamsService,
-  ) { }
+  ) {}
 
   async create(createRoomDto: CreateRoomDto) {
     const createdRoom = new this.roomModel(createRoomDto);
@@ -122,6 +122,39 @@ export class RoomsService {
         throw error;
       }
       throw new InternalServerErrorException('Could not add user to room.');
+    }
+  }
+
+  /**
+   * Remove a user from an available room.
+   * @param {Types.ObjectId} userId - The ID of the user to be removed from the room.
+   * @returns {Promise<RoomDocument | null>} - The updated room after removing the user, or null if no room is available.
+   * @throws {NotFoundException} - If there are no available rooms to join.
+   * @throws {InternalServerErrorException} - If an error occurs during the database operation.
+   */
+  async removeUserFromRoom(
+    userId: Types.ObjectId,
+    roomId: Types.ObjectId,
+  ): Promise<RoomDocument | null> {
+    try {
+      const room = await this.findOne(roomId);
+      if (!room) {
+        throw new NotFoundException('Room does not exist.');
+      }
+      if (room.joinedUsers.includes(userId)) {
+        room.joinedUsers = room.joinedUsers.filter(
+          (id) => id.toString() !== userId.toString(),
+        );
+      }
+      await room.save();
+      return room;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        'Could not remove user from a room.',
+      );
     }
   }
 
