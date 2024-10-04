@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -12,7 +11,7 @@ import { TeamsModule } from './teams/teams.module';
 import { ChatsModule } from './chats/chats.module';
 import { AuthModule } from './auth/auth.module';
 import { LeaderboardsModule } from './leaderboards/leaderboards.module';
-import { InitializationService } from './initialization/initialization.service';
+// import { InitializationService } from './initialization/initialization.service';
 
 @Module({
   imports: [
@@ -37,6 +36,6 @@ import { InitializationService } from './initialization/initialization.service';
     LeaderboardsModule,
   ],
   controllers: [AppController],
-  providers: [AppService, InitializationService],
+  providers: [AppService], //, InitializationService],
 })
 export class AppModule {}

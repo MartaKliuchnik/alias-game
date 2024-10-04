@@ -13,17 +13,22 @@ export class UpdateTeamDto {
 
   @IsOptional()
   @IsMongoId({ message: 'Describer must be a valid user ID' })
-  describer?: string;
+  describer?: Types.ObjectId;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
 
   @IsOptional()
   @IsMongoId({ message: 'Team leader must be a valid user ID' })
-  teamLeader?: string;
+  teamLeader?: Types.ObjectId;
 
   @IsOptional()
   @IsMongoId({ message: 'Selected word must be a valid word ID' })
-  selectedWord?: string;
+  selectedWord?: Types.ObjectId;
 
   @IsOptional()
   @IsArray()
-  tryedWords?: string[];
+  @IsMongoId({ each: true, message: 'Each word must be a valid word ID' })
+  tryedWords?: Types.ObjectId[];
 }

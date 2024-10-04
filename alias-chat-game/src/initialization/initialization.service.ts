@@ -49,7 +49,7 @@ export class InitializationService implements OnModuleInit {
    * @param {Types.ObjectId} roomId - The ID of the room to which teams will be added.
    */
   private async addTeamsToRoom(roomId: Types.ObjectId) {
-    const teams: CreateTeamDto[] = [
+    const teams: (CreateTeamDto & { roomId: Types.ObjectId })[] = [
       { roomId, name: 'Team1', players: [] },
       { roomId, name: 'Team2', players: [] },
       { roomId, name: 'Team3', players: [] },

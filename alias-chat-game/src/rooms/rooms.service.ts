@@ -126,12 +126,45 @@ export class RoomsService {
   }
 
   /**
+   * Remove a user from an available room.
+   * @param {Types.ObjectId} userId - The ID of the user to be removed from the room.
+   * @returns {Promise<RoomDocument | null>} - The updated room after removing the user, or null if no room is available.
+   * @throws {NotFoundException} - If there are no available rooms to join.
+   * @throws {InternalServerErrorException} - If an error occurs during the database operation.
+   */
+  async removeUserFromRoom(
+    userId: Types.ObjectId,
+    roomId: Types.ObjectId,
+  ): Promise<RoomDocument | null> {
+    try {
+      const room = await this.findOne(roomId);
+      if (!room) {
+        throw new NotFoundException('Room does not exist.');
+      }
+      if (room.joinedUsers.includes(userId)) {
+        room.joinedUsers = room.joinedUsers.filter(
+          (id) => id.toString() !== userId.toString(),
+        );
+      }
+      await room.save();
+      return room;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        'Could not remove user from a room.',
+      );
+    }
+  }
+
+  /**
    * Adds default teams to a specified room.
    * The default teams created are Team1, Team2, and Team3, each initialized with an empty players array.
    * @param {Types.ObjectId} roomId - The ID of the room to which teams will be added.
    */
   private async addTeamsToRoom(roomId: Types.ObjectId) {
-    const teams: CreateTeamDto[] = [
+    const teams: (CreateTeamDto & { roomId: Types.ObjectId })[] = [
       { roomId, name: 'Team1', players: [] },
       { roomId, name: 'Team2', players: [] },
       { roomId, name: 'Team3', players: [] },
