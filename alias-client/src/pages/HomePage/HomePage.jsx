@@ -1,6 +1,9 @@
 import { useNavigate } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
+import { joinRoom } from '../../fetchers/userRoom';
 
-export default function HomePage() {
+export default function HomePage({ setRoom }) {
+    const [cookies] = useCookies(['access_token', 'refresh_token']);
     const navigate = useNavigate();
 
     const handleProfileClick = () => {
@@ -11,7 +14,32 @@ export default function HomePage() {
         navigate('/login');
     };
 
-    const handleStartGameClick = () => {
+    const handleStartGameClick = async () => {
+        const accessToken = cookies.access_token;
+        if (!accessToken) {
+            console.error('No access token found.');
+            return;
+        }
+
+        const tokenParts = accessToken.split('.');
+        if (tokenParts.length !== 3) {
+            console.error('Invalid token format.');
+            return;
+        }
+
+        const base64Payload = tokenParts[1];
+        const payload = JSON.parse(atob(base64Payload));
+
+        const userId = payload.userId;
+        if (!userId) {
+            console.error('No userId found in token.');
+            return;
+        }
+        console.log(userId);
+
+        const room = await joinRoom(userId, accessToken);
+        console.log(room);
+        setRoom(room);
         navigate('/room');
     };
 

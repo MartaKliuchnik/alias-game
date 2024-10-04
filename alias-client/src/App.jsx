@@ -1,7 +1,8 @@
 import { Route, Routes } from 'react-router-dom';
+import { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Navbar from './components/Navbar/Navbar';
-import HomePage from './components/HomePage/HomePage';
+import HomePage from "./pages/HomePage/HomePage";
 import LoginPage from './pages/LoginPage/LoginPage';
 import LeaderBoardPage from './pages/LeaderBoardPage/LeaderBoardPage';
 import RegisterPage from './pages/RegisterPage/RegisterPage';
@@ -16,6 +17,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import FinalPage from './pages/FinalPage/FinalPage';
 
 export default function App() {
+  
+  const [room, setRoom] = useState({});
+  
 	return (
 		<main>
 			<Navbar />
@@ -26,8 +30,8 @@ export default function App() {
 				<Route path='describer' element={<DescriberPage />} />
 				<Route path='leader' element={<LeaderPage />} />
 				<Route path='teams-result' element={<TeamsResultPage />} />
-				<Route path='room' element={<Room name={'DEMO'} />} />
-				<Route path='home' element={<HomePage />} />
+        <Route path="room" element={<Room roomObj={room} setRoom={setRoom} />} />
+        <Route path="home" element={<HomePage setRoom={setRoom} />} />
 				<Route path='profile' element={<Profile />} />
 				<Route path='final-page' element={<FinalPage />} />
 

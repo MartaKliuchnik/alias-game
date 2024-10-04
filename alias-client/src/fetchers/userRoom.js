@@ -1,10 +1,7 @@
 // import { useCookies } from 'react-cookie';
 
-async function joinRoom(userId) {
+async function joinRoom(userId, authToken) {
     try {
-        // Get the token from cookies
-        const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmY5MmUzNmNkOGVkM2QwNjBjYzJmOTkiLCJpYXQiOjE3MjgwMjA2MjUsImV4cCI6MTcyODAyNDIyNX0.zzyh1W8CWiLzlBIpqzTCynjVP8S5bVokPDSRiDvIJg8";
-
         const response = await fetch(`http://localhost:8080/api/v1/users/${userId}/room/join`, {
             method: 'POST',
             headers: {
@@ -25,11 +22,8 @@ async function joinRoom(userId) {
     }
 }
 
-async function leaveRoom(userId, roomId) {
+async function leaveRoom(userId, roomId, authToken) {
     try {
-        // Get the token from cookies
-        const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmY5MmUzNmNkOGVkM2QwNjBjYzJmOTkiLCJpYXQiOjE3MjgwMjA2MjUsImV4cCI6MTcyODAyNDIyNX0.zzyh1W8CWiLzlBIpqzTCynjVP8S5bVokPDSRiDvIJg8";
-
         const response = await fetch(`http://localhost:8080/api/v1/users/${userId}/room/leave/${roomId}`, {
             method: 'DELETE',
             headers: {
