@@ -10,7 +10,7 @@ export class InitializationService implements OnModuleInit {
   constructor(
     private readonly roomsService: RoomsService,
     private readonly teamsService: TeamsService,
-  ) { }
+  ) {}
 
   /**
    * Lifecycle hook that is called when the module is initialized.

@@ -131,7 +131,9 @@ export class TeamsService {
   async findOne(roomId: Types.ObjectId, teamId: Types.ObjectId) {
     const team = await this.teamModel.findOne({ _id: teamId, roomId }).exec();
     if (!team) {
-      throw new NotFoundException(`Team ${teamId} in room ${roomId} not found`);
+      throw new NotFoundException(
+        `Team ${teamId} in room ${roomId} not found!!!`,
+      );
     }
     return team;
   }
