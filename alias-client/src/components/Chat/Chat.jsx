@@ -1,9 +1,52 @@
 import React, { useEffect, useState } from 'react';
 
-const Chat = () => {
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:8080');
+
+export default function Chat({getIdFromToken}) {
     const [messages, setMessages] = useState([]);
     const [text, setText] = useState('');
     const [team, setTeam] = useState(null);
+    const [roomId] = useState('1');
+
+    const userId = getIdFromToken();
+
+    useEffect(() => {
+        if (team) {
+            socket.emit('joinTeam', {roomId, teamId: team});
+
+            setMessages([]);
+
+            // TODO FIX A PROBLEM WITH ID (CHECK ID IN CHAT)
+
+            const messageHandler = (messageHand) => {
+                console.log(userId);
+                if (messageHand.teamId === team) {
+                    setMessages((prevMessages) => {
+                        if (!prevMessages.find(msg => msg.text === messageHand.text && msg.userId === messageHand.userId)) {
+                            return [...prevMessages, messageHand];
+                        }
+                        return prevMessages;
+                    });
+                }
+            }
+
+            socket.on('receiveMessage', messageHandler);
+
+            return () => {
+                socket.off('receiveMessage');
+            };
+        }
+    }, [team, roomId]);
+
+    const sendMessage = () => {
+        if (!text.trim()) return;
+        const newMessage = {userId, text, teamId: team};
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+        socket.emit('sendMessage', {roomId, teamId: team, text, userId});
+        setText('');
+    };
 
     return (
         <div className="container">
@@ -25,11 +68,12 @@ const Chat = () => {
                     <div className="chat-window border rounded p-3 mb-3">
                         <h4>Chat:</h4>
                         <div className="messages">
-                            {/* {messages.map((msg, index) => (
-                                <div key={index} className={msg.team === team ? "alert alert-primary" : "alert alert-secondary"}>
-                                    <strong>{msg.team}:</strong> {msg.text}
+                            {messages.map((msg, index) => (
+                                <div key={index}
+                                     className={msg.team === team ? "alert alert-primary" : "alert alert-secondary"}>
+                                    <strong>{msg.userId}:</strong> {msg.text}
                                 </div>
-                            ))} */}
+                            ))}
                         </div>
                         <div className="message-input input-group mt-3">
                             <input
@@ -39,7 +83,7 @@ const Chat = () => {
                                 value={text}
                                 onChange={(e) => setText(e.target.value)}
                             />
-                            <button className="btn btn-primary" onClick={() => console.log('Send message')}>Send message</button>
+                            <button className="btn btn-primary" onClick={sendMessage}>Send message</button>
                         </div>
                     </div>
                 </div>
@@ -47,5 +91,3 @@ const Chat = () => {
         </div>
     );
 };
-
-export default Chat;
