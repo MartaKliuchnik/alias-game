@@ -20,6 +20,7 @@ import { useCookies } from 'react-cookie';
 export default function App() {
   const [room, setRoom] = useState({});
   const [team, setTeam] = useState({});
+  const [role, setRole] = useState('');
   const [cookies] = useCookies(['access_token', 'refresh_token']);
 
   const getIdFromToken = () => {
@@ -60,7 +61,9 @@ export default function App() {
         <Route path='describer' element={<DescriberPage />} />
         <Route path='leader' element={<LeaderPage />} />
         <Route path='teams-result' element={<TeamsResultPage />} />
-        <Route path="room" element={<Room roomObj={room} setRoom={setRoom} setTeam={setTeam} getIdFromToken={getIdFromToken} />} />
+        <Route path="room" element={<Room
+          roomObj={room} setRoom={setRoom} setTeam={setTeam} teamObj={team}
+          getIdFromToken={getIdFromToken} setRole={setRole} />} />
         <Route path="home" element={<HomePage setRoom={setRoom} getIdFromToken={getIdFromToken} getTokens={getTokens} />} />
         <Route path='profile' element={<Profile />} />
         <Route path='final-page' element={<FinalPage />} />
