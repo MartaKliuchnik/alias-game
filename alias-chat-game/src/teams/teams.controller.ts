@@ -36,6 +36,14 @@ export class TeamsController {
     return this.teamsService.findAll(roomId);
   }
 
+  // Deletes all teams from a specific room.
+  @Delete() // /api/v1/rooms/{roomId}/teams
+  async deleteAllTeams(
+    @Param('roomId', ParseObjectIdPipe) roomId: Types.ObjectId,
+  ): Promise<{ message: string }> {
+    return await this.teamsService.deleteAllTeamsFromRoom(roomId);
+  }
+
   // Get a specific team by ID
   @Get(':teamId') // api/v1/rooms/{roomId}/teams/{teamId}
   findOneTeam(
@@ -74,14 +82,14 @@ export class TeamsController {
       roomId,
       teamId,
     );
+
     const players = await Promise.all(
       playerIds.map(async (id: Types.ObjectId) => {
         const player = await this.usersService.getUserById(id);
         return player;
       }),
     );
-
-    return players;
+    return players.sort((a, b) => b.score - a.score);
   }
 
   // Add a player to a team
@@ -90,7 +98,6 @@ export class TeamsController {
     @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
     @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
   ) {
-    return this.teamsService.addPlayerToTeam(userId, teamId);
     return this.teamsService.addPlayerToTeam(userId, teamId);
   }
 
