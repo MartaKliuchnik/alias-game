@@ -16,6 +16,7 @@ import Wait from './components/Wait/Wait';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import FinalPage from './pages/FinalPage/FinalPage';
 import { useCookies } from 'react-cookie';
+import Chat from "./components/Chat/Chat.jsx";
 
 export default function App() {
   const [room, setRoom] = useState({});
@@ -60,10 +61,11 @@ export default function App() {
         <Route path='describer' element={<DescriberPage />} />
         <Route path='leader' element={<LeaderPage />} />
         <Route path='teams-result' element={<TeamsResultPage />} />
-        <Route path="room" element={<Room roomObj={room} setRoom={setRoom} setTeam={setTeam} />} />
-        <Route path="home" element={<HomePage setRoom={setRoom} getIdFromToken={getIdFromToken} getTokens={getTokens} />} />
-        <Route path='profile' element={<Profile />} />
+        <Route path='room' element={<Room roomObj={room} setRoom={setRoom} setTeam={setTeam} />} />
+        <Route path='home' element={<HomePage setRoom={setRoom} getIdFromToken={getIdFromToken} getTokens={getTokens} />} />
+        <Route path='profile' element={<Profile getIdFromToken={getIdFromToken}/>} />
         <Route path='final-page' element={<FinalPage />} />
+        <Route path='chat--dev' element={<Chat getIdFromToken={getIdFromToken}/>} />
 
         <Route
           path='discussion'
