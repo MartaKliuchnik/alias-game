@@ -11,23 +11,25 @@ export class MessagesService {
     @InjectModel(Message.name) private messageModel: Model<Message>,
   ) {}
 
-  create(createMessageDto: CreateMessageDto) {
-    return 'This action adds a new message';
+  // async createMessage(createMessageDto: CreateMessageDto) {
+  //   const { text } = createMessageDto;
+  //   const message = new this.messageModel({ userId: '', text });
+  //   return await message.save();
+  // }
+
+  async getMessageByTeamId(teamId: string) {
+    return this.messageModel.find({ teamId });
   }
 
-  findAll() {
-    return `This action returns all messages`;
-  }
+  // TODO fix with CreateMessage
 
-  findOne(id: number) {
-    return `This action returns a #${id} message`;
-  }
-
-  update(id: number, updateMessageDto: UpdateMessageDto) {
-    return `This action updates a #${id} message`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} message`;
+  async saveMessage(data: {
+    roomId: string;
+    teamId: string;
+    text: string;
+    userId: string;
+  }) {
+    const message = new this.messageModel(data);
+    return await message.save();
   }
 }

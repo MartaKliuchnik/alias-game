@@ -7,7 +7,7 @@ import { AuthGuard } from './gurards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   @Post('register') // /api/v1/auth/register
   async register(@Body() createUserDto: CreateUserDto) {
@@ -27,7 +27,7 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Post('logout') // /api/v1/auth/logout
   async logout(@Req() request: Request & { userId: string }) {
-    const userId = request.userId; 
+    const userId = request.userId;
     return this.authService.logout(userId);
   }
 }
