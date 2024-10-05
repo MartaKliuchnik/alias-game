@@ -112,4 +112,13 @@ export class TeamsController {
   ) {
     return this.teamsService.defineDescriberAndLeader(roomId, teamId);
   }
+
+  // Reset round fields to null
+  @Put(':teamId/reset') // api/v1/rooms/{roomId}/teams/{teamId}/reset
+  resetRound(
+    @Param('roomId', ParseObjectIdPipe) roomId: Types.ObjectId,
+    @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
+  ) {
+    return this.teamsService.resetRound(roomId, teamId);
+  }
 }
