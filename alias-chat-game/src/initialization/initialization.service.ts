@@ -1,4 +1,5 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Types } from 'mongoose';
 import { CreateRoomDto } from 'src/rooms/dto/create-room.dto';
 import { RoomsService } from 'src/rooms/rooms.service';
@@ -10,6 +11,7 @@ export class InitializationService implements OnModuleInit {
   constructor(
     private readonly roomsService: RoomsService,
     private readonly teamsService: TeamsService,
+    private readonly configService: ConfigService,
   ) {}
 
   /**
@@ -17,6 +19,11 @@ export class InitializationService implements OnModuleInit {
    * It triggers the creation of default rooms with teams.
    */
   async onModuleInit() {
+    if (this.configService.get<string>('NODE_ENV') === 'development') {
+      // Cleanup for development environment
+      await this.teamsService.deleteAllTeams();
+      await this.roomsService.deleteAllRooms();
+    }
     await this.createDefaultRooms();
   }
 
@@ -48,7 +55,7 @@ export class InitializationService implements OnModuleInit {
    * @param {Types.ObjectId} roomId - The ID of the room to which teams will be added.
    */
   private async addTeamsToRoom(roomId: Types.ObjectId) {
-    const teams: CreateTeamDto[] = [
+    const teams: (CreateTeamDto & { roomId: Types.ObjectId })[] = [
       { roomId, name: 'Team1', players: [] },
       { roomId, name: 'Team2', players: [] },
       { roomId, name: 'Team3', players: [] },

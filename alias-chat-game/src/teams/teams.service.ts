@@ -32,6 +32,37 @@ export class TeamsService {
   }
 
   /**
+   * Deletes all teams from database.
+   * @returns {Promise<{ message: string }>} - A message indicating the result of the deletion operation.
+   */
+  async deleteAllTeams(): Promise<{ message: string }> {
+    const { deletedCount } = await this.teamModel.deleteMany({}).exec();
+    return {
+      message:
+        deletedCount > 0
+          ? `Successfully deleted ${deletedCount} teams from the database.`
+          : 'No teams found to delete.',
+    };
+  }
+
+  /**
+   * Deletes all teams from a specific room.
+   * @param {Types.ObjectId} roomId - The ID of the room from which to delete all teams.
+   * @returns {Promise<{ message: string }>} - A message indicating the result of the deletion operation.
+   */
+  async deleteAllTeamsFromRoom(
+    roomId: Types.ObjectId,
+  ): Promise<{ message: string }> {
+    const { deletedCount } = await this.teamModel.deleteMany({ roomId }).exec();
+    return {
+      message:
+        deletedCount > 0
+          ? `Successfully deleted ${deletedCount} team(s) from room ${roomId}.`
+          : `No teams found in room ${roomId}.`,
+    };
+  }
+
+  /**
    * Retrieves a team by its ID.
    * @param {Types.ObjectId} teamId - The ID of the team to retrieve.
    * @returns {Promise<TeamDocument | null>} - The team document if found, or null if not found.
@@ -77,6 +108,39 @@ export class TeamsService {
   }
 
   /**
+   * Removes a user from a specified team.
+   * @param {Types.ObjectId} userId - The ID of the user to be removed from the team.
+   * @param {Types.ObjectId} teamId - The ID of the team from which the user will be removed.
+   * @returns {Promise<Object>} - An object containing a success message, the room ID, and the team ID.
+   * @throws {NotFoundException} - If the specified team is not found.
+   * @throws {BadRequestException} - If the team doesn't have user.
+   */
+  async removePlayerFromTeam(
+    userId: Types.ObjectId,
+    teamId: Types.ObjectId,
+  ): Promise<object> {
+    const team = await this.findTeamById(teamId);
+    if (!team) {
+      throw new NotFoundException('Team not found.');
+    }
+
+    if (team.players.includes(userId)) {
+      team.players = team.players.filter(
+        (id) => id.toString() !== userId.toString(),
+      );
+      await this.update(teamId, { players: team.players });
+    } else {
+      throw new BadRequestException('User is not in the team.');
+    }
+
+    return {
+      message: 'Player removed from the team successfully.',
+      roomId: team.roomId,
+      teamId: team._id,
+    };
+  }
+
+  /**
    * Updates a team with the given ID using the provided updateTeamDto.
    * @param {Types.ObjectId} teamId - The ID of the team to be updated.
    * @param {UpdateTeamDto} updateTeamDto - An object containing the fields to be updated.
@@ -94,21 +158,23 @@ export class TeamsService {
   }
 
   findAll(roomId: Types.ObjectId) {
-    return this.teamModel.find({ roomId }).exec();
+    return this.teamModel.find({ roomId }).sort({ teamScore: -1 }).exec();
   }
 
   async findOne(roomId: Types.ObjectId, teamId: Types.ObjectId) {
     const team = await this.teamModel.findOne({ _id: teamId, roomId }).exec();
     if (!team) {
-      throw new NotFoundException(`Team ${teamId} in room ${roomId} not found`);
+      throw new NotFoundException(
+        `Team ${teamId} in room ${roomId} not found!!!`,
+      );
     }
     return team;
   }
 
+  // Delete a specific team in the specified room
+  // api/v1/rooms/{roomId}/teams/{teamId}
   async remove(roomId: Types.ObjectId, teamId: Types.ObjectId) {
-    const result = await this.teamModel
-      .deleteOne({ _id: teamId, roomId })
-      .exec();
+    const result = await this.teamModel.deleteOne({ _id: teamId, roomId });
     if (result.deletedCount === 0) {
       throw new NotFoundException(`Team ${teamId} in room ${roomId} not found`);
     }

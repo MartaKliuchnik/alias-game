@@ -1,10 +1,13 @@
 import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+import { useCookies } from "react-cookie";
 
 export default function LoginPage() {
 	const userRef = useRef();
 	const errRef = useRef();
 	const navigate = useNavigate();
+	const [cookies, setCookie] = useCookies(['access_token', 'refresh_token']);
 
 	const [user, setUser] = useState('');
 	const [pwd, setPwd] = useState('');
@@ -19,18 +22,34 @@ export default function LoginPage() {
 		setErrMsg('');
 	}, [user, pwd]);
 
+	useEffect(() => {
+		console.log(cookies);
+	}, [cookies]);
+
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		console.log(user, pwd);
-		setUser('');
-		setPwd('');
-		setSuccess(true);
+		try {
+			const res = await axios.post('http://localhost:8080/api/v1/auth/login', {
+				username: user,
+				password: pwd
+			});
+			const { access_token, refresh_token } = res.data.data;
+
+			setCookie('access_token', access_token, { path: '/', sameSite: 'strict' });
+			setCookie('refresh_token', refresh_token, { path: '/', sameSite: 'strict' });
+			setUser('');
+			setPwd('');
+			setSuccess(true);
+			console.log('success');
+		} catch (error) {
+			console.error('Error', error)
+		}
 	};
 
 	return (
 		<div className='container my-5'>
 			{success ? (
-				navigate('/room')
+				navigate('/home')
 			) : (
 				<section className='row justify-content-center'>
 					<div className='col-lg-4 col-md-6'>
@@ -73,7 +92,7 @@ export default function LoginPage() {
 									/>
 								</div>
 
-								<button className='btn btn-lg btn-secondary w-100'>
+								<button type='submit' className='btn btn-lg btn-secondary w-100'>
 									Log In
 								</button>
 							</form>
