@@ -1,5 +1,5 @@
 // Function to fetch the team result based on roomId and teamId
-const fetchTeamResult = async (roomId, teamId) => {
+const getTeamAnswerRes = async (roomId, teamId) => {
   const url = `http://localhost:8080/api/v1/rooms/${roomId}/teams/${teamId}`;
 
   try {
@@ -18,4 +18,4 @@ const fetchTeamResult = async (roomId, teamId) => {
   }
 };
 
-export default fetchTeamResult;
+export default getTeamAnswerRes;

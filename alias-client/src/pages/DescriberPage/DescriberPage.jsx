@@ -5,16 +5,16 @@ import { getRandomWord } from "../../fetchers/getRandomWord";
 import { saveDescription } from "../../fetchers/saveDescription";
 import { checkDescription } from "../../fetchers/checkDescription";
 
-export default function DescriberPage() {
+// eslint-disable-next-line react/prop-types
+export default function DescriberPage({ getTokens, roomId, teamId }) {
   const [description, setDescription] = useState("");
   const [isTimeUp, setIsTimeUp] = useState(false);
   const [word, setWord] = useState(null);
   const [message, setMessage] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const navigate = useNavigate();
-  const roomId = "67013095bf8e9f7326e013f7";
-  const teamId = "67013149420fd1486ca018e1";
-  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmZkYmYxZGYwZWFmOGU0OTM5MzNkZmUiLCJpYXQiOjE3MjgxMzE0MDksImV4cCI6MTcyODEzNTAwOX0.idmkhIPwHQ0_F_fSOUYOeebIXACgQcb_xqz6kCB05_Y";
+
+  const { access_token: token } = getTokens();
 
   useEffect(() => {
     const fetchWord = async () => {

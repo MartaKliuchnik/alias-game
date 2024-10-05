@@ -8,6 +8,7 @@ import { getTeamsFromRoom } from '../../fetchers/getTeamsFromRoom';
 import { getPlayersFromRoom } from '../../fetchers/getPlayersFromRoom';
 import { joinTeam, leaveTeam } from '../../fetchers/userTeam';
 
+// eslint-disable-next-line react/prop-types
 export default function Room({ roomObj, setRoom, setTeam }) {
   const navigate = useNavigate();
   const [cookies] = useCookies(['access_token']);

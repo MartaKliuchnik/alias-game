@@ -1,26 +1,23 @@
 import { useState, useEffect } from "react";
-import fetchTeamResult from "../../fetchers/fetchTeamResult";
+import getTeamScoresInRoom from "../../fetchers/getTeamScoresInRoom"; // Import the new fetch function
+import getTeamAnswerRes from "../../fetchers/getTeamAnswerRes";
 import fetchWord from "../../fetchers/fetchWord";
-import mockTeams from "../../data/mockTeams";
 
-export default function TeamsResultPage() {
-  const [teamResult, setTeamResult] = useState(null);
+// eslint-disable-next-line react/prop-types
+export default function TeamsResultPage({ roomId, teamId }) {
+  const [teamResult, setTeamAnswerRes] = useState(null);
   const [fetchedWord, setFetchedWord] = useState("");
   const [error, setError] = useState("");
-
-  const roomId = "67013095bf8e9f7326e013f7"; // Test roomId
-  const teamId = "67013149420fd1486ca018e1"; // Test teamId
-
+  const [teams, setTeams] = useState([]); // State for storing fetched teams
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await fetchTeamResult(roomId, teamId);
-        setTeamResult(result); // Store the result in state
+        const result = await getTeamAnswerRes(roomId, teamId);
+        setTeamAnswerRes(result);
 
-        // Fetch the word using the selectedWord ID from teamResult
         const word = await fetchWord(result.selectedWord);
-        setFetchedWord(word); // Store the fetched word in state
+        setFetchedWord(word);
       } catch (error) {
         setError(error.message);
       }
@@ -28,6 +25,20 @@ export default function TeamsResultPage() {
 
     fetchData();
   }, [roomId, teamId]);
+
+  // Fetch teams when roomId changes
+  useEffect(() => {
+    const fetchTeams = async () => {
+      try {
+        const fetchedTeams = await getTeamScoresInRoom(roomId); // Fetch teams using roomId
+        setTeams(fetchedTeams);
+      } catch (error) {
+        setError(error.message);
+      }
+    };
+
+    fetchTeams();
+  }, [roomId]);
 
   if (error) {
     return <div className="alert alert-danger">{error}</div>;
@@ -77,7 +88,7 @@ export default function TeamsResultPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {mockTeams.map((team, index) => (
+                    {teams.map((team, index) => (
                       <tr key={team._id}>
                         <th scope="row" className="text-center">
                           {index + 1}
@@ -102,7 +113,8 @@ export default function TeamsResultPage() {
                 <div>
                   <div className="alert alert-success">
                     <p>
-                      <strong>Correct Answer:</strong> {fetchedWord} {/* Use the fetched word here */}
+                      <strong>Correct Answer:</strong> {fetchedWord}{" "}
+                      {/* Use the fetched word here */}
                     </p>
                     <p>
                       <strong>Your Answer:</strong> {answer}
@@ -120,7 +132,8 @@ export default function TeamsResultPage() {
                       <strong>Your Answer:</strong> {answer}
                     </p>
                     <p>
-                      The correct word was: <strong>{fetchedWord}</strong> {/* Use the fetched word here */}
+                      The correct word was: <strong>{fetchedWord}</strong>{" "}
+                      {/* Use the fetched word here */}
                     </p>
                   </div>
                   <p className="mt-4 text-center">Better luck next time!</p>

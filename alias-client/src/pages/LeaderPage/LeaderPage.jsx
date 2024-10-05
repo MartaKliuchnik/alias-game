@@ -1,24 +1,38 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Timer } from "../../components/Timer/Timer";
 import { useNavigate } from "react-router-dom";
 import { checkAnswer } from "../../fetchers/checkAnswer";
 import { saveAnswer } from "../../fetchers/saveAnswer";
+import getSelectedWordId from "../../fetchers/getSelectedWordId";
 
-export default function LeaderPage() {
+// eslint-disable-next-line react/prop-types
+export default function LeaderPage({ roomId, teamId }) {
   const [leaderWord, setLeaderWord] = useState("");
   const [isTimeUp, setIsTimeUp] = useState(false);
   const [message, setMessage] = useState("");
+  const [wordId, setWordId] = useState(null);
   const wordRef = useRef();
   const navigate = useNavigate();
-  const wordId = "66fbe2fec4dcc97328d2ed48"; // test wordId !!!
-  const roomId = "67013095bf8e9f7326e013f7"; // test roomId !!!
-  const teamId = "67013149420fd1486ca018e1"; // test teamId !!!
+
+  useEffect(() => {
+    const fetchWordId = async () => {
+      try {
+        const selectedWordId = await getSelectedWordId(roomId, teamId);
+		console.log('selectedWordId: ', selectedWordId);
+        setWordId(selectedWordId);
+      } catch {
+        setMessage("Failed to load the word ID. Please try again later.");
+      }
+    };
+
+    fetchWordId();
+  }, [roomId, teamId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (isTimeUp) {
-      console.log(null); // Time has run out
+      console.log(null);
       return;
     }
 
@@ -27,9 +41,14 @@ export default function LeaderPage() {
       return;
     }
 
+    if (!wordId) {
+      setMessage("Word ID is not available. Please try again later.");
+      return;
+    }
+
     try {
       const isCorrect = await checkAnswer(leaderWord, wordId);
-	  console.log('isCorrect: ', isCorrect);
+      console.log('isCorrect: ', isCorrect);
 
       const success = await saveAnswer(roomId, teamId, leaderWord, isCorrect);
 
@@ -91,18 +110,17 @@ export default function LeaderPage() {
                     ? "Time's up! Can't submit a decision."
                     : "Write your final decision"
                 }
-                disabled={message !== ""}
+                disabled={message !== "" || !wordId}
               />
             </div>
             <button
               className="btn btn-lg btn-success w-100"
-              disabled={isTimeUp || message !== ""}
+              disabled={isTimeUp || message !== "" || !wordId}
             >
               Submit Your Answer
             </button>
           </form>
           {message && <div className="alert alert-info mt-3">{message}</div>}{" "}
-          {}
         </div>
       </section>
     </div>
