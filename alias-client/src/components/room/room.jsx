@@ -7,8 +7,9 @@ import { leaveRoom } from '../../fetchers/userRoom';
 import { getTeamsFromRoom } from '../../fetchers/getTeamsFromRoom';
 import { getPlayersFromRoom } from '../../fetchers/getPlayersFromRoom';
 import { joinTeam, leaveTeam } from '../../fetchers/userTeam';
+import { getTeam } from '../../fetchers/getTeam';
 
-export default function Room({ 
+export default function Room({
   roomObj, teamObj, setRoom,
   setTeam, getIdFromToken, setRole }) {
 
@@ -72,9 +73,15 @@ export default function Room({
     return () => clearInterval(intervalId);
   }, [cookies, roomObj, navigate]);
 
+  const updateTeam = async () => {
+    const team = await getTeam(roomObj._id, teamObj._id, cookies.access_token);
+    setTeam(team);
+  }
+
   useEffect(() => {
     const allTeamsFull = teams.every(team => team.players.length >= maxUsers);
     if (allTeamsFull && teams.length > 0) {
+      updateTeam();
       console.log('ready');
       const userId = getIdFromToken();
       console.log('teamObj:', teamObj);
