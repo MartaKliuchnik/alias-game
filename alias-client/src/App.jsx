@@ -18,15 +18,17 @@ import FinalPage from "./pages/FinalPage/FinalPage";
 import { useCookies } from "react-cookie";
 
 export default function App() {
-  const [room, setRoom] = useState({
-    _id: "67014776d28a8c8ef68aa3c2", // Default room ID (just for test)
-  });
+//   const [room, setRoom] = useState({
+//     _id: "67014776d28a8c8ef68aa3c2", // Default room ID (just for test)
+//   });
 
-  const [team, setTeam] = useState({
-    _id: "670189790d94b777b1cd525a", // Default team ID (just for test)
-  });
-
-  const [cookies] = useCookies(["access_token", "refresh_token"]);
+//   const [team, setTeam] = useState({
+//     _id: "670189790d94b777b1cd525a", // Default team ID (just for test)
+//   });
+  const [room, setRoom] = useState({});
+  const [team, setTeam] = useState({});
+  const [role, setRole] = useState('');
+  const [cookies] = useCookies(['access_token', 'refresh_token']);
 
   const getIdFromToken = () => {
     const accessToken = cookies.access_token;
@@ -84,10 +86,9 @@ export default function App() {
           path="teams-result"
           element={<TeamsResultPage roomId={room._id} teamId={team._id} />}
         />
-        <Route
-          path="room"
-          element={<Room roomObj={room} setRoom={setRoom} setTeam={setTeam} />}
-        />
+         <Route path="room" element={<Room
+          roomObj={room} setRoom={setRoom} setTeam={setTeam} teamObj={team}
+          getIdFromToken={getIdFromToken} setRole={setRole} />} />
         <Route
           path="home"
           element={
