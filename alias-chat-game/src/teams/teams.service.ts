@@ -14,7 +14,7 @@ import { SetTeamLeaderDto } from './dto/set-team-leader.dto';
 @Injectable()
 export class TeamsService {
   private readonly MAX_USERS_IN_TEAM = 3;
-  constructor(@InjectModel(Team.name) private teamModel: Model<Team>) { }
+  constructor(@InjectModel(Team.name) private teamModel: Model<Team>) {}
 
   /**
    * Creates a new team within a specified room.

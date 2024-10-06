@@ -18,7 +18,7 @@ export default function LeaderPage({ roomId, teamId }) {
     const fetchWordId = async () => {
       try {
         const selectedWordId = await getSelectedWordId(roomId, teamId);
-		console.log('selectedWordId: ', selectedWordId);
+        console.log("selectedWordId: ", selectedWordId);
         setWordId(selectedWordId);
       } catch {
         setMessage("Failed to load the word ID. Please try again later.");
@@ -48,7 +48,7 @@ export default function LeaderPage({ roomId, teamId }) {
 
     try {
       const isCorrect = await checkAnswer(leaderWord, wordId);
-      console.log('isCorrect: ', isCorrect);
+      console.log("isCorrect: ", isCorrect);
 
       const success = await saveAnswer(roomId, teamId, leaderWord, isCorrect);
 
