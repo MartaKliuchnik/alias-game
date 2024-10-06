@@ -1,4 +1,10 @@
-import { IsOptional, IsArray, IsMongoId, IsString } from 'class-validator';
+import {
+  IsOptional,
+  IsArray,
+  IsMongoId,
+  IsString,
+  IsBoolean,
+} from 'class-validator';
 import { Types } from 'mongoose';
 
 export class UpdateTeamDto {
@@ -31,4 +37,12 @@ export class UpdateTeamDto {
   @IsArray()
   @IsMongoId({ each: true, message: 'Each word must be a valid word ID' })
   tryedWords?: Types.ObjectId[];
+
+  @IsOptional()
+  @IsBoolean()
+  success?: boolean;
+
+  @IsOptional()
+  @IsString()
+  answer?: string;
 }

@@ -14,4 +14,4 @@ import { UsersModule } from 'src/users/users.module';
   providers: [TeamsService],
   exports: [TeamsService, MongooseModule],
 })
-export class TeamsModule { }
+export class TeamsModule {}
