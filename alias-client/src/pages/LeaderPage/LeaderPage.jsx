@@ -1,102 +1,128 @@
-import { useRef, useState } from 'react';
-import { Timer } from '../../components/Timer/Timer';
-import { useNavigate } from 'react-router-dom';
-import { checkAnswer } from '../../fetchers/checkAnswer'; // Importing the checkAnswer function
+import { useEffect, useRef, useState } from "react";
+import { Timer } from "../../components/Timer/Timer";
+import { useNavigate } from "react-router-dom";
+import { checkAnswer } from "../../fetchers/checkAnswer";
+import { saveAnswer } from "../../fetchers/saveAnswer";
+import getSelectedWordId from "../../fetchers/getSelectedWordId";
 
-export default function LeaderPage() {
-	const [leaderWord, setLeaderWord] = useState('');
-	const [isTimeUp, setIsTimeUp] = useState(false);
-	const wordRef = useRef();
-	const navigate = useNavigate();
-	const wordId = '66fbe2e2c4dcc97328d2ed42'; // test wordId !!!
+// eslint-disable-next-line react/prop-types
+export default function LeaderPage({ roomId, teamId }) {
+  const [leaderWord, setLeaderWord] = useState("");
+  const [isTimeUp, setIsTimeUp] = useState(false);
+  const [message, setMessage] = useState("");
+  const [wordId, setWordId] = useState(null);
+  const wordRef = useRef();
+  const navigate = useNavigate();
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
+  useEffect(() => {
+    const fetchWordId = async () => {
+      try {
+        const selectedWordId = await getSelectedWordId(roomId, teamId);
+		console.log('selectedWordId: ', selectedWordId);
+        setWordId(selectedWordId);
+      } catch {
+        setMessage("Failed to load the word ID. Please try again later.");
+      }
+    };
 
-		// Time runs out
-		if (isTimeUp) {
-			console.log(null); // Submit null if time has run out
-			return;
-		}
+    fetchWordId();
+  }, [roomId, teamId]);
 
-		// Validate if the input is empty or whitespace-only
-		if (!leaderWord.trim()) {
-			alert('You must provide a valid decision before submitting.');
-			return;
-		}
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-		try {
-			// Check if the answer is correct by making the API call
-			const isCorrect = await checkAnswer(leaderWord, wordId);
+    if (isTimeUp) {
+      console.log(null);
+      return;
+    }
 
-			if (!isCorrect) {
-				// Alert if the answer is incorrect
-				alert('Your answer is incorrect. Please try again.');
-				return;
-			}
+    if (!leaderWord.trim()) {
+      setMessage("You must provide a valid decision before submitting.");
+      return;
+    }
 
-			// If correct, proceed with the submission
-			alert('Your decision has been successfully submitted and recorded.');
-			setLeaderWord('');
-			navigate('/teams-result'); // Redirect to the results page
-		} catch {
-			// Handle error during submission
-			alert('Failed to submit the answer. Please try again later.');
-		}
-	};
+    if (!wordId) {
+      setMessage("Word ID is not available. Please try again later.");
+      return;
+    }
 
-	const handleTimeUp = () => {
-		setIsTimeUp(true);
-		setLeaderWord(''); // Clear the input field when time is up
-		alert(
-			'Time is up! You did not submit a decision within the allowed time. No decision has been recorded.'
-		);
-		navigate('/teams-result'); // Redirect to the results page
-	};
+    try {
+      const isCorrect = await checkAnswer(leaderWord, wordId);
+      console.log('isCorrect: ', isCorrect);
 
-	return (
-		<div className='container my-5'>
-			<section
-				className='row justify-content-center align-items-center gap-5'
-				style={{ marginTop: '8rem' }}
-			>
-				<div className='col-md-6 text-center'>
-					<h2 className='mb-4'>
-						{isTimeUp ? "Time's up!" : 'Answer Before Time Runs Out!'}
-					</h2>
-					<Timer initialCount={10} onTimeUp={handleTimeUp} />
-				</div>
-				<div className='col-md-6'>
-					<form onSubmit={handleSubmit} className='p-4 border rounded shadow'>
-						<div className='mb-3'>
-							<label htmlFor='leaderWord' className='form-label'>
-								Your Final Decision
-							</label>
-							<input
-								type='text'
-								id='leaderWord'
-								className='form-control form-control-lg'
-								ref={wordRef}
-								autoComplete='off'
-								onChange={(e) => setLeaderWord(e.target.value)}
-								value={leaderWord}
-								required
-								placeholder={
-									isTimeUp
-										? "Time's up! Can't submit a decision."
-										: 'Write your final decision'
-								}
-							/>
-						</div>
-						<button
-							className='btn btn-lg btn-success w-100'
-							disabled={isTimeUp}
-						>
-							Submit Your Answer
-						</button>
-					</form>
-				</div>
-			</section>
-		</div>
-	);
+      const success = await saveAnswer(roomId, teamId, leaderWord, isCorrect);
+
+      if (success) {
+        setMessage(
+          isCorrect
+            ? "Answer is correct and recorded!"
+            : "Answer is incorrect but recorded!"
+        );
+        setLeaderWord("");
+        wordRef.current.disabled = true;
+      } else {
+        setMessage("Failed to submit the answer. Please try again later.");
+      }
+    } catch {
+      setMessage("Failed to submit the answer. Please try again later.");
+    }
+  };
+
+  const handleTimeUp = () => {
+    setIsTimeUp(true);
+    setLeaderWord("");
+    wordRef.current.disabled = true;
+  };
+
+  if (isTimeUp) {
+    navigate("/teams-result");
+  }
+
+  return (
+    <div className="container my-5">
+      <section
+        className="row justify-content-center align-items-center gap-5"
+        style={{ marginTop: "8rem" }}
+      >
+        <div className="col-md-6 text-center">
+          <h2 className="mb-4">
+            {isTimeUp ? "Time's up!" : "Answer Before Time Runs Out!"}
+          </h2>
+          <Timer initialCount={10} onTimeUp={handleTimeUp} />
+        </div>
+        <div className="col-md-6">
+          <form onSubmit={handleSubmit} className="p-4 border rounded shadow">
+            <div className="mb-3">
+              <label htmlFor="leaderWord" className="form-label">
+                Your Final Decision
+              </label>
+              <input
+                type="text"
+                id="leaderWord"
+                className="form-control form-control-lg"
+                ref={wordRef}
+                autoComplete="off"
+                onChange={(e) => setLeaderWord(e.target.value)}
+                value={leaderWord}
+                required
+                placeholder={
+                  isTimeUp
+                    ? "Time's up! Can't submit a decision."
+                    : "Write your final decision"
+                }
+                disabled={message !== "" || !wordId}
+              />
+            </div>
+            <button
+              className="btn btn-lg btn-success w-100"
+              disabled={isTimeUp || message !== "" || !wordId}
+            >
+              Submit Your Answer
+            </button>
+          </form>
+          {message && <div className="alert alert-info mt-3">{message}</div>}{" "}
+        </div>
+      </section>
+    </div>
+  );
 }

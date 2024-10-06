@@ -18,4 +18,4 @@ import { User, UserSchema } from 'src/users/schemas/user.schema';
   providers: [TeamsService],
   exports: [TeamsService, MongooseModule],
 })
-export class TeamsModule { }
+export class TeamsModule {}

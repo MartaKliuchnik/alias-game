@@ -13,6 +13,8 @@ export default function Room({
   roomObj, teamObj, setRoom,
   setTeam, getIdFromToken, setRole }) {
 
+// eslint-disable-next-line react/prop-types
+export default function Room({ roomObj, setRoom, setTeam }) {
   const navigate = useNavigate();
   const [cookies] = useCookies(['access_token']);
 
