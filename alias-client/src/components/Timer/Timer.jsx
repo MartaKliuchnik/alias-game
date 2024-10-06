@@ -1,16 +1,35 @@
-import { useEffect, useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
-export function Timer({ initialCount, onTimeUp }) {
-	const [counter, setCounter] = useState(initialCount);
+const Timer = ({ startTime, onTimeOut, small }) => {
+	const [time, setTime] = useState(startTime);
+	const intervalRef = useRef(null);
+	const timeOutCallback = useCallback(onTimeOut, [onTimeOut]);
 
 	useEffect(() => {
-		if (counter > 0) {
-			const timerId = setTimeout(() => setCounter(counter - 1), 1000);
-			return () => clearTimeout(timerId); // Clean up timer on unmount
-		} else if (onTimeUp) {
-			onTimeUp();
+		if (time === 0) {
+			clearInterval(intervalRef.current);
+			timeOutCallback();
+			return;
 		}
-	}, [counter, onTimeUp]);
 
-	return <div className='display-4'>{counter}</div>;
-}
+		intervalRef.current = setInterval(() => {
+			setTime((prevTime) => {
+				if (prevTime <= 1) {
+					clearInterval(intervalRef.current);
+					return 0;
+				}
+				return prevTime - 1;
+			});
+		}, 1000);
+
+		return () => clearInterval(intervalRef.current);
+	}, [time]);
+
+	return small ? (
+		<div className='text-white'>Timer {time} sec</div>
+	) : (
+		<div className='display-4'>{time}</div>
+	);
+};
+
+export default React.memo(Timer);

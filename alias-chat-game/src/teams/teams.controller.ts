@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   Put,
+  Query,
 } from '@nestjs/common';
 import { TeamsService } from './teams.service';
 import { UsersService } from 'src/users/users.service';
@@ -32,8 +33,11 @@ export class TeamsController {
 
   // Get all teams in a room
   @Get() // api/v1/rooms/{roomId}/teams
-  findAllTeams(@Param('roomId', ParseObjectIdPipe) roomId: Types.ObjectId) {
-    return this.teamsService.findAll(roomId);
+  findAllTeams(
+    @Param('roomId', ParseObjectIdPipe) roomId: Types.ObjectId,
+    @Query('nestUsers') nestUsers: boolean = false,
+  ) {
+    return this.teamsService.findAll(roomId, nestUsers);
   }
 
   // Deletes all teams from a specific room.
