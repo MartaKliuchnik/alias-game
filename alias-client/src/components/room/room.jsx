@@ -9,12 +9,8 @@ import { getPlayersFromRoom } from '../../fetchers/getPlayersFromRoom';
 import { joinTeam, leaveTeam } from '../../fetchers/userTeam';
 import { getTeam } from '../../fetchers/getTeam';
 
-export default function Room({
-  roomObj, teamObj, setRoom,
-  setTeam, getIdFromToken, setRole }) {
-
 // eslint-disable-next-line react/prop-types
-export default function Room({ roomObj, setRoom, setTeam }) {
+export default function Room({ roomObj, teamObj, setRoom, setTeam, getIdFromToken, setRole }) {
   const navigate = useNavigate();
   const [cookies] = useCookies(['access_token']);
 
