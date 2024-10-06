@@ -157,7 +157,7 @@ export class TeamsService {
       .exec();
   }
 
-  findAll(roomId: Types.ObjectId, nestUsers: boolean) {
+  findAll(roomId: Types.ObjectId, nestUsers: boolean = false) {
     let query = this.teamModel.find({ roomId }).sort({ teamScore: -1 });
 
     if (nestUsers) {
