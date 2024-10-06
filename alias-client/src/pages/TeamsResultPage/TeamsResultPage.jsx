@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import getTeamScoresInRoom from "../../fetchers/getTeamScoresInRoom";
 import getTeamAnswerRes from "../../fetchers/getTeamAnswerRes";
-import fetchWord from "../../fetchers/fetchWord";
-import updateTeamScores from "../../fetchers/updateTeamScores";
+import getWord from "../../fetchers/getWord";
 
 // eslint-disable-next-line react/prop-types
 export default function TeamsResultPage({ roomId, teamId }) {
@@ -14,12 +13,10 @@ export default function TeamsResultPage({ roomId, teamId }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await updateTeamScores(roomId);
-
         const result = await getTeamAnswerRes(roomId, teamId);
         setTeamAnswerRes(result);
 
-        const word = await fetchWord(result.selectedWord);
+        const word = await getWord(result.selectedWord);
         setFetchedWord(word);
       } catch (error) {
         setError(error.message);

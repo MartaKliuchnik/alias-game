@@ -18,13 +18,13 @@ import FinalPage from "./pages/FinalPage/FinalPage";
 import { useCookies } from "react-cookie";
 
 export default function App() {
-//   const [room, setRoom] = useState({
-//     _id: "67014776d28a8c8ef68aa3c2", // Default room ID (just for test)
-//   });
+  /* const [room, setRoom] = useState({
+    _id: "67030cda713f72dd45fb4e0e", // Default room ID (just for test)
+  });
 
-//   const [team, setTeam] = useState({
-//     _id: "670189790d94b777b1cd525a", // Default team ID (just for test)
-//   });
+  const [team, setTeam] = useState({
+    _id: "67030d5e713f72dd45fb4e2c", // Default team ID (just for test)
+  }); */
   const [room, setRoom] = useState({});
   const [team, setTeam] = useState({});
   const [role, setRole] = useState('');

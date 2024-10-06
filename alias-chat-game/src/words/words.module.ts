@@ -6,10 +6,12 @@ import { Word, WordSchema } from './schemas/word.schema';
 import { TeamsModule } from '../teams/teams.module'; // Import TeamsModule
 import { TeamsService } from 'src/teams/teams.service';
 import { JwtModule } from '@nestjs/jwt';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Word.name, schema: WordSchema }]),
+    UsersModule,
     TeamsModule,
     JwtModule.register({
       secret: 'AliasSecret', // Ensure the same secret is used

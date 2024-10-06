@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { checkAnswer } from "../../fetchers/checkAnswer";
 import { saveAnswer } from "../../fetchers/saveAnswer";
 import getSelectedWordId from "../../fetchers/getSelectedWordId";
+import calculateScores from "../../fetchers/calculateScores";
 
 // eslint-disable-next-line react/prop-types
 export default function LeaderPage({ roomId, teamId }) {
@@ -60,6 +61,8 @@ export default function LeaderPage({ roomId, teamId }) {
         );
         setLeaderWord("");
         wordRef.current.disabled = true;
+
+        await calculateScores(roomId, teamId);
       } else {
         setMessage("Failed to submit the answer. Please try again later.");
       }

@@ -20,7 +20,7 @@ export class TeamsController {
   constructor(
     private readonly teamsService: TeamsService,
     private readonly usersService: UsersService,
-  ) { }
+  ) {}
 
   // Add a team to a room
   @Post() // api/v1/rooms/{roomId}/teams
@@ -131,5 +131,12 @@ export class TeamsController {
     @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
   ) {
     return this.teamsService.resetRound(roomId, teamId);
+  }
+
+  @Put(':teamId/calculate-scores')
+  async calculateScores(
+    @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
+  ) {
+    return await this.teamsService.calculateScores(teamId);
   }
 }

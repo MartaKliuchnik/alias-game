@@ -1,5 +1,5 @@
 // Function to fetch a word by its ID
-const fetchWord = async (wordId) => {
+const getWord = async (wordId) => {
     const url = `http://localhost:8080/api/v1/words/${wordId}`;
 
     try {
@@ -17,4 +17,4 @@ const fetchWord = async (wordId) => {
     }
 };
 
-export default fetchWord;
+export default getWord;
