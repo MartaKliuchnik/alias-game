@@ -32,7 +32,7 @@ const TeamList = ({ teamName, users }) => (
   <div>
     <h5 className="text-white">Team {teamName}</h5>
     <ul className="list-group">
-      {users.map((user, index) => (
+      {users?.map((user, index) => (
         <UserCard key={index} username={user.username} />
       ))}
     </ul>

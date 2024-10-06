@@ -40,7 +40,7 @@ export class RoomsService {
     return await this.roomModel.find().exec();
   }
 
-  async findOne(id: Types.ObjectId) {
+  async findOne(id: Types.ObjectId): Promise<RoomDocument> {
     this.validateId(id);
     const room = await this.roomModel.findById(id).exec();
     if (!room) {
