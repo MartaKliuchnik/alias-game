@@ -14,7 +14,7 @@ import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class TeamsService {
-  private readonly MAX_USERS_IN_TEAM = 3;
+  private readonly MAX_USERS_IN_TEAM: number = 3;
   constructor(
     @InjectModel(Team.name) private teamModel: Model<Team>,
     private readonly usersService: UsersService,
