@@ -30,7 +30,7 @@ export default function RegisterPage() {
 			setPwd('');
 			setSuccess(true);
 			navigate('/login');
-		} catch (error) {
+		} catch {
 			setErrMsg('Registration failed. Please try again.');
 			errRef.current.focus();
 		}

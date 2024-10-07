@@ -30,6 +30,7 @@ const Timer = ({ startTime, onTimeOut, small }) => {
 		intervalRef.current = requestAnimationFrame(tick);
 
 		return () => cancelAnimationFrame(intervalRef.current);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [timeOutCallback]);
 
 	return small ? (

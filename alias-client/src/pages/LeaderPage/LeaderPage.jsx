@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Timer } from "../../components/Timer/Timer";
+import Timer from "../../components/Timer/Timer";
 import { useNavigate } from "react-router-dom";
 import { checkAnswer } from "../../fetchers/checkAnswer";
 import { saveAnswer } from "../../fetchers/saveAnswer";
