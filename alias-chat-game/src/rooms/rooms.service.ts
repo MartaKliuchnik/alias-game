@@ -12,6 +12,7 @@ import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { CreateTeamDto } from 'src/teams/dto/create-team.dto';
 import { TeamsService } from 'src/teams/teams.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class RoomsService {
@@ -20,6 +21,7 @@ export class RoomsService {
   constructor(
     @InjectModel(Room.name) private roomModel: Model<RoomDocument>,
     private readonly teamsService: TeamsService,
+    private readonly usersService: UsersService,
   ) {}
 
   async create(createRoomDto: CreateRoomDto) {
@@ -37,10 +39,10 @@ export class RoomsService {
   }
 
   async findAll() {
-    return this.roomModel.find().exec();
+    return await this.roomModel.find().exec();
   }
 
-  async findOne(id: Types.ObjectId) {
+  async findOne(id: Types.ObjectId): Promise<RoomDocument> {
     this.validateId(id);
     const room = await this.roomModel.findById(id).exec();
     if (!room) {
@@ -60,6 +62,8 @@ export class RoomsService {
     return updatedRoom;
   }
 
+  // Delete the room
+  // api/v1/rooms/:roomId
   async delete(id: Types.ObjectId) {
     this.validateId(id);
     const deletedRoom = await this.roomModel.findByIdAndDelete(id).exec();
@@ -199,9 +203,34 @@ export class RoomsService {
   }
 
   /**
-   * Deletes all rooms from the database.
+   * Deletes all rooms in the database.
+   * @returns {Promise<{ message: string }>} - A message indicating the result of the deletion operation.
    */
-  async deleteAllRooms(): Promise<void> {
-    await this.roomModel.deleteMany({}); // This will delete all documents in the rooms collection
+  async deleteAllRooms(): Promise<{ message: string }> {
+    const { deletedCount } = await this.roomModel.deleteMany({}).exec();
+    return {
+      message:
+        deletedCount > 0
+          ? `Successfully deleted ${deletedCount} rooms.`
+          : 'No rooms found to delete.',
+    };
+  }
+
+  async calculateScores(roomId: Types.ObjectId): Promise<{ message: string }> {
+    const teams = await this.teamsService.findAll(roomId);
+
+    for (const team of teams) {
+      if (team.success) {
+        team.teamScore += 20;
+
+        for (const playerId of team.players) {
+          await this.usersService.incrementScore(playerId, 10);
+        }
+
+        await team.save();
+      }
+    }
+
+    return { message: 'Scores calculated successfully!' };
   }
 }

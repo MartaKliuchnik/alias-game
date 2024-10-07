@@ -1,12 +1,9 @@
 import UserCard from './UserCard';
 
-export default function TeamCard({ team, onAddUser, onRemoveUser }) {
+export default function TeamCard({ team, onAddUser, onRemoveUser, isFull }) {
   const handleAddUser = () => {
-    if (!team.isFull) {
-      const username = prompt('Enter new username:');
-      if (username) {
-        onAddUser(team._id, username);
-      }
+    if (!isFull) {
+      onAddUser(team._id);
     }
   };
 
@@ -28,9 +25,9 @@ export default function TeamCard({ team, onAddUser, onRemoveUser }) {
         <button
           className="btn btn-primary mt-3 w-100"
           onClick={handleAddUser}
-          disabled={team.isFull}
+          disabled={isFull}
         >
-          {team.isFull ? 'Full team' : 'Join team'}
+          {isFull ? 'Full team' : 'Join team'}
         </button>
       </div>
     </div>

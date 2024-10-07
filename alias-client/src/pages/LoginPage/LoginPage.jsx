@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from "axios";
-import { useCookies } from "react-cookie";
+import axios from 'axios';
+import { useCookies } from 'react-cookie';
 
 export default function LoginPage() {
 	const userRef = useRef();
@@ -22,27 +22,30 @@ export default function LoginPage() {
 		setErrMsg('');
 	}, [user, pwd]);
 
-	useEffect(() => {
-		console.log(cookies);
-	}, [cookies]);
+	useEffect(() => {}, [cookies]);
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
 			const res = await axios.post('http://localhost:8080/api/v1/auth/login', {
 				username: user,
-				password: pwd
+				password: pwd,
 			});
 			const { access_token, refresh_token } = res.data.data;
 
-			setCookie('access_token', access_token, { path: '/', sameSite: 'strict' });
-			setCookie('refresh_token', refresh_token, { path: '/', sameSite: 'strict' });
+			setCookie('access_token', access_token, {
+				path: '/',
+				sameSite: 'strict',
+			});
+			setCookie('refresh_token', refresh_token, {
+				path: '/',
+				sameSite: 'strict',
+			});
 			setUser('');
 			setPwd('');
 			setSuccess(true);
-			console.log('success');
 		} catch (error) {
-			console.error('Error', error)
+			console.error('Error', error);
 		}
 	};
 
@@ -92,7 +95,10 @@ export default function LoginPage() {
 									/>
 								</div>
 
-								<button type='submit' className='btn btn-lg btn-secondary w-100'>
+								<button
+									type='submit'
+									className='btn btn-lg btn-secondary w-100'
+								>
 									Log In
 								</button>
 							</form>

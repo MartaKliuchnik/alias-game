@@ -1,6 +1,6 @@
 export default function UserCard({ index, username, teamId, onRemoveUser }) {
   const handleRemoveUser = () => {
-    onRemoveUser(teamId, username);
+    onRemoveUser(teamId);
   };
 
   return (

@@ -1,58 +1,86 @@
-import { useRef, useState } from 'react';
-import { Timer } from '../../components/Timer/Timer';
+import { useEffect, useRef, useState } from 'react';
+import Timer from '../../components/Timer/Timer.jsx';
 import { useNavigate } from 'react-router-dom';
-import { checkAnswer } from '../../fetchers/checkAnswer'; // Importing the checkAnswer function
+import { checkAnswer } from '../../fetchers/checkAnswer';
+import { saveAnswer } from '../../fetchers/saveAnswer.js';
+import getSelectedWordId from '../../fetchers/getSelectedWordId.js';
 
-export default function LeaderPage() {
+export default function LeaderPage({ getTokens, teamObj, setTeam }) {
+	// const access_token = getTokens().access_token;
+	const { roomId, _id: teamId } = teamObj;
+
 	const [leaderWord, setLeaderWord] = useState('');
 	const [isTimeUp, setIsTimeUp] = useState(false);
+	const [message, setMessage] = useState('');
+	const [wordId, setWordId] = useState(null);
+
 	const wordRef = useRef();
 	const navigate = useNavigate();
-	const wordId = '66fbe2e2c4dcc97328d2ed42'; // test wordId !!!
+
+	// Fetch the selected word when the component loads
+	useEffect(() => {
+		const fetchWordId = async () => {
+			try {
+				const selectedWordId = await getSelectedWordId(roomId, teamId);
+				setWordId(selectedWordId);
+			} catch {
+				setMessage('Failed to load the word ID. Please try again later.');
+			}
+		};
+
+		fetchWordId();
+	}, [roomId, teamId]);
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
 		// Time runs out
-		if (isTimeUp) {
-			console.log(null); // Submit null if time has run out
-			return;
-		}
+		if (isTimeUp) return;
 
 		// Validate if the input is empty or whitespace-only
 		if (!leaderWord.trim()) {
-			alert('You must provide a valid decision before submitting.');
+			setMessage('You must provide a valid decision before submitting.');
+			return;
+		}
+
+		if (!wordId) {
+			setMessage('Word ID is not available. Please try again later.');
 			return;
 		}
 
 		try {
 			// Check if the answer is correct by making the API call
 			const isCorrect = await checkAnswer(leaderWord, wordId);
+			const success = await saveAnswer(roomId, teamId, leaderWord, isCorrect);
 
-			if (!isCorrect) {
-				// Alert if the answer is incorrect
-				alert('Your answer is incorrect. Please try again.');
-				return;
+			if (success) {
+				setMessage(
+					isCorrect
+						? 'Answer is correct and recorded!'
+						: 'Answer is incorrect but recorded!'
+				);
+				setLeaderWord('');
+				wordRef.current.disabled = true;
+			} else {
+				setMessage('Failed to submit the answer. Please try again later.');
 			}
-
-			// If correct, proceed with the submission
-			alert('Your decision has been successfully submitted and recorded.');
-			setLeaderWord('');
-			navigate('/teams-result'); // Redirect to the results page
 		} catch {
-			// Handle error during submission
-			alert('Failed to submit the answer. Please try again later.');
+			setMessage('Failed to submit the answer. Please try again later.');
 		}
 	};
 
 	const handleTimeUp = () => {
 		setIsTimeUp(true);
 		setLeaderWord(''); // Clear the input field when time is up
-		alert(
-			'Time is up! You did not submit a decision within the allowed time. No decision has been recorded.'
-		);
-		navigate('/teams-result'); // Redirect to the results page
+		wordRef.current.disabled = true;
 	};
+
+	// Trigger navigation when time is up
+	useEffect(() => {
+		if (isTimeUp) {
+			navigate('/teams-result');
+		}
+	}, [isTimeUp, navigate]);
 
 	return (
 		<div className='container my-5'>
@@ -64,7 +92,7 @@ export default function LeaderPage() {
 					<h2 className='mb-4'>
 						{isTimeUp ? "Time's up!" : 'Answer Before Time Runs Out!'}
 					</h2>
-					<Timer initialCount={10} onTimeUp={handleTimeUp} />
+					<Timer startTime={10} onTimeOut={handleTimeUp} small={false} />
 				</div>
 				<div className='col-md-6'>
 					<form onSubmit={handleSubmit} className='p-4 border rounded shadow'>
@@ -86,15 +114,17 @@ export default function LeaderPage() {
 										? "Time's up! Can't submit a decision."
 										: 'Write your final decision'
 								}
+								disabled={message !== '' || !wordId}
 							/>
 						</div>
 						<button
 							className='btn btn-lg btn-success w-100'
-							disabled={isTimeUp}
+							disabled={isTimeUp || message !== '' || !wordId}
 						>
 							Submit Your Answer
 						</button>
 					</form>
+					{message && <div className='alert alert-info mt-3'>{message}</div>}{' '}
 				</div>
 			</section>
 		</div>

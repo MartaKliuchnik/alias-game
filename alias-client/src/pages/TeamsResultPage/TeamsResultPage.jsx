@@ -1,6 +1,6 @@
 import mockTeams from '../../data/mockTeams';
 
-export default function TeamsResultPage() {
+export default function TeamsResultPage({ getTokens, teamObj, setTeam }) {
 	const success = true;
 	const answerCorrect = 'bike';
 	const wrongAnswer = 'car';

@@ -92,13 +92,27 @@ export class WordsService {
   async getRandomWord(
     roomId: Types.ObjectId,
     teamId: Types.ObjectId,
-    userId: Types.ObjectId,
+    userId: string,
   ): Promise<{ word: WordDocument; tryedWords: Types.ObjectId[] }> {
     const team = await this.teamsService.findOne(roomId, teamId);
+    const userObjectId = new Types.ObjectId(userId);
 
     // Verify if the requesting user is the describer of the team
-    if (team.describer !== userId) {
+    if (!team.describer.equals(userObjectId)) {
       throw new UnauthorizedException('Only the describer can get a new word.');
+    }
+
+    // Check if a word has already been selected
+    if (team.selectedWord) {
+      const selectedWord = await this.wordModel
+        .findById(team.selectedWord)
+        .exec();
+
+      // Return the already selected word and the existing tryedWords array
+      return {
+        word: selectedWord,
+        tryedWords: team.tryedWords,
+      };
     }
 
     const tryedWords = team.tryedWords;

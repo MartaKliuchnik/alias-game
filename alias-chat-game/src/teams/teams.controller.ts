@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   Put,
+  Query,
 } from '@nestjs/common';
 import { TeamsService } from './teams.service';
 import { UsersService } from 'src/users/users.service';
@@ -19,7 +20,7 @@ export class TeamsController {
   constructor(
     private readonly teamsService: TeamsService,
     private readonly usersService: UsersService,
-  ) {}
+  ) { }
 
   // Add a team to a room
   @Post() // api/v1/rooms/{roomId}/teams
@@ -32,8 +33,19 @@ export class TeamsController {
 
   // Get all teams in a room
   @Get() // api/v1/rooms/{roomId}/teams
-  findAllTeams(@Param('roomId', ParseObjectIdPipe) roomId: Types.ObjectId) {
-    return this.teamsService.findAll(roomId);
+  findAllTeams(
+    @Param('roomId', ParseObjectIdPipe) roomId: Types.ObjectId,
+    @Query('nestUsers') nestUsers: boolean = false,
+  ) {
+    return this.teamsService.findAll(roomId, nestUsers);
+  }
+
+  // Deletes all teams from a specific room.
+  @Delete() // /api/v1/rooms/{roomId}/teams
+  async deleteAllTeams(
+    @Param('roomId', ParseObjectIdPipe) roomId: Types.ObjectId,
+  ): Promise<{ message: string }> {
+    return await this.teamsService.deleteAllTeamsFromRoom(roomId);
   }
 
   // Get a specific team by ID
@@ -74,14 +86,14 @@ export class TeamsController {
       roomId,
       teamId,
     );
+
     const players = await Promise.all(
       playerIds.map(async (id: Types.ObjectId) => {
         const player = await this.usersService.getUserById(id);
         return player;
       }),
     );
-
-    return players;
+    return players.sort((a, b) => b.score - a.score);
   }
 
   // Add a player to a team
@@ -90,7 +102,6 @@ export class TeamsController {
     @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
     @Param('userId', ParseObjectIdPipe) userId: Types.ObjectId,
   ) {
-    return this.teamsService.addPlayerToTeam(userId, teamId);
     return this.teamsService.addPlayerToTeam(userId, teamId);
   }
 
@@ -111,5 +122,14 @@ export class TeamsController {
     @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
   ) {
     return this.teamsService.defineDescriberAndLeader(roomId, teamId);
+  }
+
+  // Reset round fields to null
+  @Put(':teamId/reset') // api/v1/rooms/{roomId}/teams/{teamId}/reset
+  resetRound(
+    @Param('roomId', ParseObjectIdPipe) roomId: Types.ObjectId,
+    @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
+  ) {
+    return this.teamsService.resetRound(roomId, teamId);
   }
 }
