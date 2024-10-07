@@ -144,6 +144,7 @@ export default function App() {
 							description={team.description}
 							setTeam={setTeam}
 							role={role}
+							userId={getIdFromToken}
 						/>
 					}
 				/>
