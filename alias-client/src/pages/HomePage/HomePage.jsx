@@ -17,7 +17,7 @@ export default function HomePage({ setRoom, getIdFromToken, getTokens }) {
         const accessToken = getTokens().access_token;
         console.log(userId, accessToken);
         const room = await joinRoom(userId, accessToken);
-        console.log(room);
+        console.log("ROOM: ", room);
         setRoom(room);
         navigate('/room');
     };

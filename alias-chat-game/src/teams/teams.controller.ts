@@ -93,7 +93,8 @@ export class TeamsController {
         return player;
       }),
     );
-    return players.sort((a, b) => b.score - a.score);
+
+    return players.sort((a, b) => Number(b.score) - Number(a.score));
   }
 
   // Add a player to a team

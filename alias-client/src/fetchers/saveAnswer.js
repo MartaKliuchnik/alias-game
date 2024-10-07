@@ -15,9 +15,9 @@ export const saveAnswer = async (roomId, teamId, answer, success) => {
             throw new Error('Failed to save the answer');
         }
 
-        return true; // Вернуть true, если запрос прошел успешно
+        return true; // Return true if query was successful
     } catch (error) {
         console.error('Error saving answer:', error);
-        return false; // Вернуть false в случае ошибки
+        return false; // Return false if error occurs
     }
 };

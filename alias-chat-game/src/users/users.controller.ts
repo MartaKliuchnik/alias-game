@@ -6,7 +6,7 @@ import {
   Param,
   Delete,
   Query,
-  UseGuards,
+  //UseGuards,
   Post,
   Logger,
 } from '@nestjs/common';
@@ -15,19 +15,20 @@ import { UserSafeDto } from './dto/user-safe.dto';
 import { ParseObjectIdPipe } from '../parse-id.pipe';
 import { Types } from 'mongoose';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AuthGuard } from '../auth/gurards/auth.guard';
+// import { AuthGuard } from '../auth/gurards/auth.guard';
 import { RoomsService } from 'src/rooms/rooms.service';
 import { TeamsService } from 'src/teams/teams.service';
 
 // UsersController handles CRUD operations for user management.
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly roomsService: RoomsService,
     private readonly teamsService: TeamsService,
-  ) { }
+  ) {}
+
   /**
    * @route GET /api/v1/users
    * @description Retrieve all users
@@ -35,7 +36,8 @@ export class UsersController {
    */
   @Get()
   async findAll(): Promise<UserSafeDto[] | []> {
-    return this.usersService.getUsers();
+    const users = await this.usersService.getUsers();
+    return users.sort((a, b) => b.score - a.score);
   }
 
   /**

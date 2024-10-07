@@ -25,10 +25,13 @@ export default function App() {
   const [team, setTeam] = useState({
     _id: "67030d5e713f72dd45fb4e2c", // Default team ID (just for test)
   }); */
+
   const [room, setRoom] = useState({});
   const [team, setTeam] = useState({});
-  const [role, setRole] = useState('');
-  const [cookies] = useCookies(['access_token', 'refresh_token']);
+
+  // eslint-disable-next-line no-unused-vars
+  const [role, setRole] = useState("");
+  const [cookies] = useCookies(["access_token", "refresh_token"]);
 
   const getIdFromToken = () => {
     const accessToken = cookies.access_token;
@@ -75,7 +78,11 @@ export default function App() {
         <Route
           path="describer"
           element={
-            <DescriberPage getTokens={getTokens} roomId={room._id} teamId={team._id} />
+            <DescriberPage
+              getTokens={getTokens}
+              roomId={room._id}
+              teamId={team._id}
+            />
           }
         />
         <Route
@@ -86,9 +93,19 @@ export default function App() {
           path="teams-result"
           element={<TeamsResultPage roomId={room._id} teamId={team._id} />}
         />
-         <Route path="room" element={<Room
-          roomObj={room} setRoom={setRoom} setTeam={setTeam} teamObj={team}
-          getIdFromToken={getIdFromToken} setRole={setRole} />} />
+        <Route
+          path="room"
+          element={
+            <Room
+              roomObj={room}
+              setRoom={setRoom}
+              setTeam={setTeam}
+              teamObj={team}
+              getIdFromToken={getIdFromToken}
+              setRole={setRole}
+            />
+          }
+        />
         <Route
           path="home"
           element={
@@ -100,7 +117,7 @@ export default function App() {
           }
         />
         <Route path="profile" element={<Profile />} />
-        <Route path="final-page" element={<FinalPage />} />
+        <Route path="final-page" element={<FinalPage roomId={room._id} />} />
 
         <Route
           path="discussion"
