@@ -5,11 +5,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import TeamCard from './TeamCard';
 import { leaveRoom } from '../../fetchers/userRoom';
 import { getTeamsFromRoom } from '../../fetchers/getTeamsFromRoom';
-import { getPlayersFromTeam } from '../../fetchers/getPlayersFromTeam';
+import { getPlayersFromRoom } from '../../fetchers/getPlayersFromRoom';
 import { joinTeam, leaveTeam } from '../../fetchers/userTeam';
 import { getTeam } from '../../fetchers/getTeam';
 
-<<<<<<< HEAD
+// eslint-disable-next-line react/prop-types
 export default function Room({
 	roomObj,
 	teamObj,
@@ -23,12 +23,6 @@ export default function Room({
 
 	const handleBackClick = async () => {
 		const accessToken = cookies.access_token;
-=======
-// eslint-disable-next-line react/prop-types
-export default function Room({ roomObj, teamObj, setRoom, setTeam, getIdFromToken, setRole }) {
-  const navigate = useNavigate();
-  const [cookies] = useCookies(['access_token']);
->>>>>>> pre-prod
 
 		const userId = getIdFromToken();
 		if (!userId) {
@@ -60,7 +54,7 @@ export default function Room({ roomObj, teamObj, setRoom, setTeam, getIdFromToke
 			let fetchedTeams = await getTeamsFromRoom(roomObj._id);
 			fetchedTeams = await Promise.all(
 				fetchedTeams.map(async (team) => {
-					const players = await getPlayersFromTeam(team.roomId, team._id);
+					const players = await getPlayersFromRoom(team.roomId, team._id);
 					team.players = players;
 					return team;
 				})
@@ -93,7 +87,9 @@ export default function Room({ roomObj, teamObj, setRoom, setTeam, getIdFromToke
 		const allTeamsFull = teams.every((team) => team.players.length >= maxUsers);
 		if (allTeamsFull && teams.length > 0) {
 			updateTeam();
+			console.log('ready');
 			const userId = getIdFromToken();
+			console.log('teamObj:', teamObj);
 			if (teamObj.describer != null && teamObj.teamLeader != null) {
 				if (teamObj.describer == userId) {
 					setRole('describer');

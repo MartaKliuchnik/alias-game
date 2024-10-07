@@ -1,11 +1,7 @@
 import { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Timer from '../Timer/Timer.jsx';
-<<<<<<< HEAD
-import { getPlayersFromTeam } from '../../fetchers/getPlayersFromTeam.js';
-=======
 import { getPlayersFromRoom } from '../../fetchers/getPlayersFromRoom.js';
->>>>>>> pre-prod
 import { getTeam } from '../../fetchers/getTeam.js';
 import { useNavigate } from 'react-router-dom';
 
@@ -42,11 +38,7 @@ export default function Discussion({ teamObj, description, setTeam, role }) {
 				setTeam(latestTeam);
 
 				// Fetch players info for the team
-<<<<<<< HEAD
-				const players = await getPlayersFromTeam(roomId, teamId);
-=======
 				const players = await getPlayersFromRoom(roomId, teamId);
->>>>>>> pre-prod
 				setTeamPlayersInfo(players);
 			} catch (error) {
 				console.error('Error fetching team or players:', error);

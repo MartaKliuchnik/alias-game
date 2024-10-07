@@ -1,15 +1,15 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getTeamsFromRoom } from '../../fetchers/getTeamsFromRoom';
-import { getPlayersFromTeam } from '../../fetchers/getPlayersFromTeam';
+import { getPlayersFromRoom } from '../../fetchers/getPlayersFromRoom';
 import Spinner from '../../components/Spinner/Spinner';
 import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
 
-export default function FinalPage({ teamObj, setTeam, getTokens }) {
-	// const access_token = getTokens().access_token;
-	const { roomId, _id: teamId } = teamObj;
+export default function FinalPage() {
 	const navigate = useNavigate();
+	const roomId = '66fd2f7f8f5e247f23fbf293'; // Example roomId from DB aliasChat2
 
+	const [teams, setTeams] = useState([]);
 	const [players, setPlayers] = useState([]);
 	const [loading, setLoading] = useState(true); // To handle loading state
 	const [error, setError] = useState(null); // To handle error state
@@ -19,12 +19,12 @@ export default function FinalPage({ teamObj, setTeam, getTokens }) {
 			try {
 				// Fetch all teams in the room
 				const teams = await getTeamsFromRoom(roomId);
-				setTeam(teams); // Store the fetched teams
+				setTeams(teams); // Store the fetched teams
 
 				// Fetch players for each team in parallel
 				const teamIds = teams.map((team) => team._id);
 				const playersData = await Promise.all(
-					teamIds.map((teamId) => getPlayersFromTeam(roomId, teamId))
+					teamIds.map((teamId) => getPlayersFromRoom(roomId, teamId))
 				);
 
 				// Combine all player data

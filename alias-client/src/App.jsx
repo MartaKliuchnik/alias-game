@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Navbar from './components/Navbar/Navbar';
 import HomePage from './pages/HomePage/HomePage';
@@ -71,7 +71,10 @@ export default function App() {
 			<Routes>
 				<Route path='/' element={<RegisterPage />} />
 				<Route path='login' element={<LoginPage />} />
-				<Route path='leaderboard' element={<LeaderBoardPage />} />
+				<Route
+					path='leaderboard'
+					element={<LeaderBoardPage teamObj={team} />}
+				/>
 				<Route
 					path='describer'
 					element={

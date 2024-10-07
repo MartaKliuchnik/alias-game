@@ -94,8 +94,6 @@ export class WordsService {
     teamId: Types.ObjectId,
     userId: string,
   ): Promise<{ word: WordDocument; tryedWords: Types.ObjectId[] }> {
-    const userObjectId = new Types.ObjectId(userId);
-
     const team = await this.teamsService.findOne(roomId, teamId);
     const userObjectId = new Types.ObjectId(userId);
 

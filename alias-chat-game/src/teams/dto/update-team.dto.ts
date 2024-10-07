@@ -62,22 +62,16 @@ export class UpdateTeamDto {
   @IsMongoId({ each: true, message: 'Each word must be a valid word ID' })
   tryedWords?: Types.ObjectId[];
 
-<<<<<<< HEAD
-=======
   /**
    * Boolean value of word guess' ressult
    */
->>>>>>> pre-prod
   @IsOptional()
   @IsBoolean()
   success?: boolean;
 
-<<<<<<< HEAD
-=======
   /**
    * Answer made by team leader
    */
->>>>>>> pre-prod
   @IsOptional()
   @IsString()
   answer?: string;

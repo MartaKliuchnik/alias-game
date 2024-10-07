@@ -7,7 +7,7 @@ export class LeaderboardsController {
   constructor(private readonly leaderboardsService: LeaderboardsService) {}
 
   /**
-   * @route GET /api/v1/users/leaderboards
+   * @route GET /api/v1/leaderboards
    * @description Retrieve the top players' leaderboards
    * @access Public
    */

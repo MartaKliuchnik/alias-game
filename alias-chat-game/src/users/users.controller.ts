@@ -27,7 +27,7 @@ export class UsersController {
     private readonly usersService: UsersService,
     private readonly roomsService: RoomsService,
     private readonly teamsService: TeamsService,
-  ) { }
+  ) {}
   /**
    * @route GET /api/v1/users
    * @description Retrieve all users
