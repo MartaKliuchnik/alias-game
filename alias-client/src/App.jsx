@@ -18,6 +18,13 @@ import FinalPage from './pages/FinalPage/FinalPage';
 import { useCookies } from 'react-cookie';
 
 export default function App() {
+	//   const [room, setRoom] = useState({
+	//     _id: "67014776d28a8c8ef68aa3c2", // Default room ID (just for test)
+	//   });
+
+	//   const [team, setTeam] = useState({
+	//     _id: "670189790d94b777b1cd525a", // Default team ID (just for test)
+	//   });
 	const [room, setRoom] = useState({});
 	const [team, setTeam] = useState({});
 	const [role, setRole] = useState('');
@@ -25,6 +32,7 @@ export default function App() {
 
 	const getIdFromToken = () => {
 		const accessToken = cookies.access_token;
+		console.log('accessToken: ', accessToken);
 		if (!accessToken) {
 			console.error('No access token found.');
 			return;
@@ -54,22 +62,16 @@ export default function App() {
 		};
 	};
 
+	console.log('getTokens(): ', getTokens());
+	console.log('getIdFromToken(): ', getIdFromToken());
+
 	return (
 		<main>
 			<Navbar />
 			<Routes>
 				<Route path='/' element={<RegisterPage />} />
 				<Route path='login' element={<LoginPage />} />
-				<Route
-					path='leaderboard'
-					element={
-						<LeaderBoardPage
-							getTokens={getTokens}
-							teamObj={team}
-							setTeam={setTeam}
-						/>
-					}
-				/>
+				<Route path='leaderboard' element={<LeaderBoardPage />} />
 				<Route
 					path='describer'
 					element={

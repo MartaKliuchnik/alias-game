@@ -9,6 +9,7 @@ import { getPlayersFromTeam } from '../../fetchers/getPlayersFromTeam';
 import { joinTeam, leaveTeam } from '../../fetchers/userTeam';
 import { getTeam } from '../../fetchers/getTeam';
 
+<<<<<<< HEAD
 export default function Room({
 	roomObj,
 	teamObj,
@@ -22,6 +23,12 @@ export default function Room({
 
 	const handleBackClick = async () => {
 		const accessToken = cookies.access_token;
+=======
+// eslint-disable-next-line react/prop-types
+export default function Room({ roomObj, teamObj, setRoom, setTeam, getIdFromToken, setRole }) {
+  const navigate = useNavigate();
+  const [cookies] = useCookies(['access_token']);
+>>>>>>> pre-prod
 
 		const userId = getIdFromToken();
 		if (!userId) {

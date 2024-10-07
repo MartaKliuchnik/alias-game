@@ -97,10 +97,24 @@ export class WordsService {
     const userObjectId = new Types.ObjectId(userId);
 
     const team = await this.teamsService.findOne(roomId, teamId);
+    const userObjectId = new Types.ObjectId(userId);
 
     // Verify if the requesting user is the describer of the team
     if (!team.describer.equals(userObjectId)) {
       throw new UnauthorizedException('Only the describer can get a new word.');
+    }
+
+    // Check if a word has already been selected
+    if (team.selectedWord) {
+      const selectedWord = await this.wordModel
+        .findById(team.selectedWord)
+        .exec();
+
+      // Return the already selected word and the existing tryedWords array
+      return {
+        word: selectedWord,
+        tryedWords: team.tryedWords,
+      };
     }
 
     const tryedWords = team.tryedWords;
