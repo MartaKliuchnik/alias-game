@@ -1,4 +1,4 @@
-export const getPlayersFromRoom = async (roomId, teamId) => {
+export const getPlayersFromRoom = async (roomId, teamId, token) => {
 	try {
 		const response = await fetch(
 			`http://localhost:8080/api/v1/rooms/${roomId}/teams/${teamId}/players`, // Using dynamic roomId and teamId
@@ -6,7 +6,7 @@ export const getPlayersFromRoom = async (roomId, teamId) => {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',
-					// Authorization: `Bearer ${accessToken}`,
+					authorization: token,
 				},
 			}
 		);
