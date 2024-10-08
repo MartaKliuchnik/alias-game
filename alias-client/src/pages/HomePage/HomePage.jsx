@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { joinRoom } from '../../fetchers/userRoom';
 
+// eslint-disable-next-line react/prop-types
 export default function HomePage({ setRoom, getIdFromToken, getTokens }) {
 	const navigate = useNavigate();
 
@@ -12,13 +13,14 @@ export default function HomePage({ setRoom, getIdFromToken, getTokens }) {
 		navigate('/login');
 	};
 
-	const handleStartGameClick = async () => {
-		const userId = getIdFromToken();
-		const accessToken = getTokens().access_token;
-		const room = await joinRoom(userId, accessToken);
-		setRoom(room);
-		navigate('/room');
-	};
+
+    const handleStartGameClick = async () => {
+        const userId = getIdFromToken();
+        const accessToken = getTokens().access_token;
+        const room = await joinRoom(userId, accessToken);
+        setRoom(room);
+        navigate('/room');
+    };
 
 	return (
 		<div

@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -10,11 +11,15 @@ import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { SetDescriberDto } from './dto/set-describer.dto';
 import { SetTeamLeaderDto } from './dto/set-team-leader.dto';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class TeamsService {
   private readonly MAX_USERS_IN_TEAM: number = 3;
-  constructor(@InjectModel(Team.name) private teamModel: Model<Team>) {}
+  constructor(
+    @InjectModel(Team.name) private teamModel: Model<Team>,
+    private readonly usersService: UsersService,
+  ) {}
 
   /**
    * Creates a new team within a specified room.
@@ -317,5 +322,51 @@ export class TeamsService {
     }
 
     return team;
+  }
+
+  async calculateScores(teamId: Types.ObjectId): Promise<{ message: string }> {
+    const team = await this.findTeamById(teamId);
+
+    if (!team) {
+      throw new NotFoundException('Team not found.');
+    }
+
+    if (team.success) {
+      team.teamScore += 10;
+      await team.save();
+
+      const playerIds = team.players;
+      for (const playerId of playerIds) {
+        await this.usersService.incrementScore(playerId, 10);
+      }
+
+      return {
+        message: 'Team and player scores have been successfully updated.',
+      };
+    } else {
+      return { message: 'No score update as the team did not succeed.' };
+    }
+  }
+
+  async startIntervalRoundManage(
+    roomId: Types.ObjectId,
+    teamId: Types.ObjectId,
+  ) {
+    const intervalId = setInterval(async () => {
+      let team = await this.findTeamById(teamId);
+      Logger.log('Team at game start: ');
+      Logger.log(team);
+      // Check if team has tried less than 3 words
+      if (team.tryedWords.length < 3) {
+        Logger.log('Reset: ');
+        team = await this.resetRound(roomId, teamId);
+        Logger.log(team);
+        Logger.log('Describer and leader: ');
+        team = await this.defineDescriberAndLeader(roomId, teamId);
+        Logger.log(team);
+      } else {
+        clearInterval(intervalId);
+      }
+    }, 105000); // 110 seconds
   }
 }
