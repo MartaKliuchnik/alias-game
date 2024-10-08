@@ -82,16 +82,28 @@ export default function App() {
               getTokens={getTokens}
               roomId={room._id}
               teamId={team._id}
+              teamObj={team}
+              setTeam={setTeam}
             />
           }
         />
         <Route
           path="leader"
-          element={<LeaderPage roomId={room._id} teamId={team._id} />}
+          element={<LeaderPage
+            roomId={room._id}
+            teamId={team._id}
+            getTokens={getTokens}
+            teamObj={team}
+            setTeam={setTeam} />}
         />
         <Route
           path="teams-result"
-          element={<TeamsResultPage roomId={room._id} teamId={team._id} />}
+          element={<TeamsResultPage
+            roomId={room._id}
+            teamId={team._id}
+            teamObj={team}
+            setTeam={setTeam}
+            getTokens={getTokens} />}
         />
         <Route
           path="room"
@@ -126,6 +138,9 @@ export default function App() {
               teamName={team.name}
               description={team.description}
               users={team.players}
+              teamObj={team}
+							setTeam={setTeam}
+							role={role}
             />
           }
         />
@@ -135,6 +150,8 @@ export default function App() {
             <Wait
               teamName={team.name}
               users={team.players}
+              teamObj={team}
+							setTeam={setTeam}
               waitTime={10}
               role={"leader made decision"}
             />
@@ -146,6 +163,8 @@ export default function App() {
             <Wait
               teamName={team.name}
               users={team.players}
+              teamObj={team}
+							setTeam={setTeam}
               waitTime={30}
               role={"describer write description"}
             />

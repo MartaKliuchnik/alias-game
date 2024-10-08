@@ -91,7 +91,7 @@ export default function LeaderPage({ roomId, teamId }) {
           <h2 className="mb-4">
             {isTimeUp ? "Time's up!" : "Answer Before Time Runs Out!"}
           </h2>
-          <Timer initialCount={10} onTimeUp={handleTimeUp} />
+          <Timer startTime={10} onTimeUp={handleTimeUp} small={false} />
         </div>
         <div className="col-md-6">
           <form onSubmit={handleSubmit} className="p-4 border rounded shadow">
