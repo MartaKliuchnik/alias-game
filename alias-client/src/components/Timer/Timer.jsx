@@ -1,35 +1,35 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useEffect } from 'react';
+import { useTimer } from 'react-timer-hook';
 
+// eslint-disable-next-line react/prop-types
 const Timer = ({ startTime, onTimeOut, small }) => {
-	const [time, setTime] = useState(startTime);
-	const intervalRef = useRef(null);
-	const timeOutCallback = useCallback(onTimeOut, [onTimeOut]);
+  const expiryTimestamp = new Date();
+  expiryTimestamp.setSeconds(expiryTimestamp.getSeconds() + startTime); // set expiry time
 
-	useEffect(() => {
-		if (time === 0) {
-			clearInterval(intervalRef.current);
-			timeOutCallback();
-			return;
-		}
+  const {
+    seconds,
+    minutes,
+    isRunning,
+    start,
+    restart
+  } = useTimer({
+    expiryTimestamp,
+    onExpire: onTimeOut,
+    autoStart: true,
+  });
 
-		intervalRef.current = setInterval(() => {
-			setTime((prevTime) => {
-				if (prevTime <= 1) {
-					clearInterval(intervalRef.current);
-					return 0;
-				}
-				return prevTime - 1;
-			});
-		}, 1000);
+  // Restart the timer if `startTime` changes
+  useEffect(() => {
+    const newExpiry = new Date();
+    newExpiry.setSeconds(newExpiry.getSeconds() + startTime);
+    restart(newExpiry);
+  }, [startTime, restart]);
 
-		return () => clearInterval(intervalRef.current);
-	}, [time]);
-
-	return small ? (
-		<div className='text-white'>Timer {time} sec</div>
-	) : (
-		<div className='display-4'>{time}</div>
-	);
+  return small ? (
+    <div className='text-white'>Timer {seconds} sec</div>
+  ) : (
+    <div className='display-4'>{minutes}:{seconds}</div>
+  );
 };
 
 export default React.memo(Timer);

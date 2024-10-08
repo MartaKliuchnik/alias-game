@@ -4,7 +4,7 @@ import { TeamsService } from './teams.service';
 import { TeamsController } from './teams.controller';
 import { Team, TeamSchema } from './schemas/team.schema';
 import { UsersModule } from 'src/users/users.module';
-import { User, UserSchema } from 'src/users/schemas/user.schema';
+import { UserSchema } from 'src/users/schemas/user.schema';
 
 @Module({
   imports: [

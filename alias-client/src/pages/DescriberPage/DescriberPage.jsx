@@ -5,8 +5,10 @@ import { getRandomWord } from '../../fetchers/getRandomWord';
 import { saveDescription } from '../../fetchers/saveDescription';
 import { checkDescription } from '../../fetchers/checkDescription';
 
+// eslint-disable-next-line react/prop-types
 export default function DescriberPage({ getTokens, teamObj, setTeam }) {
 	const access_token = getTokens().access_token;
+	// eslint-disable-next-line react/prop-types
 	const { roomId, _id: teamId } = teamObj;
 
 	const [description, setDescription] = useState('');
