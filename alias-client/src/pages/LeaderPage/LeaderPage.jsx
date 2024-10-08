@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { Timer } from "../../components/Timer/Timer";
+import Timer from "../../components/Timer/Timer";
 import { useNavigate } from "react-router-dom";
 import { checkAnswer } from "../../fetchers/checkAnswer";
 import { saveAnswer } from "../../fetchers/saveAnswer";
 import getSelectedWordId from "../../fetchers/getSelectedWordId";
+import calculateScores from "../../fetchers/calculateScores";
 
 // eslint-disable-next-line react/prop-types
 export default function LeaderPage({ roomId, teamId }) {
@@ -18,7 +19,7 @@ export default function LeaderPage({ roomId, teamId }) {
     const fetchWordId = async () => {
       try {
         const selectedWordId = await getSelectedWordId(roomId, teamId);
-		console.log('selectedWordId: ', selectedWordId);
+        console.log("selectedWordId: ", selectedWordId);
         setWordId(selectedWordId);
       } catch {
         setMessage("Failed to load the word ID. Please try again later.");
@@ -48,7 +49,7 @@ export default function LeaderPage({ roomId, teamId }) {
 
     try {
       const isCorrect = await checkAnswer(leaderWord, wordId);
-      console.log('isCorrect: ', isCorrect);
+      console.log("isCorrect: ", isCorrect);
 
       const success = await saveAnswer(roomId, teamId, leaderWord, isCorrect);
 
@@ -60,6 +61,8 @@ export default function LeaderPage({ roomId, teamId }) {
         );
         setLeaderWord("");
         wordRef.current.disabled = true;
+
+        await calculateScores(roomId, teamId);
       } else {
         setMessage("Failed to submit the answer. Please try again later.");
       }
@@ -88,7 +91,7 @@ export default function LeaderPage({ roomId, teamId }) {
           <h2 className="mb-4">
             {isTimeUp ? "Time's up!" : "Answer Before Time Runs Out!"}
           </h2>
-          <Timer initialCount={10} onTimeUp={handleTimeUp} />
+          <Timer startTime={10} onTimeOut={handleTimeUp} small={false} />
         </div>
         <div className="col-md-6">
           <form onSubmit={handleSubmit} className="p-4 border rounded shadow">

@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
-import getTeamScoresInRoom from "../../fetchers/getTeamScoresInRoom"; // Import the new fetch function
+import getTeamScoresInRoom from "../../fetchers/getTeamScoresInRoom";
 import getTeamAnswerRes from "../../fetchers/getTeamAnswerRes";
-import fetchWord from "../../fetchers/fetchWord";
+import getWord from "../../fetchers/getWord";
 
 // eslint-disable-next-line react/prop-types
 export default function TeamsResultPage({ roomId, teamId }) {
   const [teamResult, setTeamAnswerRes] = useState(null);
   const [fetchedWord, setFetchedWord] = useState("");
   const [error, setError] = useState("");
-  const [teams, setTeams] = useState([]); // State for storing fetched teams
+  const [teams, setTeams] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -16,7 +16,7 @@ export default function TeamsResultPage({ roomId, teamId }) {
         const result = await getTeamAnswerRes(roomId, teamId);
         setTeamAnswerRes(result);
 
-        const word = await fetchWord(result.selectedWord);
+        const word = await getWord(result.selectedWord);
         setFetchedWord(word);
       } catch (error) {
         setError(error.message);
@@ -30,7 +30,7 @@ export default function TeamsResultPage({ roomId, teamId }) {
   useEffect(() => {
     const fetchTeams = async () => {
       try {
-        const fetchedTeams = await getTeamScoresInRoom(roomId); // Fetch teams using roomId
+        const fetchedTeams = await getTeamScoresInRoom(roomId);
         setTeams(fetchedTeams);
       } catch (error) {
         setError(error.message);

@@ -1,4 +1,7 @@
 export const getRandomWord = async (roomId, teamId, token) => {
+  console.log("token: ", token);
+  console.log("teamId: ", teamId);
+  console.log("roomId: ", roomId);
   try {
     const response = await fetch("http://localhost:8080/api/v1/words/random", {
       method: "POST",
