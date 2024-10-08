@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import getTeamScoresInRoom from "../../fetchers/getTeamScoresInRoom";
 import getTeamAnswerRes from "../../fetchers/getTeamAnswerRes";
 import getWord from "../../fetchers/getWord";
+import Timer from "../../components/Timer/Timer";
+import { getTeam } from "../../fetchers/getTeam";
 
 // eslint-disable-next-line react/prop-types
-export default function TeamsResultPage({ roomId, teamId }) {
+export default function TeamsResultPage({ roomId, teamId, teamObj, setTeam, getTokens, getIdFromToken, setRole }) {
+	const navigate = useNavigate();
   const [teamResult, setTeamAnswerRes] = useState(null);
   const [fetchedWord, setFetchedWord] = useState("");
   const [error, setError] = useState("");
@@ -15,14 +19,12 @@ export default function TeamsResultPage({ roomId, teamId }) {
       try {
         const result = await getTeamAnswerRes(roomId, teamId);
         setTeamAnswerRes(result);
-
         const word = await getWord(result.selectedWord);
         setFetchedWord(word);
       } catch (error) {
         setError(error.message);
       }
     };
-
     fetchData();
   }, [roomId, teamId]);
 
@@ -50,12 +52,34 @@ export default function TeamsResultPage({ roomId, teamId }) {
 
   const { answer, success } = teamResult;
 
+  const nextRound = async () => {
+    const token = getTokens().access_token;
+    const updatedTeam = await getTeam(roomId, teamId, token);
+    setTeam(updatedTeam)
+    const userId = getIdFromToken();
+			console.log('teamObj:', teamObj);
+			if (teamObj.describer != null && teamObj.teamLeader != null) {
+				if (teamObj.describer == userId) {
+					setRole('describer');
+					navigate('/describer');
+					return;
+				} else if (teamObj.teamLeader == userId) {
+					setRole('leader');
+				} else {
+					setRole('player');
+				}
+				navigate('/wait-describer');
+				return;
+			}
+  }
+
   return (
     <div className="container my-8">
       <div
         className="row justify-content-center align-items-stretch gap-5"
         style={{ marginTop: "8rem" }}
       >
+        <Timer startTime={15} onTimeOut={nextRound} small={false} />
         {/* Section for showing the table with updated scores for teams */}
         <div className="col-lg-5 col-md-6 d-flex">
           <div className="card shadow d-flex h-100">

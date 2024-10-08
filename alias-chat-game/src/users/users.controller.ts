@@ -8,7 +8,6 @@ import {
   Query,
   //UseGuards,
   Post,
-  Logger,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserSafeDto } from './dto/user-safe.dto';
@@ -123,17 +122,16 @@ export class UsersController {
         room.teams.map(async (teamId) => {
           const players = (await this.teamsService.findTeamById(teamId))
             .players;
-          Logger.log(players);
-          Logger.log('compare:', players.length >= MAX_USERS_IN_TEAM);
           return players.length >= MAX_USERS_IN_TEAM;
         }),
       )
     ).every(Boolean);
 
     if (isReady) {
-      room.teams.forEach(async (teamId) =>
-        this.teamsService.defineDescriberAndLeader(room._id, teamId),
-      );
+      room.teams.forEach(async (teamId) => {
+        await this.teamsService.defineDescriberAndLeader(room._id, teamId);
+      });
+      await this.teamsService.startIntervalRoundManage(room._id, teamId);
     }
     return team;
   }

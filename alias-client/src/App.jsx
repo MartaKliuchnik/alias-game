@@ -103,7 +103,10 @@ export default function App() {
             teamId={team._id}
             teamObj={team}
             setTeam={setTeam}
-            getTokens={getTokens} />}
+            setRole={setRole}
+            getTokens={getTokens}
+            getIdFromToken={getIdFromToken}
+          />}
         />
         <Route
           path="room"
@@ -139,8 +142,8 @@ export default function App() {
               description={team.description}
               users={team.players}
               teamObj={team}
-							setTeam={setTeam}
-							role={role}
+              setTeam={setTeam}
+              role={role}
             />
           }
         />
@@ -151,7 +154,7 @@ export default function App() {
               teamName={team.name}
               users={team.players}
               teamObj={team}
-							setTeam={setTeam}
+              setTeam={setTeam}
               waitTime={10}
               role={"leader made decision"}
             />
@@ -164,7 +167,7 @@ export default function App() {
               teamName={team.name}
               users={team.players}
               teamObj={team}
-							setTeam={setTeam}
+              setTeam={setTeam}
               waitTime={30}
               role={"describer write description"}
             />
