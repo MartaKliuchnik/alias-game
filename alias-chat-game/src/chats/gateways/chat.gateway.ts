@@ -8,6 +8,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { Injectable } from '@nestjs/common';
 import { MessagesService } from '../../messages/messages.service';
+import { CreateMessageDto } from '../../messages/dto/create-message.dto';
 
 @WebSocketGateway({ cors: true })
 @Injectable()
@@ -40,12 +41,11 @@ export class ChatGateway {
   async handleMessage(
     @ConnectedSocket() client: Socket,
     @MessageBody()
-    data: { roomId: string; teamId: string; text: string; userId: string },
+    data: CreateMessageDto,
   ) {
-    const { roomId, teamId, text, userId } = data;
-    const message = { roomId, teamId, text, userId };
+    const { roomId, teamId } = data;
+    const message = await this.messageService.saveMessage(data);
     const teamRoom = `${roomId}-${teamId}`;
-    console.log(message);
     this.server.to(teamRoom).emit('receiveMessage', message);
   }
 }
