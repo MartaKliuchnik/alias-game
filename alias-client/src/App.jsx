@@ -139,8 +139,9 @@ export default function App() {
               description={team.description}
               users={team.players}
               teamObj={team}
-							setTeam={setTeam}
-							role={role}
+              setTeam={setTeam}
+			  role={role}
+              userId={getIdFromToken}
             />
           }
         />
