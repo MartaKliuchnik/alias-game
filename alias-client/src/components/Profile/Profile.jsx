@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 
-export default function Profile() {
+export default function Profile({getIdFromToken}) {
     const [userData, setUserData] = useState({
       username: '',
       score: 0,
@@ -9,17 +10,18 @@ export default function Profile() {
     });
   
     const [isEditing, setIsEditing] = useState(false);
-  
+
+    const userId = getIdFromToken();
+
     useEffect(() => {
-      const fetchUserData = async () => {
-        const user = {
-          username: 'JohnDoe',
-          score: 100,
-          played: 50,
-          wins: 30,
-        };
-        setUserData(user);
-      };
+        const fetchUserData = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8080/api/v1/users/${userId}`);
+                setUserData(response.data);
+            } catch (error) {
+                console.error('Error', error)
+            }
+        }
       fetchUserData();
     }, []);
   
@@ -36,7 +38,14 @@ export default function Profile() {
     };
   
     const handleSaveClick = async () => {
-      setIsEditing(false);
+        try {
+            await axios.patch(`http://localhost:8080/api/v1/users/${userData.userId}`, { username: userData.username });
+            const response = await axios.get(`http://localhost:8080/api/v1/users/${userData.userId}`);
+            setUserData(response.data);
+            setIsEditing(false);
+        } catch (error) {
+            console.error('Error', error);
+        }
     };
   
     const handleCancelClick = () => {

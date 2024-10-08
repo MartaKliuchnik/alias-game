@@ -143,7 +143,8 @@ export default function App() {
               users={team.players}
               teamObj={team}
               setTeam={setTeam}
-              role={role}
+			  role={role}
+              userId={getIdFromToken}
             />
           }
         />

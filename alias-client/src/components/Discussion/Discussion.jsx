@@ -4,6 +4,7 @@ import Timer from '../Timer/Timer.jsx';
 import { getPlayersFromRoom } from '../../fetchers/getPlayersFromRoom.js';
 import { getTeam } from '../../fetchers/getTeam.js';
 import { useNavigate } from 'react-router-dom';
+import Chat from "../Chat/Chat.jsx";
 
 // UserCard Component
 const UserCard = ({ username }) => (
@@ -23,7 +24,7 @@ const TeamList = ({ teamName, players = [] }) => (
 );
 
 // Main Component
-export default function Discussion({ teamObj, description, setTeam, role }) {
+export default function Discussion({ teamObj, description, setTeam, role, userId }) {
 	const [teamPlayersInfo, setTeamPlayersInfo] = useState([]); // 3 players with their info
 	const { roomId, _id: teamId, name: teamName } = teamObj;
 
@@ -89,6 +90,7 @@ export default function Discussion({ teamObj, description, setTeam, role }) {
 					{/* Empty Block for Chat */}
 					<div className='bg-secondary rounded flex-grow-1'>
 						{/* Insert Chat component */}
+						<Chat getIdFromToken={userId} teamId={teamId} name={teamName} role={role}/>
 						<p className='mt-3 text-center'>
 							{role === 'describer'
 								? 'CHAT FOR DESCRIBER'
