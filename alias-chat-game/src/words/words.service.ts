@@ -11,8 +11,8 @@ import { CreateWordDto } from './dto/create-word.dto';
 import { UpdateWordDto } from './dto/update-word.dto';
 import * as levenshtein from 'fast-levenshtein';
 import * as natural from 'natural';
-import { TeamsService } from 'src/teams/teams.service';
-import { UpdateTeamDto } from 'src/teams/dto/update-team.dto';
+import { TeamsService } from '../teams/teams.service';
+import { UpdateTeamDto } from '../teams/dto/update-team.dto';
 
 @Injectable()
 export class WordsService {
@@ -97,8 +97,12 @@ export class WordsService {
     const team = await this.teamsService.findOne(roomId, teamId);
     const userObjectId = new Types.ObjectId(userId);
 
+    if (!team) {
+      throw new NotFoundException('Team not found');
+    }
+
     // Verify if the requesting user is the describer of the team
-    if (!team.describer.equals(userObjectId)) {
+    if (team.describer.toString() !== userObjectId.toString()) {
       throw new UnauthorizedException('Only the describer can get a new word.');
     }
 

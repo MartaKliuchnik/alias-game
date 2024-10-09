@@ -6,7 +6,7 @@ import { UsersController } from '../users.controller';
 import { UsersService } from '../users.service';
 import { userStub } from './stubs/user.stub';
 import { mockAuthGuard } from '../__mocks__/auth.guard.mock';
-import { AuthGuard } from '../../auth/gurards/auth.guard';
+import { AuthGuard } from '../../auth/guards/auth.guard';
 import { UpdateUserDto } from '../dto/update-user.dto';
 
 jest.mock('../users.service');

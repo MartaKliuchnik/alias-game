@@ -1,12 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { WordsController } from '../words.controller';
 import { WordsService } from '../words.service';
+import { wordStub } from './../test/stubs/word.stub';
 import { Word } from '../schemas/word.schema';
-import { wordStub } from './stubs/word.stub';
-import { CreateWordDto } from '../dto/create-word.dto';
+import { AuthGuard } from '../../auth/guards/auth.guard';
 import { UpdateWordDto } from '../dto/update-word.dto';
+import { CreateWordDto } from '../dto/create-word.dto';
+import { Types } from 'mongoose';
+import { mockAuthGuard } from '../__mocks__/auth.guard.mock';
 
-// npm test words.controller
 jest.mock('../words.service');
 
 describe('WordsController', () => {
@@ -17,7 +19,10 @@ describe('WordsController', () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       controllers: [WordsController],
       providers: [WordsService],
-    }).compile();
+    })
+      .overrideGuard(AuthGuard)
+      .useValue(mockAuthGuard)
+      .compile();
 
     wordsController = moduleRef.get<WordsController>(WordsController);
     wordsService = moduleRef.get<WordsService>(WordsService);
@@ -168,6 +173,44 @@ describe('WordsController', () => {
 
       test('then it should return correct description status', () => {
         expect(response).toEqual({ correct: false });
+      });
+    });
+  });
+
+  describe('getRandomWord', () => {
+    describe('when getRandomWord is called', () => {
+      let roomId: Types.ObjectId;
+      let teamId: Types.ObjectId;
+      let request: any;
+      let response: { word: Word; tryedWords: Types.ObjectId[] };
+
+      beforeEach(async () => {
+        roomId = new Types.ObjectId(); // Create a new ObjectId for room
+        teamId = new Types.ObjectId(); // Create a new ObjectId for team
+        request = { userId: 'someUserId' }; // Mock request object
+
+        // Mock the service method response
+        wordsService.getRandomWord = jest.fn().mockResolvedValue({
+          word: wordStub(), // Use your existing word stub
+          tryedWords: [], // Assume no tried words for this test
+        });
+
+        response = await wordsController.getRandomWord(roomId, teamId, request);
+      });
+
+      test('then it should call wordsService.getRandomWord', () => {
+        expect(wordsService.getRandomWord).toHaveBeenCalledWith(
+          roomId,
+          teamId,
+          request.userId,
+        );
+      });
+
+      test('then it should return a random word and tried words', () => {
+        expect(response).toEqual({
+          word: wordStub(),
+          tryedWords: [],
+        });
       });
     });
   });

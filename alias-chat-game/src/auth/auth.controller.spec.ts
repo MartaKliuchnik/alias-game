@@ -4,7 +4,7 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import {AuthGuard} from "./gurards/auth.guard";
+import { AuthGuard } from "./guards/auth.guard";
 
 describe('AuthController', () => {
   let authController: AuthController;
@@ -26,7 +26,7 @@ describe('AuthController', () => {
           useValue: mockAuthService,
         },
       ],
-    }).overrideGuard(AuthGuard).useValue({canActivate: jest.fn(() => true)}).compile();
+    }).overrideGuard(AuthGuard).useValue({ canActivate: jest.fn(() => true) }).compile();
 
     authController = module.get<AuthController>(AuthController);
     authService = module.get<AuthService>(AuthService);

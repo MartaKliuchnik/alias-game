@@ -4,15 +4,25 @@ import { WordsService } from '../words.service';
 import { Word } from '../schemas/word.schema';
 import { Model, Types } from 'mongoose';
 import { wordStub } from './stubs/word.stub';
-import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { TeamsService } from '../../teams/teams.service';
+import {
+  BadRequestException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 
 // npm test words.service
 
 describe('WordsService', () => {
   let wordsService: WordsService;
   let wordModel: Model<Word>;
+  let mockTeamsService: Partial<TeamsService>;
 
   beforeEach(async () => {
+    mockTeamsService = {
+      findOne: jest.fn(),
+      update: jest.fn(),
+    };
     const moduleRef: TestingModule = await Test.createTestingModule({
       providers: [
         WordsService,
@@ -27,6 +37,7 @@ describe('WordsService', () => {
             findByIdAndDelete: jest.fn(),
           },
         },
+        { provide: TeamsService, useValue: mockTeamsService },
       ],
     }).compile();
 
@@ -203,6 +214,57 @@ describe('WordsService', () => {
       const result = await wordsService['findById'](wordStub().wordId);
 
       expect(result).toEqual(wordStub());
+    });
+  });
+
+  describe('getRandomWord', () => {
+    const roomId = new Types.ObjectId();
+    const teamId = new Types.ObjectId();
+    const userId = '507f1f77bcf86cd799439011'; // 24 character hex string
+
+    const teamStub = {
+      describer: userId,
+      tryedWords: ['6706a8523b7069a52a3594ba'],
+      selectedWord: null,
+    };
+
+    it('should throw NotFoundException if no unused words are available', async () => {
+      mockTeamsService.findOne = jest.fn().mockResolvedValue(teamStub);
+      wordModel.find = jest.fn().mockReturnValue({
+        exec: jest.fn().mockResolvedValue([]),
+      });
+
+      await expect(
+        wordsService.getRandomWord(roomId, teamId, userId),
+      ).rejects.toThrow(NotFoundException);
+
+      expect(mockTeamsService.findOne).toHaveBeenCalledWith(roomId, teamId);
+      expect(wordModel.find).toHaveBeenCalledWith({
+        _id: { $nin: teamStub.tryedWords },
+      });
+    });
+
+    it('should throw UnauthorizedException if the user is not the describer', async () => {
+      mockTeamsService.findOne = jest.fn().mockResolvedValue({
+        ...teamStub,
+        describer: 'anotherUser',
+      });
+
+      await expect(
+        wordsService.getRandomWord(roomId, teamId, userId),
+      ).rejects.toThrow(UnauthorizedException);
+
+      expect(mockTeamsService.findOne).toHaveBeenCalledWith(roomId, teamId);
+    });
+
+    it('should throw NotFoundException if the team is not found', async () => {
+      mockTeamsService.findOne = jest.fn().mockResolvedValue(null);
+
+      await expect(
+        wordsService.getRandomWord(roomId, teamId, userId),
+      ).rejects.toThrow(NotFoundException);
+
+      expect(mockTeamsService.findOne).toHaveBeenCalledWith(roomId, teamId);
     });
   });
 

@@ -10,13 +10,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { WordsService } from './words.service';
-import { TeamsService } from 'src/teams/teams.service';
 import { CreateWordDto } from './dto/create-word.dto';
 import { UpdateWordDto } from './dto/update-word.dto';
 import { Word } from './schemas/word.schema';
 import { Types } from 'mongoose';
-import { AuthGuard } from 'src/auth/gurards/auth.guard';
-import { ParseObjectIdPipe } from 'src/parse-id.pipe';
+import { AuthGuard } from '../auth/guards/auth.guard';
+import { ParseObjectIdPipe } from '../parse-id.pipe';
 
 /**
  * Controller for handling word-related operations.
@@ -30,10 +29,6 @@ export class WordsController {
      * Service for handling the business logic related to words.
      */
     private readonly wordsService: WordsService,
-    /**
-     * Service for handling team-related operations, used in conjunction with word features.
-     */
-    private readonly teamsService: TeamsService,
   ) {}
 
   /**
