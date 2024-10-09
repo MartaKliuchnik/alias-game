@@ -6,21 +6,20 @@ import {
   Param,
   Delete,
   Query,
-  UseGuards,
+  //UseGuards,
   Post,
-  Logger,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserSafeDto } from './dto/user-safe.dto';
 import { ParseObjectIdPipe } from '../parse-id.pipe';
 import { Types } from 'mongoose';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AuthGuard } from '../auth/gurards/auth.guard';
+// import { AuthGuard } from '../auth/gurards/auth.guard';
 import { RoomsService } from 'src/rooms/rooms.service';
 import { TeamsService } from 'src/teams/teams.service';
 
 // UsersController handles CRUD operations for user management.
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(
@@ -28,6 +27,7 @@ export class UsersController {
     private readonly roomsService: RoomsService,
     private readonly teamsService: TeamsService,
   ) {}
+
   /**
    * @route GET /api/v1/users
    * @description Retrieve all users
@@ -35,7 +35,8 @@ export class UsersController {
    */
   @Get()
   async findAll(): Promise<UserSafeDto[] | []> {
-    return this.usersService.getUsers();
+    const users = await this.usersService.getUsers();
+    return users.sort((a, b) => b.score - a.score);
   }
 
   /**
@@ -121,17 +122,16 @@ export class UsersController {
         room.teams.map(async (teamId) => {
           const players = (await this.teamsService.findTeamById(teamId))
             .players;
-          Logger.log(players);
-          Logger.log('compare:', players.length >= MAX_USERS_IN_TEAM);
           return players.length >= MAX_USERS_IN_TEAM;
         }),
       )
     ).every(Boolean);
 
     if (isReady) {
-      room.teams.forEach(async (teamId) =>
-        this.teamsService.defineDescriberAndLeader(room._id, teamId),
-      );
+      room.teams.forEach(async (teamId) => {
+        await this.teamsService.defineDescriberAndLeader(room._id, teamId);
+      });
+      await this.teamsService.startIntervalRoundManage(room._id, teamId);
     }
     return team;
   }

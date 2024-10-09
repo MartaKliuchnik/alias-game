@@ -21,7 +21,6 @@ export class RoomsService {
   constructor(
     @InjectModel(Room.name) private roomModel: Model<RoomDocument>,
     private readonly teamsService: TeamsService,
-    private readonly usersService: UsersService,
   ) {}
 
   async create(createRoomDto: CreateRoomDto) {
@@ -214,23 +213,5 @@ export class RoomsService {
           ? `Successfully deleted ${deletedCount} rooms.`
           : 'No rooms found to delete.',
     };
-  }
-
-  async calculateScores(roomId: Types.ObjectId): Promise<{ message: string }> {
-    const teams = await this.teamsService.findAll(roomId);
-
-    for (const team of teams) {
-      if (team.success) {
-        team.teamScore += 20;
-
-        for (const playerId of team.players) {
-          await this.usersService.incrementScore(playerId, 10);
-        }
-
-        await team.save();
-      }
-    }
-
-    return { message: 'Scores calculated successfully!' };
   }
 }
