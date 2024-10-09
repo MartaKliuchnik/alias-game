@@ -26,7 +26,7 @@ export class UsersController {
     private readonly usersService: UsersService,
     private readonly roomsService: RoomsService,
     private readonly teamsService: TeamsService,
-  ) {}
+  ) { }
 
   /**
    * @route GET /api/v1/users
@@ -130,8 +130,8 @@ export class UsersController {
     if (isReady) {
       room.teams.forEach(async (teamId) => {
         await this.teamsService.defineDescriberAndLeader(room._id, teamId);
+        await this.teamsService.startIntervalRoundManage(room._id, teamId);
       });
-      await this.teamsService.startIntervalRoundManage(room._id, teamId);
     }
     return team;
   }
