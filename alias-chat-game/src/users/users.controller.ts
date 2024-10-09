@@ -15,8 +15,8 @@ import { ParseObjectIdPipe } from '../parse-id.pipe';
 import { Types } from 'mongoose';
 import { UpdateUserDto } from './dto/update-user.dto';
 // import { AuthGuard } from '../auth/gurards/auth.guard';
-import { RoomsService } from 'src/rooms/rooms.service';
-import { TeamsService } from 'src/teams/teams.service';
+import { RoomsService } from '../rooms/rooms.service';
+import { TeamsService } from '../teams/teams.service';
 
 // UsersController handles CRUD operations for user management.
 // @UseGuards(AuthGuard)

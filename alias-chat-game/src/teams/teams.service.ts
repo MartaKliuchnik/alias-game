@@ -367,6 +367,6 @@ export class TeamsService {
       } else {
         clearInterval(intervalId);
       }
-    }, 105000); // 110 seconds
+    }, 115000); // 115 seconds
   }
 }

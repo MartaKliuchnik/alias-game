@@ -28,9 +28,9 @@ export default function App() {
     _id: "67065c46ea47770ea9a383de", // Default team ID (just for test)
   }); */
 
+  const [turnCounter, setTurnCounter] = useState(1);
   const [room, setRoom] = useState({});
   const [team, setTeam] = useState({});
-
   const [role, setRole] = useState("");
   const [cookies] = useCookies(["access_token", "refresh_token"]);
 
@@ -101,17 +101,17 @@ export default function App() {
         />
         <Route
           path="teams-result"
-          element={
-            <TeamsResultPage
-              roomId={room._id}
-              teamId={team._id}
-              teamObj={team}
-              setTeam={setTeam}
-              setRole={setRole}
-              getTokens={getTokens}
-              getIdFromToken={getIdFromToken}
-            />
-          }
+          element={<TeamsResultPage
+            roomId={room._id}
+            teamId={team._id}
+            teamObj={team}
+            setTeam={setTeam}
+            setRole={setRole}
+            getTokens={getTokens}
+            getIdFromToken={getIdFromToken}
+            turnCounter={turnCounter}
+            setTurnCounter={setTurnCounter}
+          />}
         />
         <Route
           path="room"
@@ -136,7 +136,7 @@ export default function App() {
             />
           }
         />
-        <Route path="profile" element={<Profile />} />
+        <Route path="profile" element={<Profile getIdFromToken={getIdFromToken} />} />
         <Route path="final-page" element={<FinalPage roomId={room._id} />} />
 
         <Route
