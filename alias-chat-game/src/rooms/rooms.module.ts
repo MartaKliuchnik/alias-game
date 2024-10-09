@@ -3,8 +3,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { RoomsService } from './rooms.service';
 import { RoomsController } from './rooms.controller';
 import { Room, RoomSchema } from './schemas/room.schema';
-import { TeamsModule } from 'src/teams/teams.module';
-import { UsersModule } from 'src/users/users.module';
+import { TeamsModule } from '../teams/teams.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
