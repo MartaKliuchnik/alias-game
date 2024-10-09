@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -345,5 +346,27 @@ export class TeamsService {
     } else {
       return { message: 'No score update as the team did not succeed.' };
     }
+  }
+
+  async startIntervalRoundManage(
+    roomId: Types.ObjectId,
+    teamId: Types.ObjectId,
+  ) {
+    const intervalId = setInterval(async () => {
+      let team = await this.findTeamById(teamId);
+      Logger.log('Team at game start: ');
+      Logger.log(team);
+      // Check if team has tried less than 3 words
+      if (team.tryedWords.length < 3) {
+        Logger.log('Reset: ');
+        team = await this.resetRound(roomId, teamId);
+        Logger.log(team);
+        Logger.log('Describer and leader: ');
+        team = await this.defineDescriberAndLeader(roomId, teamId);
+        Logger.log(team);
+      } else {
+        clearInterval(intervalId);
+      }
+    }, 105000); // 110 seconds
   }
 }
