@@ -9,10 +9,10 @@ import {
   Query,
 } from '@nestjs/common';
 import { TeamsService } from './teams.service';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
-import { ParseObjectIdPipe } from 'src/parse-id.pipe';
+import { ParseObjectIdPipe } from '../parse-id.pipe';
 import { Types } from 'mongoose';
 
 @Controller('rooms/:roomId/teams')

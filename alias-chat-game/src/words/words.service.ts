@@ -11,8 +11,8 @@ import { CreateWordDto } from './dto/create-word.dto';
 import { UpdateWordDto } from './dto/update-word.dto';
 import * as levenshtein from 'fast-levenshtein';
 import * as natural from 'natural';
-import { TeamsService } from 'src/teams/teams.service';
-import { UpdateTeamDto } from 'src/teams/dto/update-team.dto';
+import { TeamsService } from '../teams/teams.service';
+import { UpdateTeamDto } from '../teams/dto/update-team.dto';
 
 @Injectable()
 export class WordsService {

@@ -11,7 +11,7 @@ import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { SetDescriberDto } from './dto/set-describer.dto';
 import { SetTeamLeaderDto } from './dto/set-team-leader.dto';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class TeamsService {
@@ -367,6 +367,6 @@ export class TeamsService {
       } else {
         clearInterval(intervalId);
       }
-    }, 105000); // 110 seconds
+    }, 115000); // 115 seconds
   }
 }
