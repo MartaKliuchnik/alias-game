@@ -8,7 +8,7 @@ import { getTeam } from "../../fetchers/getTeam";
 
 // eslint-disable-next-line react/prop-types
 export default function TeamsResultPage({ roomId, teamId, teamObj, setTeam, getTokens, getIdFromToken, setRole }) {
-	const navigate = useNavigate();
+  const navigate = useNavigate();
   const [teamResult, setTeamAnswerRes] = useState(null);
   const [fetchedWord, setFetchedWord] = useState("");
   const [error, setError] = useState("");
@@ -55,22 +55,22 @@ export default function TeamsResultPage({ roomId, teamId, teamObj, setTeam, getT
   const nextRound = async () => {
     const token = getTokens().access_token;
     const updatedTeam = await getTeam(roomId, teamId, token);
+    console.log(updatedTeam);
     setTeam(updatedTeam)
     const userId = getIdFromToken();
-			console.log('teamObj:', teamObj);
-			if (teamObj.describer != null && teamObj.teamLeader != null) {
-				if (teamObj.describer == userId) {
-					setRole('describer');
-					navigate('/describer');
-					return;
-				} else if (teamObj.teamLeader == userId) {
-					setRole('leader');
-				} else {
-					setRole('player');
-				}
-				navigate('/wait-describer');
-				return;
-			}
+    if (updatedTeam.describer != null && updatedTeam.teamLeader != null) {
+      if (updatedTeam.describer == userId) {
+        setRole('describer');
+        navigate('/describer');
+        return;
+      } else if (updatedTeam.teamLeader == userId) {
+        setRole('leader');
+      } else {
+        setRole('player');
+      }
+      navigate('/wait-describer');
+      return;
+    }
   }
 
   return (

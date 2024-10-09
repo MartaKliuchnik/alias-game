@@ -28,8 +28,6 @@ export default function App() {
 
   const [room, setRoom] = useState({});
   const [team, setTeam] = useState({});
-
-  // eslint-disable-next-line no-unused-vars
   const [role, setRole] = useState("");
   const [cookies] = useCookies(["access_token", "refresh_token"]);
 
