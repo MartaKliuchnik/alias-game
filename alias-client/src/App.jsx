@@ -19,11 +19,13 @@ import { useCookies } from "react-cookie";
 
 export default function App() {
   /* const [room, setRoom] = useState({
-    _id: "67030cda713f72dd45fb4e0e", // Default room ID (just for test)
+    _id: "67065c46ea47770ea9a383dc", // Default room ID (just for test)
   });
 
   const [team, setTeam] = useState({
-    _id: "67030d5e713f72dd45fb4e2c", // Default team ID (just for test)
+    roomId: "67065c46ea47770ea9a383dc",
+    name: "Team Test",
+    _id: "67065c46ea47770ea9a383de", // Default team ID (just for test)
   }); */
 
   const [turnCounter, setTurnCounter] = useState(1);
@@ -34,7 +36,6 @@ export default function App() {
 
   const getIdFromToken = () => {
     const accessToken = cookies.access_token;
-    console.log("accessToken: ", accessToken);
     if (!accessToken) {
       console.error("No access token found.");
       return;
@@ -64,8 +65,8 @@ export default function App() {
     };
   };
 
-  console.log("getTokens(): ", getTokens());
-  console.log("getIdFromToken(): ", getIdFromToken());
+  /* console.log("getTokens(): ", getTokens());
+  console.log("getIdFromToken(): ", getIdFromToken()); */
 
   return (
     <main>
@@ -88,12 +89,15 @@ export default function App() {
         />
         <Route
           path="leader"
-          element={<LeaderPage
-            roomId={room._id}
-            teamId={team._id}
-            getTokens={getTokens}
-            teamObj={team}
-            setTeam={setTeam} />}
+          element={
+            <LeaderPage
+              roomId={room._id}
+              teamId={team._id}
+              getTokens={getTokens}
+              teamObj={team}
+              setTeam={setTeam}
+            />
+          }
         />
         <Route
           path="teams-result"
@@ -145,7 +149,7 @@ export default function App() {
               teamObj={team}
               setTeam={setTeam}
               role={role}
-              userId={getIdFromToken}
+              getIdFromToken={getIdFromToken}
             />
           }
         />

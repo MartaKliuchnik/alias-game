@@ -45,6 +45,7 @@ export class ChatGateway {
   ) {
     const { roomId, teamId } = data;
     const message = await this.messageService.saveMessage(data);
+    console.log('data: ', data);
     const teamRoom = `${roomId}-${teamId}`;
     this.server.to(teamRoom).emit('receiveMessage', message);
   }

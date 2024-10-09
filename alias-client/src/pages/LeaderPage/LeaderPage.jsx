@@ -8,6 +8,8 @@ import calculateScores from "../../fetchers/calculateScores";
 
 // eslint-disable-next-line react/prop-types
 export default function LeaderPage({ roomId, teamId }) {
+  console.log('LeaderPage teamId: ', teamId);
+  console.log('LeaderPage roomId: ', roomId);
   const [leaderWord, setLeaderWord] = useState("");
   const [isTimeUp, setIsTimeUp] = useState(false);
   const [message, setMessage] = useState("");
