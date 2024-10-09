@@ -11,7 +11,7 @@ import {
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
-import { ParseObjectIdPipe } from 'src/parse-id.pipe';
+import { ParseObjectIdPipe } from '../parse-id.pipe';
 import { Types } from 'mongoose';
 
 /**

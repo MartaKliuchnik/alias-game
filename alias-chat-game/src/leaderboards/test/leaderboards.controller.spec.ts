@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { LeaderboardsController } from '../leaderboards.controller';
 import { LeaderboardsService } from '../leaderboards.service';
-import { UserSafeDto } from 'src/users/dto/user-safe.dto';
-import { leaderboardStub } from './stubs/leaderboard.stub';
+import { UserSafeDto } from '../../users/dto/user-safe.dto';
+import { leaderboardStub } from './stubs/leaderboards.stub';
 
 jest.mock('../leaderboards.service');
 

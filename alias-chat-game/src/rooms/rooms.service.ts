@@ -12,7 +12,6 @@ import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { CreateTeamDto } from '../teams/dto/create-team.dto';
 import { TeamsService } from '../teams/teams.service';
-import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class RoomsService {
