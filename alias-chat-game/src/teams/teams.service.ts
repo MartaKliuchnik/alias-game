@@ -370,8 +370,23 @@ export class TeamsService {
         team = await this.defineDescriberAndLeader(roomId, teamId);
         Logger.log(team);
       } else {
+        const room = await this.roomsService.findOne(roomId);
+        const topTeam = (
+          await Promise.all(
+            room.teams.map(async (teamId) => await this.findTeamById(teamId)),
+          )
+        ).sort((a, b) => b.teamScore - a.teamScore)[0];
+        Logger.log(team.name);
+        Logger.log(topTeam);
+
+        const teamWon = topTeam._id.toString() == teamId.toString();
+        await Promise.all(
+          team.players.map(
+            async (userId) =>
+              await this.usersService.addGameResult(userId, teamWon),
+        ));
         clearInterval(intervalId);
       }
-    }, 115000); // 115 seconds
+    }, 85000);
   }
 }

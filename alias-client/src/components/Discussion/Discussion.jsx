@@ -90,7 +90,7 @@ export default function Discussion({
         <div className="col-md-3">
           {/* Timer */}
           <div className="mb-4 bg-dark p-3 rounded">
-            <Timer startTime={60} onTimeOut={handleTimeOut} small={true} />
+            <Timer startTime={30} onTimeOut={handleTimeOut} small={true} />
           </div>
           {/* Team List */}
           <div className="bg-dark p-3 rounded">
