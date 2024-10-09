@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
@@ -9,7 +10,6 @@ import { getPlayersFromRoom } from '../../fetchers/getPlayersFromRoom';
 import { joinTeam, leaveTeam } from '../../fetchers/userTeam';
 import { getTeam } from '../../fetchers/getTeam';
 
-// eslint-disable-next-line react/prop-types
 export default function Room({
 	roomObj,
 	teamObj,
@@ -76,6 +76,7 @@ export default function Room({
 			loadTeams();
 		}, 500);
 		return () => clearInterval(intervalId);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [cookies, roomObj, navigate]);
 
 	const updateTeam = async () => {
@@ -104,6 +105,7 @@ export default function Room({
 				return;
 			}
 		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [teams, navigate]);
 
 	const addUserToTeam = (teamId) => {

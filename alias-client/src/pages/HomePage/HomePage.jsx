@@ -13,7 +13,6 @@ export default function HomePage({ setRoom, getIdFromToken, getTokens }) {
 		navigate('/login');
 	};
 
-
     const handleStartGameClick = async () => {
         const userId = getIdFromToken();
         const accessToken = getTokens().access_token;
