@@ -10,8 +10,9 @@ import mongoose, { Model, Types } from 'mongoose';
 import { Room, RoomDocument } from './schemas/room.schema';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
-import { CreateTeamDto } from 'src/teams/dto/create-team.dto';
-import { TeamsService } from 'src/teams/teams.service';
+import { CreateTeamDto } from '../teams/dto/create-team.dto';
+import { TeamsService } from '../teams/teams.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class RoomsService {

@@ -1,10 +1,10 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Types } from 'mongoose';
-import { CreateRoomDto } from 'src/rooms/dto/create-room.dto';
-import { RoomsService } from 'src/rooms/rooms.service';
-import { CreateTeamDto } from 'src/teams/dto/create-team.dto';
-import { TeamsService } from 'src/teams/teams.service';
+import { CreateRoomDto } from '../rooms/dto/create-room.dto';
+import { CreateTeamDto } from '../teams/dto/create-team.dto';
+import { RoomsService } from '../rooms/rooms.service';
+import { TeamsService } from '../teams/teams.service';
 
 @Injectable()
 export class InitializationService implements OnModuleInit {
