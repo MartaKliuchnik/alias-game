@@ -26,6 +26,7 @@ export default function App() {
     _id: "67030d5e713f72dd45fb4e2c", // Default team ID (just for test)
   }); */
 
+  const [turnCounter, setTurnCounter] = useState(1);
   const [room, setRoom] = useState({});
   const [team, setTeam] = useState({});
   const [role, setRole] = useState("");
@@ -104,6 +105,8 @@ export default function App() {
             setRole={setRole}
             getTokens={getTokens}
             getIdFromToken={getIdFromToken}
+            turnCounter={turnCounter}
+            setTurnCounter={setTurnCounter}
           />}
         />
         <Route
@@ -129,7 +132,7 @@ export default function App() {
             />
           }
         />
-        <Route path="profile" element={<Profile />} />
+        <Route path="profile" element={<Profile getIdFromToken={getIdFromToken} />} />
         <Route path="final-page" element={<FinalPage roomId={room._id} />} />
 
         <Route
@@ -141,7 +144,7 @@ export default function App() {
               users={team.players}
               teamObj={team}
               setTeam={setTeam}
-			  role={role}
+              role={role}
               userId={getIdFromToken}
             />
           }

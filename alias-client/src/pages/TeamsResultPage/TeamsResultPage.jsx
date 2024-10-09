@@ -7,7 +7,10 @@ import Timer from "../../components/Timer/Timer";
 import { getTeam } from "../../fetchers/getTeam";
 
 // eslint-disable-next-line react/prop-types
-export default function TeamsResultPage({ roomId, teamId, teamObj, setTeam, getTokens, getIdFromToken, setRole }) {
+export default function TeamsResultPage({
+  roomId, teamId, teamObj, setTeam,
+  getTokens, getIdFromToken, setRole,
+  turnCounter, setTurnCounter }) {
   const navigate = useNavigate();
   const [teamResult, setTeamAnswerRes] = useState(null);
   const [fetchedWord, setFetchedWord] = useState("");
@@ -53,6 +56,11 @@ export default function TeamsResultPage({ roomId, teamId, teamObj, setTeam, getT
   const { answer, success } = teamResult;
 
   const nextRound = async () => {
+    if (turnCounter == 3) {
+      navigate('/final-page');
+      return;
+    }
+    setTurnCounter(turnCounter + 1);
     const token = getTokens().access_token;
     const updatedTeam = await getTeam(roomId, teamId, token);
     console.log(updatedTeam);
