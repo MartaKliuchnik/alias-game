@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   Logger,
   NotFoundException,
@@ -12,6 +14,7 @@ import { UpdateTeamDto } from './dto/update-team.dto';
 import { SetDescriberDto } from './dto/set-describer.dto';
 import { SetTeamLeaderDto } from './dto/set-team-leader.dto';
 import { UsersService } from '../users/users.service';
+import { RoomsService } from '../rooms/rooms.service';
 
 @Injectable()
 export class TeamsService {
@@ -19,6 +22,8 @@ export class TeamsService {
   constructor(
     @InjectModel(Team.name) private teamModel: Model<Team>,
     private readonly usersService: UsersService,
+    @Inject(forwardRef(() => RoomsService))
+    private readonly roomsService: RoomsService,
   ) {}
 
   /**

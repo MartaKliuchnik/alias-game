@@ -4,7 +4,6 @@ import { WordsService } from './words.service';
 import { WordsController } from './words.controller';
 import { Word, WordSchema } from './schemas/word.schema';
 import { TeamsModule } from '../teams/teams.module'; // Import TeamsModule
-import { TeamsService } from '../teams/teams.service';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '../users/users.module';
 
@@ -19,6 +18,6 @@ import { UsersModule } from '../users/users.module';
     }), // Register JwtModule with configuration
   ],
   controllers: [WordsController],
-  providers: [WordsService, TeamsService],
+  providers: [WordsService],
 })
 export class WordsModule {}

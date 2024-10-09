@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ConflictException,
+  forwardRef,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -19,6 +21,7 @@ export class RoomsService {
 
   constructor(
     @InjectModel(Room.name) private roomModel: Model<RoomDocument>,
+    @Inject(forwardRef(() => TeamsService))
     private readonly teamsService: TeamsService,
   ) {}
 
