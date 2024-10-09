@@ -19,23 +19,23 @@ import { useCookies } from "react-cookie";
 
 export default function App() {
   /* const [room, setRoom] = useState({
-    _id: "67030cda713f72dd45fb4e0e", // Default room ID (just for test)
+    _id: "67065c46ea47770ea9a383dc", // Default room ID (just for test)
   });
 
   const [team, setTeam] = useState({
-    _id: "67030d5e713f72dd45fb4e2c", // Default team ID (just for test)
+    roomId: "67065c46ea47770ea9a383dc",
+    name: "Team Test",
+    _id: "67065c46ea47770ea9a383de", // Default team ID (just for test)
   }); */
 
+  const [turnCounter, setTurnCounter] = useState(1);
   const [room, setRoom] = useState({});
   const [team, setTeam] = useState({});
-
-  // eslint-disable-next-line no-unused-vars
   const [role, setRole] = useState("");
   const [cookies] = useCookies(["access_token", "refresh_token"]);
 
   const getIdFromToken = () => {
     const accessToken = cookies.access_token;
-    console.log("accessToken: ", accessToken);
     if (!accessToken) {
       console.error("No access token found.");
       return;
@@ -65,8 +65,8 @@ export default function App() {
     };
   };
 
-  console.log("getTokens(): ", getTokens());
-  console.log("getIdFromToken(): ", getIdFromToken());
+  /* console.log("getTokens(): ", getTokens());
+  console.log("getIdFromToken(): ", getIdFromToken()); */
 
   return (
     <main>
@@ -89,12 +89,15 @@ export default function App() {
         />
         <Route
           path="leader"
-          element={<LeaderPage
-            roomId={room._id}
-            teamId={team._id}
-            getTokens={getTokens}
-            teamObj={team}
-            setTeam={setTeam} />}
+          element={
+            <LeaderPage
+              roomId={room._id}
+              teamId={team._id}
+              getTokens={getTokens}
+              teamObj={team}
+              setTeam={setTeam}
+            />
+          }
         />
         <Route
           path="teams-result"
@@ -106,6 +109,8 @@ export default function App() {
             setRole={setRole}
             getTokens={getTokens}
             getIdFromToken={getIdFromToken}
+            turnCounter={turnCounter}
+            setTurnCounter={setTurnCounter}
           />}
         />
         <Route
@@ -131,7 +136,7 @@ export default function App() {
             />
           }
         />
-        <Route path="profile" element={<Profile />} />
+        <Route path="profile" element={<Profile getIdFromToken={getIdFromToken} />} />
         <Route path="final-page" element={<FinalPage roomId={room._id} />} />
 
         <Route
@@ -143,8 +148,8 @@ export default function App() {
               users={team.players}
               teamObj={team}
               setTeam={setTeam}
-			  role={role}
-              userId={getIdFromToken}
+              role={role}
+              getIdFromToken={getIdFromToken}
             />
           }
         />

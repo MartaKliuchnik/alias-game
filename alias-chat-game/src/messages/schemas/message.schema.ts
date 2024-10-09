@@ -9,6 +9,9 @@ export class Message {
   userId: Types.ObjectId;
 
   @Prop({ type: String, required: true })
+  userName: string;
+
+  @Prop({ type: String, required: true })
   text: string;
 
   @Prop({ type: Types.ObjectId, ref: 'rooms', required: true })

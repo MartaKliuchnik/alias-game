@@ -8,8 +8,8 @@ import {
   ArchivedUserSchema,
 } from './schemas/archived-user.schema';
 import { JwtModule } from '@nestjs/jwt';
-import { RoomsModule } from 'src/rooms/rooms.module';
-import { TeamsModule } from 'src/teams/teams.module';
+import { RoomsModule } from '../rooms/rooms.module';
+import { TeamsModule } from '../teams/teams.module';
 
 /**
  * UsersModule sets up the User and ArchivedUser models,
