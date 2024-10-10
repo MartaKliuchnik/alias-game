@@ -115,23 +115,9 @@ export class UsersController {
     @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
   ) {
     const team = await this.teamsService.addPlayerToTeam(userId, teamId);
-    const MAX_USERS_IN_TEAM = 3;
-    const room = await this.roomsService.findOne(team.roomId);
-    const isReady = (
-      await Promise.all(
-        room.teams.map(async (teamId) => {
-          const players = (await this.teamsService.findTeamById(teamId))
-            .players;
-          return players.length >= MAX_USERS_IN_TEAM;
-        }),
-      )
-    ).every(Boolean);
-
+    const isReady = await this.roomsService.isRoomReady(team.roomId);
     if (isReady) {
-      room.teams.forEach(async (teamId) => {
-        await this.teamsService.defineDescriberAndLeader(room._id, teamId);
-        await this.teamsService.startIntervalRoundManage(room._id, teamId);
-      });
+      this.roomsService.startGame(team.roomId);
     }
     return team;
   }

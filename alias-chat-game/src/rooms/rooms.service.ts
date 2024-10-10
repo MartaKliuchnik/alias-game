@@ -216,4 +216,26 @@ export class RoomsService {
           : 'No rooms found to delete.',
     };
   }
+
+  async isRoomReady(roomId) {
+    const MAX_USERS_IN_TEAM = 3;
+    const room = await this.findOne(roomId);
+    return (
+      await Promise.all(
+        room.teams.map(async (teamId) => {
+          const players = (await this.teamsService.findTeamById(teamId))
+            .players;
+          return players.length >= MAX_USERS_IN_TEAM;
+        }),
+      )
+    ).every(Boolean);
+  }
+
+  async startGame(roomId) {
+    const room = await this.findOne(roomId);
+    room.teams.forEach(async (teamId) => {
+      await this.teamsService.defineDescriberAndLeader(roomId, teamId);
+      await this.teamsService.startIntervalRoundManage(roomId, teamId);
+    });
+  }
 }
