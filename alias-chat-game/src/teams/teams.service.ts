@@ -1,7 +1,8 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -12,6 +13,7 @@ import { UpdateTeamDto } from './dto/update-team.dto';
 import { SetDescriberDto } from './dto/set-describer.dto';
 import { SetTeamLeaderDto } from './dto/set-team-leader.dto';
 import { UsersService } from '../users/users.service';
+import { RoomsService } from '../rooms/rooms.service';
 
 @Injectable()
 export class TeamsService {
@@ -19,6 +21,8 @@ export class TeamsService {
   constructor(
     @InjectModel(Team.name) private teamModel: Model<Team>,
     private readonly usersService: UsersService,
+    @Inject(forwardRef(() => RoomsService))
+    private readonly roomsService: RoomsService,
   ) {}
 
   /**
@@ -354,19 +358,25 @@ export class TeamsService {
   ) {
     const intervalId = setInterval(async () => {
       let team = await this.findTeamById(teamId);
-      Logger.log('Team at game start: ');
-      Logger.log(team);
-      // Check if team has tried less than 3 words
       if (team.tryedWords.length < 3) {
-        Logger.log('Reset: ');
         team = await this.resetRound(roomId, teamId);
-        Logger.log(team);
-        Logger.log('Describer and leader: ');
         team = await this.defineDescriberAndLeader(roomId, teamId);
-        Logger.log(team);
       } else {
+        const room = await this.roomsService.findOne(roomId);
+        const topTeam = (
+          await Promise.all(
+            room.teams.map(async (teamId) => await this.findTeamById(teamId)),
+          )
+        ).sort((a, b) => b.teamScore - a.teamScore)[0];
+        const teamWon = topTeam._id.toString() == teamId.toString();
+        await Promise.all(
+          team.players.map(
+            async (userId) =>
+              await this.usersService.addGameResult(userId, teamWon),
+          ),
+        );
         clearInterval(intervalId);
       }
-    }, 115000); // 115 seconds
+    }, 85000);
   }
 }

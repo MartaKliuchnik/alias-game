@@ -58,7 +58,7 @@ export class InitializationService implements OnModuleInit {
     const teams: (CreateTeamDto & { roomId: Types.ObjectId })[] = [
       { roomId, name: 'Team1', players: [] },
       { roomId, name: 'Team2', players: [] },
-      { roomId, name: 'Team3', players: [] },
+      // { roomId, name: 'Team3', players: [] },
     ];
 
     const teamIds: Types.ObjectId[] = [];
