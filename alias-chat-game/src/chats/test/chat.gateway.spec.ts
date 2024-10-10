@@ -65,6 +65,7 @@ describe('ChatGateway', () => {
         roomId: '1' as unknown as Types.ObjectId,
         teamId: '6703ffc8ba4a6b1dcf6095d8' as unknown as Types.ObjectId,
         userId: '6703fff1ba4a6b1dcf609705' as unknown as Types.ObjectId,
+        userName: 'test',
         text: 'Hello Team!',
       };
       const savedMessage = { ...data, id: '67054d2aee2c032f2bd710a0' };
