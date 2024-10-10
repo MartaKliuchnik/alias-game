@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { InitializationService } from '../../initialization.service';
 import { INestApplication } from '@nestjs/common';
 
-describe('InitializationService', () => {
+describe('InitializationService (Integration)', () => {
   let app: INestApplication;
   let dbConnection: Connection;
   let initializationService: InitializationService;
