@@ -63,7 +63,7 @@ export class WordsService {
   async remove(wordId: Types.ObjectId): Promise<{ message: string }> {
     await this.findById(wordId);
     await this.wordModel.findByIdAndDelete(wordId).exec();
-    return { message: 'Word succesfully deleted.' };
+    return { message: 'Word successfully deleted.' };
   }
 
   private async findById(wordId: Types.ObjectId): Promise<WordDocument> {

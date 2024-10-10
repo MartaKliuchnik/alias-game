@@ -127,7 +127,7 @@ describe('WordsController', () => {
       });
 
       test('then it should return successfull message', () => {
-        expect(message).toEqual({ message: 'Word succesfully deleted.' });
+        expect(message).toEqual({ message: 'Word successfully deleted.' });
       });
     });
   });
@@ -185,14 +185,14 @@ describe('WordsController', () => {
       let response: { word: Word; tryedWords: Types.ObjectId[] };
 
       beforeEach(async () => {
-        roomId = new Types.ObjectId(); // Create a new ObjectId for room
-        teamId = new Types.ObjectId(); // Create a new ObjectId for team
-        request = { userId: 'someUserId' }; // Mock request object
+        roomId = new Types.ObjectId();
+        teamId = new Types.ObjectId();
+        request = { userId: 'someUserId' };
 
         // Mock the service method response
         wordsService.getRandomWord = jest.fn().mockResolvedValue({
-          word: wordStub(), // Use your existing word stub
-          tryedWords: [], // Assume no tried words for this test
+          word: wordStub(),
+          tryedWords: [],
         });
 
         response = await wordsController.getRandomWord(roomId, teamId, request);

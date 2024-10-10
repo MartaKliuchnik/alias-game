@@ -175,7 +175,7 @@ describe('WordsService', () => {
       expect(wordModel.findByIdAndDelete).toHaveBeenCalledWith(
         wordStub().wordId,
       );
-      expect(result).toEqual({ message: 'Word succesfully deleted.' });
+      expect(result).toEqual({ message: 'Word successfully deleted.' });
     });
 
     it('should throw NotFoundException if word to delete does not exist', async () => {
