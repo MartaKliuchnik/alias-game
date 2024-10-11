@@ -144,10 +144,7 @@ describe('RoomsService', () => {
   describe('update', () => {
     it('should update and return the room', async () => {
       const updateRoomDto: UpdateRoomDto = {
-        name: 'Test Room',
-        teams: [new Types.ObjectId().toString()],
-        turnTime: 60,
-        joinedUsers: [new Types.ObjectId()],
+        joinedUsers: ['6703ffd7ba4a6b1dcf6095e6', '6703fff1ba4a6b1dcf609705'] as unknown as Types.ObjectId[]
       };
 
       roomModel.findByIdAndUpdate.mockResolvedValue(mockRoom);
