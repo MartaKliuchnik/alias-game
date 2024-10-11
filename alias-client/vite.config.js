@@ -9,5 +9,4 @@ export default defineConfig({
     include: /src\/.*\.jsx?$/,
     exclude: [],
   },
-  base: "/alias-client/"
 });
