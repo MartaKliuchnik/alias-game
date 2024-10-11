@@ -19,5 +19,6 @@ import { UsersModule } from '../users/users.module';
   ],
   controllers: [WordsController],
   providers: [WordsService],
+  exports: [WordsService, MongooseModule],
 })
 export class WordsModule {}
