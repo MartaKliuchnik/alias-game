@@ -1,12 +1,13 @@
-import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { getTeamsFromRoom } from '../../fetchers/getTeamsFromRoom';
-import { getPlayersFromRoom } from '../../fetchers/getPlayersFromRoom';
-import Spinner from '../../components/Spinner/Spinner';
-import ErrorMessage from '../../components/ErrorMessage/ErrorMessage';
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { getTeamsFromRoom } from "../../fetchers/getTeamsFromRoom";
+import { getPlayersFromRoom } from "../../fetchers/getPlayersFromRoom";
+import Spinner from "../../components/Spinner/Spinner";
+import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 
 // eslint-disable-next-line react/prop-types
-export default function FinalPage({ roomId }) {
+export default function FinalPage({ roomId, getTokens }) {
+  const access_token = getTokens().access_token;
   const navigate = useNavigate();
 
   const [teams, setTeams] = useState([]);
@@ -18,20 +19,20 @@ export default function FinalPage({ roomId }) {
     const fetchTeamsAndPlayers = async () => {
       try {
         // Fetch all teams in the room
-        const teams = await getTeamsFromRoom(roomId);
+        const teams = await getTeamsFromRoom(roomId, access_token);
         setTeams(teams); // Store the fetched teams
 
         // Fetch players for each team in parallel
         const teamIds = teams.map((team) => team._id);
         const playersData = await Promise.all(
-          teamIds.map((teamId) => getPlayersFromRoom(roomId, teamId))
+          teamIds.map((teamId) => getPlayersFromRoom(roomId, teamId, access_token))
         );
 
         // Combine all player data
         setPlayers(playersData.flat()); // Store the fetched players
         setLoading(false);
       } catch (err) {
-        setError(err.message || 'Failed to retrieve teams and players.');
+        setError(err.message || "Failed to retrieve teams and players.");
         setLoading(false); // Ensure to stop loading even on error
       }
     };
@@ -51,47 +52,47 @@ export default function FinalPage({ roomId }) {
   }
 
   return (
-    <div className='container my-8'>
-      <div className='row justify-content-center mt-5 mb-4'>
+    <div className="container my-8">
+      <div className="row justify-content-center mt-5 mb-4">
         {/* Display the winning team based on score */}
-        <h2 className='display-4 text-success text-center'>
+        <h2 className="display-4 text-success text-center">
           Congratulations, {sortedTeams[0].name} has won!
         </h2>
-        <div className='text-center'>
-          <p className='lead'>Well played!</p>
+        <div className="text-center">
+          <p className="lead">Well played!</p>
         </div>
 
-        <div className='col-md-7 text-center'>
+        <div className="col-md-7 text-center">
           <button
-            className='btn btn-success btn-lg'
-            onClick={() => navigate('/home')}
+            className="btn btn-success btn-lg"
+            onClick={() => navigate("/home")}
           >
             Return to Game Room
           </button>
         </div>
       </div>
 
-      <div className='row justify-content-center'>
+      <div className="row justify-content-center">
         {/* Teams leaderboard table */}
-        <div className='col-md-6'>
-          <h4 className='text-center mb-3'>Team Scores</h4>
-          <div className='table-responsive'>
-            <table className='table table-bordered table-hover'>
-              <thead className='thead-dark'>
+        <div className="col-md-6">
+          <h4 className="text-center mb-3">Team Scores</h4>
+          <div className="table-responsive">
+            <table className="table table-bordered table-hover">
+              <thead className="thead-dark">
                 <tr>
-                  <th className='text-center'>#</th>
-                  <th className='text-center'>Team</th>
-                  <th className='text-center'>Score</th>
+                  <th className="text-center">#</th>
+                  <th className="text-center">Team</th>
+                  <th className="text-center">Score</th>
                 </tr>
               </thead>
               <tbody>
                 {sortedTeams.map((team, index) => (
                   <tr key={team._id}>
-                    <th className='text-center' scope='row'>
+                    <th className="text-center" scope="row">
                       {index + 1}
                     </th>
-                    <td className='text-center'>{team.name}</td>
-                    <td className='text-center'>{team.teamScore}</td>
+                    <td className="text-center">{team.name}</td>
+                    <td className="text-center">{team.teamScore}</td>
                   </tr>
                 ))}
               </tbody>
@@ -100,25 +101,25 @@ export default function FinalPage({ roomId }) {
         </div>
 
         {/* Players leaderboard table */}
-        <div className='col-md-6'>
-          <h4 className='text-center mb-3'>Players Scores</h4>
-          <div className='table-responsive'>
-            <table className='table table-bordered table-hover'>
-              <thead className='thead-dark'>
+        <div className="col-md-6">
+          <h4 className="text-center mb-3">Players Scores</h4>
+          <div className="table-responsive">
+            <table className="table table-bordered table-hover">
+              <thead className="thead-dark">
                 <tr>
-                  <th className='text-center'>#</th>
-                  <th className='text-center'>Player</th>
-                  <th className='text-center'>Score</th>
+                  <th className="text-center">#</th>
+                  <th className="text-center">Player</th>
+                  <th className="text-center">Score</th>
                 </tr>
               </thead>
               <tbody>
                 {sortedPlayers.map((player, index) => (
                   <tr key={player.userID}>
-                    <th className='text-center' scope='row'>
+                    <th className="text-center" scope="row">
                       {index + 1}
                     </th>
-                    <td className='text-center'>{player.username}</td>
-                    <td className='text-center'>{player.score}</td>
+                    <td className="text-center">{player.username}</td>
+                    <td className="text-center">{player.score}</td>
                   </tr>
                 ))}
               </tbody>

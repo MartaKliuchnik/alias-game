@@ -80,9 +80,9 @@ export default function App() {
             <LeaderPage
               roomId={room._id}
               teamId={team._id}
-              getTokens={getTokens}
               teamObj={team}
               setTeam={setTeam}
+              getTokens={getTokens}
             />
           }
         />
@@ -129,12 +129,16 @@ export default function App() {
           path="profile"
           element={<Profile getIdFromToken={getIdFromToken} />}
         />
-        <Route path="final-page" element={<FinalPage roomId={room._id} />} />
+        <Route
+          path="final-page"
+          element={<FinalPage roomId={room._id} getTokens={getTokens} />}
+        />
 
         <Route
           path="discussion"
           element={
             <Discussion
+              getTokens={getTokens}
               teamName={team.name}
               description={team.description}
               users={team.players}
@@ -149,6 +153,7 @@ export default function App() {
           path="wait-leader"
           element={
             <Wait
+              getTokens={getTokens}
               teamName={team.name}
               users={team.players}
               teamObj={team}
@@ -162,6 +167,7 @@ export default function App() {
           path="wait-describer"
           element={
             <Wait
+              getTokens={getTokens}
               teamName={team.name}
               users={team.players}
               teamObj={team}

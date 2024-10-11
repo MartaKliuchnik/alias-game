@@ -51,10 +51,10 @@ export default function Room({
 				return;
 			}
 
-			let fetchedTeams = await getTeamsFromRoom(roomObj._id);
+			let fetchedTeams = await getTeamsFromRoom(roomObj._id, authToken);
 			fetchedTeams = await Promise.all(
 				fetchedTeams.map(async (team) => {
-					const players = await getPlayersFromRoom(team.roomId, team._id);
+					const players = await getPlayersFromRoom(team.roomId, team._id, authToken);
 					team.players = players;
 					return team;
 				})

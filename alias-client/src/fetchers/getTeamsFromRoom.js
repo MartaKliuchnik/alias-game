@@ -1,4 +1,4 @@
-export const getTeamsFromRoom = async (roomId) => {
+export const getTeamsFromRoom = async (roomId, token) => {
 	try {
 		const response = await fetch(
 			`${import.meta.env.VITE_SERVER_URL}/api/v1/rooms/${roomId}/teams`, // Using dynamic roomId
@@ -6,7 +6,7 @@ export const getTeamsFromRoom = async (roomId) => {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',
-					// Authorization: `Bearer ${accessToken}`,
+					authorization: token,
 				},
 			}
 		);
@@ -18,7 +18,7 @@ export const getTeamsFromRoom = async (roomId) => {
 		const teams = await response.json(); // Expecting an array of team objects
 		return teams;
 	} catch (error) {
-		console.error("Error during retrieving all the room's teams");
+		console.error("Error during retrieving all the room's teams", error);
 		throw error;
 	}
 };

@@ -1,4 +1,4 @@
-export default async function calculateScores(roomId, teamId) {
+export default async function calculateScores(roomId, teamId, token) {
   try {
     const response = await fetch(
       `${import.meta.env.VITE_SERVER_URL}/api/v1/rooms/${roomId}/teams/${teamId}/calculate-scores`,
@@ -6,6 +6,7 @@ export default async function calculateScores(roomId, teamId) {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          authorization: token,
         },
       }
     );
