@@ -24,7 +24,7 @@ export class TeamsService {
     private readonly usersService: UsersService,
     @Inject(forwardRef(() => RoomsService))
     private readonly roomsService: RoomsService,
-  ) { }
+  ) {}
 
   /**
    * Creates a new team within a specified room.
@@ -386,7 +386,7 @@ export class TeamsService {
         setTimeout(() => {
           Logger.log(`Timeout start ${roomId}-${team._id}`);
           this.resetTeam(team, roomId);
-        });
+        }, 10000);
       }
     }, 85000);
   }
