@@ -14,6 +14,7 @@ import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { CreateTeamDto } from '../teams/dto/create-team.dto';
 import { TeamsService } from '../teams/teams.service';
+import { userStub } from '../users/test/stubs/user.stub';
 
 @Injectable()
 export class RoomsService {
@@ -83,7 +84,7 @@ export class RoomsService {
    * @returns {Promise<RoomDocument | null>} - The first available room or null if none is found.
    */
   async findFirstAvailableRoom(): Promise<RoomDocument | null> {
-    return this.roomModel
+    return await this.roomModel
       .findOne({
         $expr: { $lt: [{ $size: '$joinedUsers' }, this.MAX_USERS_IN_ROOM] },
       })

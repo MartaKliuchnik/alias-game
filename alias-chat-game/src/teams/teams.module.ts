@@ -5,7 +5,7 @@ import { TeamsController } from './teams.controller';
 import { Team, TeamSchema } from './schemas/team.schema';
 import { UsersModule } from '../users/users.module';
 import { UserSchema } from '../users/schemas/user.schema';
-import { RoomsModule } from 'src/rooms/rooms.module';
+import { RoomsModule } from '../rooms/rooms.module';
 
 @Module({
   imports: [

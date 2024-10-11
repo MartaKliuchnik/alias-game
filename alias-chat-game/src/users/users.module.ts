@@ -10,7 +10,6 @@ import {
 import { JwtModule } from '@nestjs/jwt';
 import { RoomsModule } from '../rooms/rooms.module';
 import { TeamsModule } from '../teams/teams.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 
 /**
  * UsersModule sets up the User and ArchivedUser models,
@@ -22,12 +21,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       { name: User.name, schema: UserSchema },
       { name: ArchivedUser.name, schema: ArchivedUserSchema },
     ]),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: configService.get<string>('JWT_EXPIRATION') },
-      }),
+    JwtModule.register({
+      secret: 'AliasSecret',
+      signOptions: { expiresIn: '1h' },
     }),
     RoomsModule,
     forwardRef(() => TeamsModule),
