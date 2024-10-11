@@ -18,21 +18,18 @@ import { AuthGuard } from '../auth/guards/auth.guard';
 import { ParseObjectIdPipe } from '../parse-id.pipe';
 
 /**
- * Controller for handling word-related operations.
- * It supports creating, retrieving, updating, deleting words, and additional
- * functionality like random word selection, checking answers, and descriptions.
+ * Controller for handling word-related operations,
+ * including creating, retrieving, updating, and deleting words.
  */
 @Controller('words')
 export class WordsController {
   constructor(
-    /**
-     * Service for handling the business logic related to words.
-     */
+    /** Service for handling business logic related to words. */
     private readonly wordsService: WordsService,
   ) {}
 
   /**
-   * Endpoint for creating a new word.
+   * Creates a new word.
    * POST /api/v1/words
    * @param {CreateWordDto} createWordDto - Data for creating the word.
    * @returns {Promise<Word>} - The newly created word.
@@ -43,34 +40,37 @@ export class WordsController {
   }
 
   /**
-   * Endpoint to retrieve all words.
+   * Retrieves all words.
    * GET /api/v1/words
    * @returns {Promise<Word[]>} - List of all words.
    */
   @Get()
+  @UseGuards(AuthGuard)
   findAll(): Promise<Word[]> {
     return this.wordsService.findAll();
   }
 
   /**
-   * Endpoint to retrieve a specific word by ID.
+   * Retrieves a specific word by ID.
    * GET /api/v1/words/:id
    * @param {Types.ObjectId} id - ID of the word to retrieve.
    * @returns {Promise<Word>} - The requested word.
    */
   @Get(':id')
+  @UseGuards(AuthGuard)
   findOne(@Param('id', ParseObjectIdPipe) id: Types.ObjectId): Promise<Word> {
     return this.wordsService.findOne(id);
   }
 
   /**
-   * Endpoint to update a specific word by ID.
+   * Updates a specific word by ID.
    * PATCH /api/v1/words/:id
    * @param {Types.ObjectId} id - ID of the word to update.
    * @param {UpdateWordDto} updateWordDto - Data for updating the word.
    * @returns {Promise<Word>} - The updated word.
    */
   @Patch(':id')
+  @UseGuards(AuthGuard)
   update(
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
     @Body() updateWordDto: UpdateWordDto,
@@ -79,12 +79,13 @@ export class WordsController {
   }
 
   /**
-   * Endpoint to delete a specific word by ID.
+   * Deletes a specific word by ID.
    * DELETE /api/v1/words/:id
    * @param {Types.ObjectId} id - ID of the word to delete.
    * @returns {Promise<{ message: string }>} - Confirmation message on successful deletion.
    */
   @Delete(':id')
+  @UseGuards(AuthGuard)
   remove(
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
   ): Promise<{ message: string }> {
@@ -92,9 +93,9 @@ export class WordsController {
   }
 
   /**
-   * Endpoint to get a random word for a team in a specific room.
+   * Gets a random word for a team in a specific room.
    * POST /api/v1/words/random
-   * Protected by AuthGuard, ensuring the user is authenticated.
+   * Protected by AuthGuard to ensure the user is authenticated.
    * @param {Types.ObjectId} roomId - ID of the room.
    * @param {Types.ObjectId} teamId - ID of the team.
    * @param {any} request - Request object to extract user details (JWT payload).
@@ -111,13 +112,14 @@ export class WordsController {
   }
 
   /**
-   * Endpoint to check if the provided answer is correct for a given word.
+   * Checks if the provided answer is correct for a given word.
    * POST /api/v1/words/:id/check-answer
    * @param {Types.ObjectId} wordId - ID of the word.
    * @param {string} answer - The user's answer to check.
-   * @returns {Promise<{ correct: boolean }>} - Whether the answer is correct or not.
+   * @returns {Promise<{ correct: boolean }>} - Whether the answer is correct.
    */
   @Post(':id/check-answer')
+  @UseGuards(AuthGuard)
   async checkAnswer(
     @Param('id', ParseObjectIdPipe) wordId: Types.ObjectId,
     @Body('answer') answer: string,
@@ -127,13 +129,14 @@ export class WordsController {
   }
 
   /**
-   * Endpoint to check if the provided description is correct for a given word.
+   * Checks if the provided description is correct for a given word.
    * POST /api/v1/words/:id/check-description
    * @param {Types.ObjectId} wordId - ID of the word.
    * @param {string} description - The user's description to check.
-   * @returns {Promise<{ correct: boolean }>} - Whether the description is correct or not.
+   * @returns {Promise<{ correct: boolean }>} - Whether the description is correct.
    */
   @Post(':id/check-description')
+  @UseGuards(AuthGuard)
   async checkDescription(
     @Param('id', ParseObjectIdPipe) wordId: Types.ObjectId,
     @Body('description') description: string,

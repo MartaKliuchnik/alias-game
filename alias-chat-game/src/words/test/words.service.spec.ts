@@ -287,7 +287,7 @@ describe('WordsService', () => {
 
       wordModel.findById = jest.fn().mockReturnValue({
         exec: jest.fn().mockResolvedValue(wordStub()),
-      }); // Mock the findById method
+      });
       const result = await wordsService.checkAnswer(wordId, answer);
 
       expect(result).toBe(false);
@@ -314,7 +314,7 @@ describe('WordsService', () => {
 
       wordModel.findById = jest.fn().mockReturnValue({
         exec: jest.fn().mockResolvedValue(wordStub()),
-      }); // Mock the findById method
+      });
       const result = await wordsService.checkDescription(wordId, description);
 
       expect(result).toBe(true);

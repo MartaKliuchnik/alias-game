@@ -21,6 +21,13 @@ export class WordsService {
     private teamsService: TeamsService,
   ) {}
 
+  /**
+   * Creates a new word in the database.
+   *
+   * @param createWordDto - The data transfer object containing word details.
+   * @returns The created word document.
+   * @throws BadRequestException if the word already exists.
+   */
   async create(createWordDto: CreateWordDto): Promise<WordDocument> {
     const existingWord = await this.wordModel.findOne({
       word: createWordDto.word,
@@ -35,14 +42,33 @@ export class WordsService {
     return createdWord;
   }
 
+  /**
+   * Retrieves all words from the database.
+   *
+   * @returns An array of word documents.
+   */
   async findAll(): Promise<WordDocument[]> {
     return this.wordModel.find().exec();
   }
 
+  /**
+   * Retrieves a word by its ID.
+   *
+   * @param wordId - The ID of the word to retrieve.
+   * @returns The word document.
+   */
   async findOne(wordId: Types.ObjectId): Promise<WordDocument> {
     return this.findById(wordId);
   }
 
+  /**
+   * Updates a word by its ID.
+   *
+   * @param wordId - The ID of the word to update.
+   * @param updateWordDto - The data transfer object containing updated word details.
+   * @returns The updated word document.
+   * @throws BadRequestException if no fields are provided for update.
+   */
   async update(
     wordId: Types.ObjectId,
     updateWordDto: UpdateWordDto,
@@ -60,12 +86,26 @@ export class WordsService {
       .exec();
   }
 
+  /**
+   * Deletes a word by its ID.
+   *
+   * @param wordId - The ID of the word to delete.
+   * @returns A confirmation message.
+   */
   async remove(wordId: Types.ObjectId): Promise<{ message: string }> {
     await this.findById(wordId);
     await this.wordModel.findByIdAndDelete(wordId).exec();
     return { message: 'Word successfully deleted.' };
   }
 
+  /**
+   * Finds a word by its ID and throws exceptions if not found or invalid.
+   *
+   * @param wordId - The ID of the word to find.
+   * @returns The found word document.
+   * @throws BadRequestException if the ID format is invalid.
+   * @throws NotFoundException if the word is not found.
+   */
   private async findById(wordId: Types.ObjectId): Promise<WordDocument> {
     if (!Types.ObjectId.isValid(wordId)) {
       throw new BadRequestException('Invalid word ID format.');
@@ -112,7 +152,7 @@ export class WordsService {
         .findById(team.selectedWord)
         .exec();
 
-      // Return the already selected word and the existing tryedWords array
+      // Return the already selected word and the existing triedWords array
       return {
         word: selectedWord,
         tryedWords: team.tryedWords,
@@ -224,20 +264,17 @@ export class WordsService {
     // Check for exact match
     if (wordToCheck1 === wordToCheck2) return true;
 
-    // Use a stemming algorithm to compare root forms of the words
+    // Perform stemming and compare
     const stemmer = natural.PorterStemmer;
-    const root1 = stemmer.stem(wordToCheck1);
-    const root2 = stemmer.stem(wordToCheck2);
+    const stemmedWord1 = stemmer.stem(wordToCheck1);
+    const stemmedWord2 = stemmer.stem(wordToCheck2);
+    if (stemmedWord1 === stemmedWord2) return true;
 
-    if (root1 === root2) return true;
-
-    // Calculate Levenshtein distance for further comparison
+    // Check for similarity using Levenshtein distance
     const distance = levenshtein.get(wordToCheck1, wordToCheck2);
+    const maxLength = Math.max(wordToCheck1.length, wordToCheck2.length);
+    const similarityThreshold = 0.2;
 
-    // Define a threshold for similarity
-    const threshold = 1;
-    if (distance <= threshold) return true;
-
-    return false;
+    return distance / maxLength <= similarityThreshold;
   }
 }

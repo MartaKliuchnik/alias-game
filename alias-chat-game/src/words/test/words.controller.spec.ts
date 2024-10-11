@@ -9,12 +9,14 @@ import { CreateWordDto } from '../dto/create-word.dto';
 import { Types } from 'mongoose';
 import { mockAuthGuard } from '../__mocks__/auth.guard.mock';
 
+// Mocking WordsService to isolate tests
 jest.mock('../words.service');
 
 describe('WordsController', () => {
   let wordsController: WordsController;
   let wordsService: WordsService;
 
+  // Setting up the testing module
   beforeEach(async () => {
     const moduleRef: TestingModule = await Test.createTestingModule({
       controllers: [WordsController],
@@ -126,7 +128,7 @@ describe('WordsController', () => {
         expect(wordsService.remove).toHaveBeenCalledWith(wordStub().wordId);
       });
 
-      test('then it should return successfull message', () => {
+      test('then it should return success message', () => {
         expect(message).toEqual({ message: 'Word successfully deleted.' });
       });
     });

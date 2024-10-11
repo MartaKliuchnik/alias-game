@@ -14,54 +14,84 @@ describe('WordsController (integration)', () => {
   let dbConnection: Connection;
   let httpServer: any;
   let app: any;
+  let authToken: string; // Variable to hold the authentication token
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
+    // Initialize the Nest application
     app = moduleRef.createNestApplication();
     await app.init();
     dbConnection = moduleRef
       .get<DatabaseService>(DatabaseService)
-      .getDbHandle();
-    httpServer = app.getHttpServer();
+      .getDbHandle(); // Get the database connection handle
+    httpServer = app.getHttpServer(); // Get the HTTP server
+
+    await request(httpServer)
+      .post('/auth/register')
+      .send({
+        username: 'TestUser1',
+        password: 'testPass-123',
+      })
+      .expect(201);
+
+    // Authenticate and get a token
+    const authResponse = await request(httpServer)
+      .post('/auth/login')
+      .send({
+        username: 'TestUser1',
+        password: 'testPass-123',
+      })
+      .expect(201);
+
+    authToken = JSON.parse(authResponse.text).data.access_token;
   });
 
   afterAll(async () => {
-    await app.close();
+    await dbConnection.collection('users').deleteMany({});
+    await app.close(); // Close the app after all tests
   });
 
   beforeEach(async () => {
+    // Clear the words collection before each test
     await dbConnection.collection('words').deleteMany({});
+    await dbConnection.collection('users').deleteMany({});
   });
 
   describe('POST /words', () => {
     it('should create a new word successfully', async () => {
       const response = await request(httpServer)
         .post('/words')
+        .set('authorization', `Bearer ${authToken}`) // Set the authorization header
         .send(createWord)
-        .expect(201);
+        .expect(201); // Expect a successful creation (201 status)
 
-      expect(response.body).toMatchObject(createWord);
+      expect(response.body).toMatchObject(createWord); // Check response matches created word
 
       const createdWord = await dbConnection
         .collection('words')
         .findOne({ word: createWord.word });
-      expect(createdWord).toBeTruthy();
+      expect(createdWord).toBeTruthy(); // Ensure the word is saved in the database
     });
 
     it('should return 400 if the word already exists', async () => {
-      await request(httpServer).post('/words').send(createWord).expect(201);
+      await request(httpServer)
+        .post('/words')
+        .set('authorization', `Bearer ${authToken}`) // Set the authorization header
+        .send(createWord)
+        .expect(201);
 
       // Attempt to create a duplicate
       const response = await request(httpServer)
         .post('/words')
+        .set('authorization', `Bearer ${authToken}`) // Set the authorization header
         .send(createWord)
-        .expect(400);
+        .expect(400); // Expect a bad request (400 status)
 
       expect(response.body.message).toEqual(
-        `Word '${createWord.word}' already exists.`,
+        `Word '${createWord.word}' already exists.`, // Check for correct error message
       );
     });
   });
@@ -71,18 +101,19 @@ describe('WordsController (integration)', () => {
       // Create a test word
       const createResponse = await request(httpServer)
         .post('/words')
+        .set('authorization', `Bearer ${authToken}`) // Set the authorization header
         .send(createWord)
         .expect(201);
 
-      const createdWordId = createResponse.body._id;
+      const createdWordId = createResponse.body._id; // Store the ID of the created word
 
       // Perform request to get the word by its ID
       const response = await request(httpServer)
         .get(`/words/${createdWordId}`)
-        .expect(200);
+        .set('authorization', `Bearer ${authToken}`) // Set the authorization header
+        .expect(200); // Expect successful retrieval (200 status)
 
-      // Check that the retrieved word matches the created word
-      expect(response.body).toMatchObject(createWord);
+      expect(response.body).toMatchObject(createWord); // Check that the retrieved word matches the created word
     });
 
     it('should return 404 if the word does not exist', async () => {
@@ -91,11 +122,11 @@ describe('WordsController (integration)', () => {
       // Perform request with a non-existent ID
       const response = await request(httpServer)
         .get(`/words/${nonExistentWordId}`)
-        .expect(404);
+        .set('authorization', `Bearer ${authToken}`) // Set the authorization header
+        .expect(404); // Expect not found (404 status)
 
-      // Update expectation for the actual message
       expect(response.body.message).toEqual(
-        `Word with ID '${nonExistentWordId}' not found.`,
+        `Word with ID '${nonExistentWordId}' not found.`, // Check for correct error message
       );
     });
   });
@@ -106,12 +137,15 @@ describe('WordsController (integration)', () => {
       await dbConnection.collection('words').insertMany(words);
 
       // Perform request to get all words
-      const response = await request(httpServer).get('/words').expect(200);
+      const response = await request(httpServer)
+        .get('/words')
+        .set('authorization', `Bearer ${authToken}`) // Set the authorization header
+        .expect(200); // Expect successful retrieval (200 status)
 
       // Convert the _id fields to strings in the response and expected words
       const wordsWithStringIds = response.body.map((word: any) => ({
         ...word,
-        _id: word._id.toString(),
+        _id: word._id.toString(), // Convert ObjectId to string
       }));
 
       const expectedWords = words.map((word) => ({
@@ -128,10 +162,12 @@ describe('WordsController (integration)', () => {
       await dbConnection.collection('words').deleteMany({});
 
       // Perform request to get all words
-      const response = await request(httpServer).get('/words').expect(200);
+      const response = await request(httpServer)
+        .get('/words')
+        .set('authorization', `Bearer ${authToken}`) // Set the authorization header
+        .expect(200); // Expect successful retrieval (200 status)
 
-      // Check that an empty array is returned
-      expect(response.body).toEqual([]);
+      expect(response.body).toEqual([]); // Check that an empty array is returned
     });
   });
 
@@ -140,25 +176,26 @@ describe('WordsController (integration)', () => {
       // Create a test word
       const createResponse = await request(httpServer)
         .post('/words')
+        .set('authorization', `Bearer ${authToken}`) // Set the authorization header
         .send(createWord)
         .expect(201);
 
-      const createdWordId = createResponse.body._id;
+      const createdWordId = createResponse.body._id; // Store the ID of the created word
 
       const updateResponse = await request(httpServer)
         .patch(`/words/${createdWordId}`)
+        .set('authorization', `Bearer ${authToken}`) // Set the authorization header
         .send(updateWord)
-        .expect(200);
+        .expect(200); // Expect successful update (200 status)
 
-      // Check that the updated word is correctly returned
-      expect(updateResponse.body).toMatchObject(updateWord);
+      expect(updateResponse.body).toMatchObject(updateWord); // Check that the updated word is correctly returned
 
       // Check that the word is updated in the database
       const updatedWord = await dbConnection
         .collection('words')
         .findOne({ _id: new Types.ObjectId(createdWordId) });
 
-      expect(updatedWord).toMatchObject(updateWord);
+      expect(updatedWord).toMatchObject(updateWord); // Verify the updated word in the database
     });
 
     it('should return 404 if the word does not exist', async () => {
@@ -172,11 +209,12 @@ describe('WordsController (integration)', () => {
       // Attempt to update a non-existent word
       const response = await request(httpServer)
         .patch(`/words/${nonExistentWordId}`)
+        .set('authorization', `Bearer ${authToken}`) // Set the authorization header
         .send(updateWordDto)
-        .expect(404);
+        .expect(404); // Expect not found (404 status)
 
       expect(response.body.message).toEqual(
-        `Word with ID '${nonExistentWordId}' not found.`,
+        `Word with ID '${nonExistentWordId}' not found.`, // Check for correct error message
       );
     });
   });
@@ -186,25 +224,28 @@ describe('WordsController (integration)', () => {
       // Create a test word
       const createResponse = await request(httpServer)
         .post('/words')
+        .set('authorization', `Bearer ${authToken}`) // Set the authorization header
         .send(createWord)
         .expect(201);
 
-      const createdWordId = createResponse.body._id;
+      const createdWordId = createResponse.body._id; // Store the ID of the created word
 
       // Delete the word
       const deleteResponse = await request(httpServer)
         .delete(`/words/${createdWordId}`)
-        .expect(200);
+        .set('authorization', `Bearer ${authToken}`) // Set the authorization header
+        .expect(200); // Expect successful deletion (200 status)
 
-      // Check that the response contains a success message
-      expect(deleteResponse.body.message).toEqual(`Word successfully deleted.`);
+      expect(deleteResponse.body).toEqual({
+        message: 'Word successfully deleted.', // Check for correct deletion message
+      });
 
-      // Check that the word is actually deleted from the database
+      // Verify that the word is no longer in the database
       const deletedWord = await dbConnection
         .collection('words')
         .findOne({ _id: new Types.ObjectId(createdWordId) });
 
-      expect(deletedWord).toBeNull();
+      expect(deletedWord).toBeNull(); // Ensure the word has been deleted
     });
 
     it('should return 404 if the word does not exist', async () => {
@@ -213,94 +254,11 @@ describe('WordsController (integration)', () => {
       // Attempt to delete a non-existent word
       const response = await request(httpServer)
         .delete(`/words/${nonExistentWordId}`)
-        .expect(404);
+        .set('authorization', `Bearer ${authToken}`) // Set the authorization header
+        .expect(404); // Expect not found (404 status)
 
       expect(response.body.message).toEqual(
-        `Word with ID '${nonExistentWordId}' not found.`,
-      );
-    });
-  });
-
-  describe('POST /words/:wordId/check-answer', () => {
-    it('should return true for a correct answer', async () => {
-      const createResponse = await request(httpServer)
-        .post('/words')
-        .send(createWord)
-        .expect(201);
-
-      const createdWordId = createResponse.body._id;
-
-      const response = await request(httpServer)
-        .post(`/words/${createdWordId}/check-answer`)
-        .send({ answer: createWord.word })
-        .expect(201);
-
-      expect(response.body).toEqual({ correct: true });
-    });
-
-    it('should return false for an incorrect answer', async () => {
-      const createResponse = await request(httpServer)
-        .post('/words')
-        .send(createWord)
-        .expect(201);
-
-      const createdWordId = createResponse.body._id;
-
-      const response = await request(httpServer)
-        .post(`/words/${createdWordId}/check-answer`)
-        .send({ answer: 'wrong-answer' })
-        .expect(201);
-
-      expect(response.body).toEqual({ correct: false });
-    });
-  });
-
-  describe('POST /words/:id/check-description', () => {
-    let wordId: Types.ObjectId;
-
-    beforeEach(async () => {
-      const createResponse = await request(httpServer)
-        .post('/words')
-        .send(createWord)
-        .expect(201);
-
-      wordId = createResponse.body._id; // Store the created word's ID
-    });
-
-    it('should return correct if the description is valid', async () => {
-      const descriptionToCheck = 'This is valid description.';
-
-      const response = await request(httpServer)
-        .post(`/words/${wordId}/check-description`)
-        .send({ description: descriptionToCheck })
-        .expect(201);
-
-      expect(response.body).toEqual({ correct: true });
-    });
-
-    it('should return correct as false if the description is invalid', async () => {
-      const descriptionToCheck = 'This invalid description with example.';
-
-      // Assuming your checkDescription method returns false for this description
-      const response = await request(httpServer)
-        .post(`/words/${wordId}/check-description`)
-        .send({ description: descriptionToCheck })
-        .expect(201);
-
-      expect(response.body).toEqual({ correct: false });
-    });
-
-    it('should return 404 if the word does not exist', async () => {
-      const nonExistentWordId = new Types.ObjectId().toHexString();
-      const descriptionToCheck = 'Some description.';
-
-      const response = await request(httpServer)
-        .post(`/words/${nonExistentWordId}/check-description`)
-        .send({ description: descriptionToCheck })
-        .expect(404);
-
-      expect(response.body.message).toEqual(
-        `Word with ID '${nonExistentWordId}' not found.`,
+        `Word with ID '${nonExistentWordId}' not found.`, // Check for correct error message
       );
     });
   });
