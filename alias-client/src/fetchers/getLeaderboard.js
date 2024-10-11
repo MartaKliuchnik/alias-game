@@ -1,6 +1,6 @@
 export const getLeaderboard = async () => {
 	try {
-		const response = await fetch(`http://localhost:8080/api/v1/leaderboards`, {
+		const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/v1/leaderboards`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',

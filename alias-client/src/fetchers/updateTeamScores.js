@@ -1,7 +1,7 @@
 // fetchers/updateTeamScores.js
 const updateTeamScores = async (roomId) => {
   const response = await fetch(
-    `http://localhost:8080/api/v1/rooms/${roomId}/calculate-scores`,
+    `${import.meta.env.VITE_SERVER_URL}/api/v1/rooms/${roomId}/calculate-scores`,
     {
       method: "PATCH",
     }

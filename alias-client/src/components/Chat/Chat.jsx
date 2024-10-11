@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
 
-const socket = io("http://localhost:8080");
+const socket = io(import.meta.env.VITE_SERVER_URL);
 
 export default function Chat({ userId, roomId, teamId, name, userName, role }) {
   console.log("role: ", role);

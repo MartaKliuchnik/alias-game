@@ -1,6 +1,6 @@
 // Function to fetch a word by its ID
 const getWord = async (wordId) => {
-    const url = `http://localhost:8080/api/v1/words/${wordId}`;
+    const url = `${import.meta.env.VITE_SERVER_URL}/api/v1/words/${wordId}`;
 
     try {
         const response = await fetch(url);
