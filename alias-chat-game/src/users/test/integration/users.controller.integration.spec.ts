@@ -5,12 +5,13 @@ import { AppModule } from '../../../app.module';
 import { DatabaseService } from '../../../database/database.service';
 import * as request from 'supertest';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
-import { ConfigService } from '@nestjs/config';
 import {
   createTestUser,
   createTestRoom,
   createTestTeam,
 } from '../stubs/test-data-creators.stub';
+import { AuthGuard } from '../../../auth/gurards/auth.guard';
+import { mockAuthGuard } from '../../__mocks__/auth.guard.mock';
 
 describe('UsersController (Integration)', () => {
   let dbConnection: Connection;
@@ -20,7 +21,10 @@ describe('UsersController (Integration)', () => {
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideGuard(AuthGuard)
+      .useValue(mockAuthGuard)
+      .compile();
 
     app = moduleRef.createNestApplication();
     await app.init();
