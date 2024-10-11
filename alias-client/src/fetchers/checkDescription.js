@@ -1,7 +1,7 @@
 export const checkDescription = async (description, wordId) => {
     try {
         const response = await fetch(
-            `http://localhost:8080/api/v1/words/${wordId}/check-description`, // Using dynamic wordId
+            `${import.meta.env.VITE_SERVER_URL}/api/v1/words/${wordId}/check-description`, // Using dynamic wordId
             {
                 method: 'POST',
                 headers: {

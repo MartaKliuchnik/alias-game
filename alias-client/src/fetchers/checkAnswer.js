@@ -2,7 +2,7 @@
 export const checkAnswer = async (answer, wordId) => {
 	try {
 		const response = await fetch(
-			`http://localhost:8080/api/v1/words/${wordId}/check-answer`, // Dynamic wordId for checking the answer
+			`${import.meta.env.VITE_SERVER_URL}/api/v1/words/${wordId}/check-answer`, // Dynamic wordId for checking the answer
 			{
 				method: 'POST',
 				headers: {

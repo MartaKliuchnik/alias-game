@@ -16,7 +16,7 @@ export default function Profile({getIdFromToken}) {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/api/v1/users/${userId}`);
+                const response = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/v1/users/${userId}`);
                 setUserData(response.data);
             } catch (error) {
                 console.error('Error', error)
@@ -39,8 +39,8 @@ export default function Profile({getIdFromToken}) {
   
     const handleSaveClick = async () => {
         try {
-            await axios.patch(`http://localhost:8080/api/v1/users/${userData.userId}`, { username: userData.username });
-            const response = await axios.get(`http://localhost:8080/api/v1/users/${userData.userId}`);
+            await axios.patch(`${import.meta.env.VITE_SERVER_URL}/api/v1/users/${userData.userId}`, { username: userData.username });
+            const response = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/v1/users/${userData.userId}`);
             setUserData(response.data);
             setIsEditing(false);
         } catch (error) {
