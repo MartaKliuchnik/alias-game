@@ -5,7 +5,7 @@
  */
 const getTeamScoresInRoom = async (roomId) => {
   const response = await fetch(
-    `http://localhost:8080/api/v1/rooms/${roomId}/teams`
+    `${import.meta.env.VITE_SERVER_URL}/api/v1/rooms/${roomId}/teams`
   );
 
   if (!response.ok) {
