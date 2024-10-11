@@ -13,11 +13,12 @@ import { UsersModule } from '../users/users.module';
     UsersModule,
     TeamsModule,
     JwtModule.register({
-      secret: 'AliasSecret', // Ensure the same secret is used
+      secret: 'AliasSecret',
       signOptions: { expiresIn: '1h' },
-    }), // Register JwtModule with configuration
+    }),
   ],
   controllers: [WordsController],
   providers: [WordsService],
+  exports: [WordsService, MongooseModule],
 })
 export class WordsModule {}

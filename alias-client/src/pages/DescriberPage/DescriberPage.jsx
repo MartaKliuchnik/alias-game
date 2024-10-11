@@ -23,10 +23,6 @@ export default function DescriberPage({ getTokens, teamObj, setTeam }) {
   useEffect(() => {
     const fetchWord = async () => {
       try {
-        console.log("Describer roomId: ", roomId);
-        console.log("Describer teamId: ", teamId);
-        console.log("Describer access_token: ", access_token);
-
         const wordData = await getRandomWord(roomId, teamId, access_token);
 
         setWord(wordData); // Store the fetched word in state
@@ -52,7 +48,7 @@ export default function DescriberPage({ getTokens, teamObj, setTeam }) {
 
     try {
       // Check if the description is valid by making the API call
-      const isValid = await checkDescription(description, word._id);
+      const isValid = await checkDescription(description, word._id, access_token);
 
       if (!isValid) {
         setMessage(
@@ -61,7 +57,7 @@ export default function DescriberPage({ getTokens, teamObj, setTeam }) {
         return;
       }
 
-      await saveDescription(roomId, teamId, description);
+      await saveDescription(roomId, teamId, description, access_token);
       setTeam((prevTeam) => {
         const updatedTeam = { ...prevTeam, description };
         return updatedTeam;
