@@ -2,7 +2,7 @@
 export default async function getSelectedWordId(roomId, teamId) {
 	try {
 		const response = await fetch(
-			`http://localhost:8080/api/v1/rooms/${roomId}/teams/${teamId}`
+			`${import.meta.env.VITE_SERVER_URL}/api/v1/rooms/${roomId}/teams/${teamId}`
 		);
 
 		if (!response.ok) {
