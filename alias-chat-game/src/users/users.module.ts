@@ -21,6 +21,9 @@ import { TeamsModule } from '../teams/teams.module';
       { name: User.name, schema: UserSchema },
       { name: ArchivedUser.name, schema: ArchivedUserSchema },
     ]),
+    JwtModule.register({
+      secret: 'AliasSecret',
+    }),
     RoomsModule,
     forwardRef(() => TeamsModule),
   ],
