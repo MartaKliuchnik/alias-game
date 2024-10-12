@@ -16,16 +16,20 @@
    - Endpoint **/api/v1/auth/logout**
    - Endpoint **/api/v1/users**
    - Endpoint **/api/v1/users/{userId}**
+   - Endpoint **/api/v1/users/{userId}/room/join**
+   - Endpoint **/api/v1/users/{userId}/room/leave/{roomId}**
+   - Endpoint **/api/v1/users/{userId}/team/join/{teamId}**
+   - Endpoint **/api/v1/users/{userId}/team/leave/{teamId}**
    - Endpoint **/api/v1/leaderboards**
 
    4.2 [Room Management](#room-management)
 
    - Room data model
-   - Endpoint **POST /api/v1/room**
-   - Endpoint **PATCH /api/v1/room/:roomId**
-   - Endpoint **GET /api/v1/rooms**
-   - Endpoint **GET /api/v1/rooms/:roomId**
-   - Endpoint **DELETE /api/v1/rooms/:roomId**
+   - Endpoint **/api/v1/room**
+   - Endpoint **/api/v1/room/:roomId**
+   - Endpoint **/api/v1/rooms**
+   - Endpoint **/api/v1/rooms/:roomId**
+   - Endpoint **/api/v1/rooms/:roomId**
 
    4.3 [Team Management](#team-management)
 
@@ -55,11 +59,11 @@
 
    4.6 [Word Management](#word-management)
    - Word data model
-   - Endpoint **POST /api/v1/word**
-   - Endpoint **GET /api/v1/words**
-   - Endpoint **GET /api/v1/words/:wordId**
-   - Endpoint **PATCH /api/v1/words/:wordId**
-   - Endpoint **DELETE /api/v1/words/:wordId**
+   - Endpoint **/api/v1/word**
+   - Endpoint **/api/v1/words**
+   - Endpoint **/api/v1/words/:wordId**
+   - Endpoint **/api/v1/words/:wordId**
+   - Endpoint **/api/v1/words/:wordId**
 
 5. [Security](#security)
 6. [Testing](#testing)
@@ -177,7 +181,7 @@ success message and the data with the userId of the newly created user.
 {
     "message": "User registered successfully.",
     "data": {
-        "userId": 1
+        "userId": "64a0d5fa3b9c680017d68c3s"
     }
 }
 ```
@@ -285,7 +289,7 @@ Description: The login request failed due to incorrect username.
 
 ```
 {
-    "message": "User does not exist."
+    "message": ""Token not found"
 }
 ```
 
@@ -340,7 +344,7 @@ refresh token. The new access token is issued if the refresh token is valid.
 curl -X POST http://localhost:8080/api/v1/auth/refresh \
 -H "Content-Type: application/json" \
 -d '{
-  "refresh_token": "d1Gh9zG8eXpz1I2kA6vR"
+  "refresh_token": "eyJhbGciOiInR5cCI6IkpXVCJ9.eyJ1c2VMGY0ZmIsImV4cCI6MTcyOTMzNDk2Mn0.M2OwSoTCuivAI2BeS2BLvX1cfw3nc"
 }'
 
 ```
@@ -354,7 +358,7 @@ new access token is returned.
 
 ```
 {
-    "message": "Access token refreshed successfully.",
+    "message": "Access token updated successfully.",
     "data": {
       "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiO5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQss"
     }
@@ -367,7 +371,7 @@ Description: The refresh token is missing or improperly formatted.
 
 ```
 {
-    "message": "Refresh token is required."
+    "message": "Invalid refresh token"
 }
 ```
 
@@ -378,7 +382,7 @@ in again to obtain a new token.
 
 ```
 {
-    "message": "Invalid or expired refresh token. Please log in again."
+    "message": "Token not found"
 }
 ```
 
@@ -432,7 +436,7 @@ any stored tokens.
 
 ```
 {
-    "message": "User logged out successfully."
+    "message: 'User logged out successfully, refresh token deleted."
 }
 ```
 
@@ -443,7 +447,7 @@ expired.
 
 ```
 {
-    "message": "Invalid or missing access token."
+    "message": "Token not found"
 }
 ```
 
@@ -491,16 +495,16 @@ found.
 ```
 [
     {
-        "userId": 1,
+        "userId": "64a0d5fa3b9c680017d68c3s",
         "username": "Alex",
-        "score": 1500,
+        "score": 1800,
         "played": 20,
         "wins": 10
     },
     {
-        "userId": 2,
+        "userId": "64a0d5fa3b9c680017d68c37",
         "username": "JaneDoe",
-        "score": 1800,
+        "score": 1500,
         "played": 25,
         "wins": 15
     }
@@ -514,7 +518,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -564,7 +568,7 @@ ID in the URL.
 
 ```
 
-curl -X GET http://localhost:8080/api/v1/users/2 \
+curl -X GET http://localhost:8080/api/v1/users/64a0d5fa3b9c680017d68c37 \
 -H "Authorization: Bearer access_token" \
 
 ```
@@ -578,7 +582,7 @@ server returns the requested user details.
 
 ```
 {
-      "userId": 2,
+      "userId": "64a0d5fa3b9c680017d68c37",
       "username": "JaneDoe",
       "score": 1800,
       "played": 25,
@@ -603,7 +607,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -639,11 +643,9 @@ Endpoint
   - Soft Delete: Marks the user account as inactive by moving it to an archived
     collection.
   - Hard Delete: Permanently removes the user's account and all associated data.
-    This action requires special authorization by an admin using a password
-    validation step in the request body.
+    This action requires special query parameter (hardDelete).
 - Authentication: The request must include a valid access token for the
-  authenticated user. Hard delete requests also require admin-level
-  authorization.
+  authenticated user. 
 
 **Request Parameter**
 
@@ -655,7 +657,7 @@ The request must include the following path parameter:
 Optional query parameter:
 
 - hardDelete: If set to true, attempts a hard delete (permanent removal of the
-  user). Requires admin validation.
+  user). 
 
 **Example Request**
 
@@ -664,7 +666,7 @@ This request must include an authorization token for the user.
 
 ```
 
-curl -X DELETE http://localhost:8080/api/v1/users/2 \
+curl -X DELETE http://localhost:8080/api/v1/users/64a0d5fa3b9c680017d68c37 \
 -H "Authorization: Bearer access_token" \
 
 ```
@@ -713,18 +715,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Unauthorized access."
-}
-```
-
-Status Code: **403 Forbidden**
-
-Description: The user does not have the required admin privileges to perform
-this operation.
-
-```
-{
-    "message": "Access denied. Admin privileges required."
+    "message": "Token not found"
 }
 ```
 
@@ -780,7 +771,7 @@ Description: A `PUT` request to update the authenticated user's details. Only
 the provided fields will be updated.
 
 ```
-curl -X PUT http://localhost:8080/api/v1/users/2 \
+curl -X PUT http://localhost:8080/api/v1/users/64a0d5fa3b9c680017d68c37 \
 -H "Authorization: Bearer access_token" \
 -d `{
   "username": "Mike",
@@ -796,7 +787,7 @@ user’s information was updated.
 
 ```
 {
-    "userId": 2,
+    "userId": "64a0d5fa3b9c680017d68c37",
     "username": "Mike",
     "score": 1500,
     "played": 20,
@@ -830,18 +821,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Unauthorized access."
-}
-```
-
-Status Code: **403 Forbidden**
-
-Description: The user does not have the necessary permissions to update another
-user's information.
-
-```
-{
-    "message": "Access denied. You do not have permission to update this user."
+    "message": "Token not found"
 }
 ```
 
@@ -878,7 +858,336 @@ request.
 }
 ```
 
-#### 10. Retrieve leaderboards
+#### 10. Add a specific user to a room
+
+Endpoint
+
+- URL Path: **_/api/v1/users/{userId}/room/join_**
+- Description: This endpoint allows an authenticated user to join an available game room. If the room reaches its maximum capacity, a new room will be created.
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token.
+
+**Request Parameter**
+
+The request must include the following path parameter:
+
+- userId: The unique identifier of the user to be added to a room.
+
+**Example Request**
+
+Description:  A `POST` request to add the user to an available room. If the room reaches maximum capacity, a new room will be created automatically.
+
+```
+curl -X PUT http://localhost:8080/api/v1/users/64a0d5fa3b9c680017d68c37/room/join \
+-H "Authorization: Bearer access_token" \
+```
+
+**Example Responses**
+
+Status Code: **200 OK**
+
+Description: The user was successfully added to the room, and the room details are returned.
+
+```
+{
+    "roomId": "64a0d5fa3b9c680017d68c3e",
+    "name": "Room1695558912345",
+    "joinedUsers": ["64a0d5fa3b9c680017d68c3e", "64a0d5fa3b9c680017d68c4f"],
+    "teams": [],
+    "turnTime": 60
+}
+```
+
+Status Code: **400 Bad Request**
+
+Description: The provided user ID is invalid or improperly formatted.
+
+```
+{
+    "message": "Invalid ObjectId"
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
+
+```
+{
+    "message": "Token not found"
+}
+```
+
+Status Code: **404 Not Found**
+
+Description: No available room exists for the user to join.
+
+```
+{
+    "message": "No available rooms to join."
+}
+```
+
+Status code: **409 Conflict**
+
+Description: This response indicates that the request could not be processed
+because the username is already in use.
+
+```
+{
+    "message": "User is already in the room."
+}
+```
+
+Status Code: **500 Internal Server Error**
+
+Description: An unexpected error occurred while adding the user to the room.
+
+```
+{
+    "message": "Could not add user to room."
+}
+```
+
+#### 11. Remove a specific user from a room
+
+Endpoint
+
+- URL Path: **_/api/v1/users/{userId}/room/leave/{roomId}_**
+- Description: This endpoint allows an authenticated user to leave a specified room.
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token.
+
+**Request Parameter**
+
+The request must include the following path parameters:
+
+- userId: The unique identifier of the user to be removed from the room.
+- roomId: The unique identifier of the room from which the user is being removed.
+
+**Example Request**
+
+Description: A `DELETE` request to remove the authenticated user from a specified room.
+
+```
+curl -X PUT http://localhost:8080/api/v1/users/64a0d5fa3b9c680017d68c37/room/leave/64a0d5fa3b9c680017d68c3e \
+-H "Authorization: Bearer access_token" \
+```
+
+**Example Responses**
+
+Status Code: **200 OK**
+
+Description: The user was successfully added to the room, and the room details are returned.
+
+```
+{
+    "roomId": "64a0d5fa3b9c680017d68c3e",
+    "name": "Room1695558912345",
+    "joinedUsers": ["64a0d5fa3b9c680017d68c3f"],
+    "teams": [],
+    "turnTime": 60
+}
+```
+
+Status Code: **400 Bad Request**
+
+Description: The provided userId or roomId is invalid or improperly formatted.
+
+```
+{
+    "message": "Invalid ObjectId"
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
+
+```
+{
+    "message": "Token not found"
+}
+```
+
+Status Code: **404 Not Found**
+
+Description: The specified room does not exist.
+
+```
+{
+    "message": "Room does not exist."
+}
+```
+
+Status Code: **500 Internal Server Error**
+
+Description: An unexpected error occurred while removing the user from the room.
+
+```
+{
+    "message": "Could not remove user from a room."
+}
+```
+
+#### 12. Add a specific user to a team
+
+Endpoint
+
+- URL Path: **_/api/v1/users/{userId}/team/join/{teamId}_**
+- Description: This endpoint allows an authenticated user to join a specified team. If the team reaches its maximum capacity, an error will be thrown.
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token.
+
+**Request Parameter**
+
+The request must include the following path parameters:
+
+- userId: The unique identifier of the user to be added to the team.
+- teamId: The unique identifier of the team to which the user will be added.
+
+**Example Request**
+
+Description: A `POST` request to add the authenticated user to a specified team.
+
+```
+curl -X PUT http://localhost:8080/api/v1/users/64a0d5fa3b9c680017d68c37/team/join/64a0d5fa3b9c680017d68c3e \
+-H "Authorization: Bearer access_token" \
+```
+
+**Example Responses**
+
+Status Code: **200 OK**
+
+Description: The user was successfully added to the team. The response includes a success message, along with the room and team IDs.
+
+```
+{
+    "message": "Player added to the team successfully.",
+    "roomId": "64a0d5fa3b9c680017d68c3d",
+    "teamId": "64a0d5fa3b9c680017d68c3e"
+}
+```
+
+Status Code: **400 Bad Request**
+
+Description: The request contains invalid data or the team is already full.
+
+```
+{
+    "message": "Invalid ObjectId"
+}
+```
+```
+{
+    "message": "Team is already full."
+}
+```
+```
+{
+    "message": "User is already in the team.""
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
+
+```
+{
+    "message": "Token not found"
+}
+```
+
+Status Code: **404 Not Found**
+
+Description: The specified team does not exist.
+
+```
+{
+    "message": "Team not found."
+}
+```
+
+#### 13. Remove a specific user from a team
+
+Endpoint
+
+- URL Path: **_/api/v1/users/{userId}/team/leave/{teamId}_**
+- Description: This endpoint allows an authenticated user to leave a specified team. If the user is not a member of the team, an error will be thrown.
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token.
+
+**Request Parameter**
+
+The request must include the following path parameters:
+
+- userId: he unique identifier of the user who wants to leave the team.
+- teamId: The unique identifier of the team from which the user will be removed.
+
+**Example Request**
+
+Description:  A `DELETE` request to remove the authenticated user from a specified team.
+
+```
+curl -X PUT http://localhost:8080/api/v1/users/64a0d5fa3b9c680017d68c37/team/leave/64a0d5fa3b9c680017d68c3e \
+-H "Authorization: Bearer access_token" \
+```
+
+**Example Responses**
+
+Status Code: **200 OK**
+
+Description: The user was successfully removed from the team. The response includes a success message, along with the room and team IDs.
+
+```
+{
+   "message": "Player removed from the team successfully.",
+    "roomId": "64a0d5fa3b9c680017d68c3d",
+    "teamId": "64a0d5fa3b9c680017d68c3e"
+}
+```
+
+Status Code: **400 Bad Request**
+
+Description: The request contains invalid data or the user is not a member of the specified team.
+
+```
+{
+    "message": "Invalid ObjectId"
+}
+```
+```
+{
+    "message": "User is not in the team."
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
+
+```
+{
+    "message": "Token not found"
+}
+```
+
+Status Code: **404 Not Found**
+
+Description: The specified team does not exist.
+
+```
+{
+    "message": "Team not found."
+}
+```
+
+#### 14. Retrieve leaderboards
 
 Endpoint
 
@@ -903,26 +1212,25 @@ curl -X GET http://localhost:8080/api/v1/leaderboard \
 
 Status Code: **200 OK**
 
-Description: This status indicates that the request was successful, and the
-server returns an array of user objects (the leaderboards data), or an empty
-array if no users are found.
+Description: This status indicates that the request was successful, and the server returns an array of up to 10 user objects (the leaderboards data), ordered by score in descending order. If no users are found, an empty array is returned.
 
 ```
 [
     {
-        "userId": 1,
+        "userId": "64a0d5fa3b9c680017d68c37",
         "username": "Alex",
         "score": 1800,
         "played": 28,
         "wins": 15
     },
     {
-        "userId": 2,
+        "userId": "64a0d5fa3b9c680017d68c3x",
         "username": "Jane",
         "score": 1500,
         "played": 20,
         "wins": 10
-    }
+    }, 
+    ...
 ]
 ```
 
@@ -933,7 +1241,7 @@ request.
 
 ```
 {
-    "message": "An unexpected error occurred while retrieving the leaderboard."
+    "message": "An unexpected error occurred while retrieving the leaderboards."
 }
 ```
 
@@ -1087,7 +1395,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -1169,7 +1477,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -1247,7 +1555,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -1317,7 +1625,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -1426,7 +1734,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -1536,7 +1844,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -1623,7 +1931,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -1742,7 +2050,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -1811,7 +2119,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -1900,7 +2208,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -1987,7 +2295,7 @@ token is invalid.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -2073,7 +2381,7 @@ token is invalid.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -2178,7 +2486,7 @@ token is invalid.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -2284,7 +2592,7 @@ token is invalid.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -2467,7 +2775,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -2542,7 +2850,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -2628,7 +2936,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -2698,7 +3006,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -2780,7 +3088,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -2868,7 +3176,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -2958,7 +3266,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -3051,7 +3359,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
@@ -3177,7 +3485,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Unauthorized access."
+    "message": "Token not found"
 }
 ```
 
