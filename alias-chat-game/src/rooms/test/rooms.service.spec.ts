@@ -164,6 +164,12 @@ describe('RoomsService', () => {
         service.update(mockRoom._id, {} as UpdateRoomDto),
       ).rejects.toThrow(NotFoundException);
     });
+
+    it('should throw BadRequestException for invalid id', async () => {
+      await expect(
+        service.update('111' as unknown as Types.ObjectId, {} as UpdateRoomDto),
+      ).rejects.toThrow(BadRequestException);
+    });
   });
 
   describe('deleteById', () => {
