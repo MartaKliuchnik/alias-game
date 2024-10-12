@@ -12,10 +12,6 @@ import { UsersModule } from '../users/users.module';
     MongooseModule.forFeature([{ name: Word.name, schema: WordSchema }]),
     UsersModule,
     TeamsModule,
-    JwtModule.register({
-      secret: 'AliasSecret',
-      signOptions: { expiresIn: '1h' },
-    }),
   ],
   controllers: [WordsController],
   providers: [WordsService],
