@@ -45,8 +45,6 @@ export class UsersService {
 
     const hashedPassword = await this.hashPassword(password);
 
-    // const newUser = new this.userModel({ username, hashedPassword });
-    // const savedUser = await newUser.save();
     const savedUser = await this.userModel.create({
       username,
       hashedPassword,
@@ -132,6 +130,15 @@ export class UsersService {
     }
   }
 
+  /**
+   * Update the user's game statistics.
+   * @param {Types.ObjectId} userId - The ID of the user whose game result is being updated
+   * @param {boolean} [win=false] - Whether the user won the game (default is false).
+   * @returns {Promise<UserSafeDto>} - A promise that resolves to the updated user's safe DTO.
+   * @throws {NotFoundException} - If the user is not found.
+   * @throws {BadRequestException} - If no valid fields are provided for the update.
+   * @throws {InternalServerErrorException} - If an unexpected error occurs during the database operation.
+   */
   async addGameResult(userId: Types.ObjectId, win: boolean = false) {
     try {
       const user = await this.findUserById(userId);
@@ -298,6 +305,12 @@ export class UsersService {
     return this.mapToSafeDto(user);
   }
 
+  /**
+   * Increment the user's score by a specified amount.
+   * @param {Types.ObjectId} userId - The ID of the user whose score is being incremented.
+   * @param {number} score - The amount to increment the user's score by.
+   * @returns {Promise<void>} - A promise that resolves when the score has been updated.
+   */
   async incrementScore(userId: Types.ObjectId, score: number): Promise<void> {
     await this.userModel.findByIdAndUpdate(userId, { $inc: { score: score } });
   }

@@ -83,7 +83,7 @@ export class RoomsService {
    * @returns {Promise<RoomDocument | null>} - The first available room or null if none is found.
    */
   async findFirstAvailableRoom(): Promise<RoomDocument | null> {
-    return this.roomModel
+    return await this.roomModel
       .findOne({
         $expr: { $lt: [{ $size: '$joinedUsers' }, this.MAX_USERS_IN_ROOM] },
       })
