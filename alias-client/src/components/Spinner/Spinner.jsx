@@ -1,6 +1,6 @@
 export default function Spinner() {
 	return (
-		<div className='d-flex justify-content-center align-items-center vh-100'>
+		<div className='d-flex justify-content-center align-items-center mt-5'>
 			<div
 				className='spinner-border text-secondary'
 				role='status'

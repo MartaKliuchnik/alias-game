@@ -132,6 +132,29 @@ export class UsersService {
     }
   }
 
+  async addGameResult(userId: Types.ObjectId, win: boolean = false) {
+    try {
+      const user = await this.findUserById(userId);
+      user.played++;
+      if (win) {
+        user.wins++;
+      }
+      const updatedUser = await user.save();
+      return this.mapToSafeDto(updatedUser);
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException ||
+        error instanceof ConflictException
+      ) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        'An unexpected error occurred while updating the user.',
+      );
+    }
+  }
+
   /**
    * Removes a user from the database, either by hard deletion or soft deletion (archiving)
    * @param {Types.ObjectId} userId - The ID of the user to remove.
@@ -273,5 +296,9 @@ export class UsersService {
     }
 
     return this.mapToSafeDto(user);
+  }
+
+  async incrementScore(userId: Types.ObjectId, score: number): Promise<void> {
+    await this.userModel.findByIdAndUpdate(userId, { $inc: { score: score } });
   }
 }

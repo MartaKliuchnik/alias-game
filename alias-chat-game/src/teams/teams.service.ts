@@ -1,6 +1,9 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -10,11 +13,18 @@ import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { SetDescriberDto } from './dto/set-describer.dto';
 import { SetTeamLeaderDto } from './dto/set-team-leader.dto';
+import { UsersService } from '../users/users.service';
+import { RoomsService } from '../rooms/rooms.service';
 
 @Injectable()
 export class TeamsService {
-  private readonly MAX_USERS_IN_TEAM = 3;
-  constructor(@InjectModel(Team.name) private teamModel: Model<Team>) {}
+  private readonly MAX_USERS_IN_TEAM: number = 3;
+  constructor(
+    @InjectModel(Team.name) private teamModel: Model<Team>,
+    private readonly usersService: UsersService,
+    @Inject(forwardRef(() => RoomsService))
+    private readonly roomsService: RoomsService,
+  ) {}
 
   /**
    * Creates a new team within a specified room.
@@ -27,8 +37,11 @@ export class TeamsService {
     roomId: Types.ObjectId,
     createTeamDto: CreateTeamDto,
   ): Promise<TeamDocument> {
-    const createdTeam = new this.teamModel({ ...createTeamDto, roomId });
-    return createdTeam.save();
+    const createdTeam = await this.teamModel.create({
+      ...createTeamDto,
+      roomId,
+    });
+    return createdTeam;
   }
 
   /**
@@ -83,7 +96,7 @@ export class TeamsService {
   async addPlayerToTeam(
     userId: Types.ObjectId,
     teamId: Types.ObjectId,
-  ): Promise<object> {
+  ): Promise<{ message; roomId; teamId }> {
     const team = await this.findTeamById(teamId);
     if (!team) {
       throw new NotFoundException('Team not found.');
@@ -157,8 +170,14 @@ export class TeamsService {
       .exec();
   }
 
-  findAll(roomId: Types.ObjectId) {
-    return this.teamModel.find({ roomId }).sort({ teamScore: -1 }).exec();
+  findAll(roomId: Types.ObjectId, nestUsers: boolean = false) {
+    let query = this.teamModel.find({ roomId }).sort({ teamScore: -1 });
+
+    if (nestUsers) {
+      query = query.populate('players');
+    }
+
+    return query.exec();
   }
 
   async findOne(roomId: Types.ObjectId, teamId: Types.ObjectId) {
@@ -279,5 +298,123 @@ export class TeamsService {
     }
 
     return team;
+  }
+
+  /**
+   * Resets the round-specific fields (description, success, answer) to null for the given team.
+   * @param roomId - The ID of the room where the team is located.
+   * @param teamId - The ID of the team whose round fields will be reset.
+   * @returns {Promise<TeamDocument>} - The updated team document with nullified fields.
+   */
+  async resetRound(
+    roomId: Types.ObjectId,
+    teamId: Types.ObjectId,
+  ): Promise<TeamDocument> {
+    const team = await this.teamModel
+      .findOneAndUpdate(
+        { _id: teamId, roomId },
+        {
+          $set: {
+            selectedWord: null,
+            description: null,
+            success: null,
+            answer: null,
+          },
+        },
+        { new: true },
+      )
+      .exec();
+
+    if (!team) {
+      throw new NotFoundException(`Team ${teamId} in room ${roomId} not found`);
+    }
+
+    return team;
+  }
+
+  async calculateScores(teamId: Types.ObjectId): Promise<{ message: string }> {
+    const team = await this.findTeamById(teamId);
+
+    if (!team) {
+      throw new NotFoundException('Team not found.');
+    }
+
+    if (team.success) {
+      team.teamScore += 10;
+      await team.save();
+
+      const playerIds = team.players;
+      for (const playerId of playerIds) {
+        await this.usersService.incrementScore(playerId, 10);
+      }
+
+      return {
+        message: 'Team and player scores have been successfully updated.',
+      };
+    } else {
+      return { message: 'No score update as the team did not succeed.' };
+    }
+  }
+
+  async startIntervalRoundManage(
+    roomId: Types.ObjectId,
+    teamId: Types.ObjectId,
+  ) {
+    Logger.log(`Start interval ${roomId}-${teamId}`);
+    let turnCounter = 0;
+    const intervalId = setInterval(async () => {
+      let team = await this.findTeamById(teamId);
+      // Reset if game continues
+      if (turnCounter < 2) {
+        turnCounter++;
+        team = await this.resetRound(roomId, teamId);
+        team = await this.defineDescriberAndLeader(roomId, teamId);
+      } else {
+        Logger.log(`Stop interval ${roomId}-${teamId}`);
+        const room = await this.roomsService.findOne(roomId);
+        // Find winner team and save game results for players
+        const topTeam = (
+          await Promise.all(
+            room.teams.map(async (teamId) => await this.findTeamById(teamId)),
+          )
+        ).sort((a, b) => b.teamScore - a.teamScore)[0];
+        const teamWon = topTeam._id.toString() == teamId.toString();
+        await Promise.all(
+          team.players.map(
+            async (userId) =>
+              await this.usersService.addGameResult(userId, teamWon),
+          ),
+        );
+        clearInterval(intervalId);
+        setTimeout(() => {
+          Logger.log(`Timeout start ${roomId}-${team._id}`);
+          this.resetTeam(team, roomId);
+        }, 10000);
+      }
+    }, 85000);
+  }
+
+  async resetTeam(team: TeamDocument, roomId: Types.ObjectId) {
+    // Remove all team players from room
+    const userIds = team.players;
+    const removedIds = [];
+    await Promise.all(
+      userIds.map(async (userId) => {
+        if (removedIds.indexOf(userId) !== -1) {
+          await this.roomsService.removeUserFromRoom(userId, roomId);
+          removedIds.push(userId);
+        }
+      }),
+    );
+    const newTeam: CreateTeamDto & { roomId: Types.ObjectId } = {
+      roomId,
+      name: team.name,
+      players: [],
+    };
+    // Remove old team from DB
+    this.remove(roomId, team._id);
+    // Add new team to DB
+    const createdTeam = await this.create(roomId, newTeam);
+    this.roomsService.updateTeam(roomId, [createdTeam._id]);
   }
 }

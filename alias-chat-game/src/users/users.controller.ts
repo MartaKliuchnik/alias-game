@@ -6,7 +6,7 @@ import {
   Param,
   Delete,
   Query,
-  UseGuards,
+  //UseGuards,
   Post,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -14,12 +14,12 @@ import { UserSafeDto } from './dto/user-safe.dto';
 import { ParseObjectIdPipe } from '../parse-id.pipe';
 import { Types } from 'mongoose';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AuthGuard } from '../auth/gurards/auth.guard';
-import { RoomsService } from 'src/rooms/rooms.service';
-import { TeamsService } from 'src/teams/teams.service';
+// import { AuthGuard } from '../auth/gurards/auth.guard';
+import { RoomsService } from '../rooms/rooms.service';
+import { TeamsService } from '../teams/teams.service';
 
 // UsersController handles CRUD operations for user management.
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(
@@ -27,6 +27,7 @@ export class UsersController {
     private readonly roomsService: RoomsService,
     private readonly teamsService: TeamsService,
   ) {}
+
   /**
    * @route GET /api/v1/users
    * @description Retrieve all users
@@ -34,7 +35,8 @@ export class UsersController {
    */
   @Get()
   async findAll(): Promise<UserSafeDto[] | []> {
-    return this.usersService.getUsers();
+    const users = await this.usersService.getUsers();
+    return users.sort((a, b) => b.score - a.score);
   }
 
   /**
@@ -113,6 +115,10 @@ export class UsersController {
     @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
   ) {
     const team = await this.teamsService.addPlayerToTeam(userId, teamId);
+    const isReady = await this.roomsService.isRoomReady(team.roomId);
+    if (isReady) {
+      this.roomsService.startGame(team.roomId);
+    }
     return team;
   }
 

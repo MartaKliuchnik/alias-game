@@ -8,17 +8,28 @@ import {
   Min,
 } from 'class-validator';
 
+/**
+ * DTO for creating a new room.
+ */
 export class CreateRoomDto {
+  /**
+   * Name of the room.
+   */
   @IsNotEmpty()
   @IsString()
   name: string;
 
+  /**
+   * Array of IDs of teams
+   */
   @IsNotEmpty()
   @IsArray()
   @IsMongoId({ each: true })
   teams: string[];
 
-  // TODO check int validation !!!
+  /**
+   * Time for each turn in seconds
+   */
   @IsInt()
   @Min(15)
   @Max(250)

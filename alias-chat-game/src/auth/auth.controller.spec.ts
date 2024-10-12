@@ -4,7 +4,7 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { UnauthorizedException } from '@nestjs/common';
+import { AuthGuard } from './gurards/auth.guard';
 
 describe('AuthController', () => {
   let authController: AuthController;
@@ -26,7 +26,10 @@ describe('AuthController', () => {
           useValue: mockAuthService,
         },
       ],
-    }).compile();
+    })
+      .overrideGuard(AuthGuard)
+      .useValue({ canActivate: jest.fn(() => true) })
+      .compile();
 
     authController = module.get<AuthController>(AuthController);
     authService = module.get<AuthService>(AuthService);
@@ -81,19 +84,15 @@ describe('AuthController', () => {
 
   describe('logout', () => {
     it('should logout the user with a valid authorization header', async () => {
-      const authHeader = 'Bearer validToken';
-      const result = { message: 'Logged out successfully' };
+      const request = { userId: 'testUserId' } as Request & { userId: string };
+      const result = {
+        message: 'User logged out successfully, refresh token deleted.',
+      };
 
       jest.spyOn(authService, 'logout').mockResolvedValue(result);
 
-      expect(await authController.logout(authHeader)).toEqual(result);
-      expect(authService.logout).toHaveBeenCalledWith(authHeader);
-    });
-
-    it('should throw UnauthorizedException if authorization header is missing', async () => {
-      await expect(authController.logout(undefined)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      expect(await authController.logout(request)).toEqual(result);
+      expect(authService.logout).toHaveBeenCalledWith('testUserId');
     });
   });
 });

@@ -2,7 +2,7 @@
 
 async function joinRoom(userId, authToken) {
     try {
-        const response = await fetch(`http://localhost:8080/api/v1/users/${userId}/room/join`, {
+        const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/v1/users/${userId}/room/join`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -24,7 +24,7 @@ async function joinRoom(userId, authToken) {
 
 async function leaveRoom(userId, roomId, authToken) {
     try {
-        const response = await fetch(`http://localhost:8080/api/v1/users/${userId}/room/leave/${roomId}`, {
+        const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/v1/users/${userId}/room/leave/${roomId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',

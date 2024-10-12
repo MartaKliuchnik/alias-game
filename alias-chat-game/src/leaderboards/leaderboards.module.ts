@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { LeaderboardsService } from './leaderboards.service';
 import { LeaderboardsController } from './leaderboards.controller';
-import { UsersModule } from 'src/users/users.module';
+import { UsersModule } from '../users/users.module';
 
 // leaderboardsModule imports UsersModule and provides leaderboards functionality.
 @Module({

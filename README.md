@@ -61,6 +61,11 @@
    - Endpoint **PATCH /api/v1/words/:wordId**
    - Endpoint **DELETE /api/v1/words/:wordId**
 
+5. [Security](#security)
+6. [Testing](#testing)
+6. [Deployment](#deployment)
+7. [Future Enhancements](#future-enhancements)
+
 ## Description
 
 Alias is a word-guessing game where players form teams. Each team takes turns
@@ -3227,3 +3232,89 @@ request.
     "message": "An unexpected error occurred while retrieving the team."
 }
 ```
+
+## Security
+
+### Server-Side Security
+
+Server-side security is essential for protecting user data and maintaining the integrity of the application. This involves implementing various measures to prevent unauthorized access, data breaches, and malicious attacks. The following features are implemented to ensure a secure environment for users and their data:
+
+- **Authentication & Authorization:** JWT (JSON Web Token) is used to keep sessions secure. When a user logs in, a unique JWT is created, allowing only authenticated users to access specific features;
+
+- **Data Encryption:** Passwords are securely hashed using bcrypt before being stored in the database. This ensures that even if the database is compromised, passwords remain safe;
+
+- **Input Validation & Sanitization:** All user input is validated with specific rules using DTO (Data Transfer Object) validation to prevent NoSQL injection attacks. Global validation only allows expected properties;
+
+- **Database Security:** Safeguards against NoSQL injection are implemented by sanitizing all input queries and performing validation checks. ParseObjectIdPipe is used to ensure only valid MongoDB ObjectId values are processed;
+
+- **Data Protection & Privacy:** User details, especially passwords, are never exposed in responses. Data sent is carefully sanitized to ensure no sensitive information is included;
+
+- **Real-time Chat Security:** All chat features are secured through authenticated Socket connections, ensuring that only authorized users can access chat rooms and keeping conversations safe.
+
+### Client-Side Security
+
+Client-side security is essential for safeguarding user data and ensuring a safe browsing experience. This involves proper handling of sensitive information within the user's browser. To enhance client-side security, the following measure has been implemented:
+
+- **Secure Cookies:** Authentication tokens are stored in secure cookies that have the `httpOnly` and `secure` flags enabled. This setup ensures that tokens are only transmitted over HTTPS connections, which helps reduce the risk of Cross-Site Scripting (XSS) attacks. Additionally, this means that these tokens cannot be accessed by client-side scripts, providing an extra layer of protection for user data.
+
+## Testing
+
+Testing is a crucial part of our development process, ensuring that our application functions correctly and efficiently. In our Node.js-Based Game "Alias" with Chat and Word Checking, we have implemented both unit and integration testing to maintain high code quality and reliability.
+
+- **Unit Testing:**
+Unit tests focus on verifying the functionality of individual components or functions in isolation. By testing these components independently, we can quickly identify and fix issues, ensuring that each part of the application behaves as expected. Our unit tests cover various modules and services, helping to catch bugs early in the development process.
+
+- **Integration Testing:**
+Integration tests check how different parts of the application work together. These tests simulate real-world scenarios to verify that components interact correctly and data flows seamlessly throughout the system. By implementing integration tests, we can ensure that the overall functionality of the application remains intact as new features are added or changes are made.
+
+With both unit and integration testing in place, we aim to deliver a robust and reliable application that meets user expectations and performs well in various scenarios.
+
+## Deployment
+
+Before deploying, ensure that you have the following:
+
+- Node.js and npm installed on the server.
+- MongoDB instance set up and accessible.
+
+#### 1. Clone current repository into a your directory:
+
+```
+git clone https://github.com/Aliko-XIII/alias-node-js.git
+```
+
+#### 2. Switch to project folder:
+
+```
+cd alias-node-js/alias-client
+```
+
+#### 3. Install the dependencies:
+
+```
+npm install
+```
+
+#### 4. Install the dependencies 
+Set Environment Variables Create a .env file in the root directory of your project and define the necessary environment variables, such as database connection strings and API keys. Ensure sensitive data is not hardcoded in the source code.
+
+#### 5. Build the Application
+
+```
+npm run build
+```
+
+#### 6. Start the Application
+
+```
+npm run start
+```
+
+## Future Enhancements
+
+As we continue to develop and improve our application, we have identified several key enhancements that will enhance user experience, increase security, and broaden accessibility. These future enhancements will help us meet user needs and keep pace with modern technology trends.
+
+- **Integration with Social Login Providers:**
+To simplify the authentication process for users, we plan to implement social login options, such as Google, Facebook, and GitHub. This enhancement not only makes it easier for users to log in but also improves security by utilizing the multi-factor authentication features provided by these platforms.
+
+- **Multi-language Support in the Chat System:**
+We aim to enhance our chat application by adding multi-language support. This feature will allow users from different regions to communicate more easily, breaking down language barriers. By integrating translation APIs (like Google Translate API or Microsoft Azure Translator), the system can automatically detect the language of messages and translate them into the recipient's preferred language. Users will have the option to select their preferred language during registration or within chat sessions, significantly improving their overall experience.

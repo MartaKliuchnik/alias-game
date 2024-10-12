@@ -9,7 +9,16 @@ export class Message {
   userId: Types.ObjectId;
 
   @Prop({ type: String, required: true })
+  userName: string;
+
+  @Prop({ type: String, required: true })
   text: string;
+
+  @Prop({ type: Types.ObjectId, ref: 'rooms', required: true })
+  roomId: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: 'teams', required: true })
+  teamId: Types.ObjectId;
 
   @Prop({ type: Date, default: Date.now })
   timestamp: Date;

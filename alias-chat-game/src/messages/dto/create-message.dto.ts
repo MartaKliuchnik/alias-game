@@ -1,6 +1,33 @@
-import { IsNotEmpty, IsString, MinLength } from 'class-validator';
+import {
+  IsMongoId,
+  IsNotEmpty,
+  IsString,
+  Length,
+  MinLength,
+} from 'class-validator';
+import { Types } from 'mongoose';
 
 export class CreateMessageDto {
+  @IsNotEmpty()
+  @IsMongoId()
+  @IsNotEmpty()
+  roomId: Types.ObjectId;
+
+  @IsNotEmpty()
+  @IsMongoId()
+  @IsNotEmpty()
+  teamId: Types.ObjectId;
+
+  @IsNotEmpty()
+  @IsMongoId()
+  @IsNotEmpty()
+  userId: Types.ObjectId;
+
+  @IsString()
+  @Length(3, 20)
+  @IsNotEmpty()
+  userName: string;
+
   @IsString()
   @IsNotEmpty()
   @MinLength(5)

@@ -1,24 +1,11 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-
-const Timer = ({ startTime, onTimeOut }) => {
-  const [time, setTime] = useState(startTime);
-
-  useEffect(() => {
-    if (time === 0) {
-      onTimeOut(); // Call action when time is out
-      return; // Exit effect if time is 0
-    }
-
-    const timerId = setInterval(() => {
-      setTime((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
-    }, 1000);
-
-    return () => clearInterval(timerId); // Clean up the timer
-  }, [time, onTimeOut]);
-
-  return <div className="text-white">Timer: {time} sec</div>;
-};
+import { useNavigate } from "react-router-dom";
+import { getPlayersFromRoom } from "../../fetchers/getPlayersFromRoom";
+import Timer from "../Timer/Timer.jsx";
+import { getTeam } from "../../fetchers/getTeam.js";
 
 // UserCard Component
 const UserCard = ({ username }) => (
@@ -26,23 +13,65 @@ const UserCard = ({ username }) => (
 );
 
 // TeamList Component
-const TeamList = ({ teamName, users }) => (
+const TeamList = ({ teamName, players = [] }) => (
   <div>
-    <h5 className="text-white">Team {teamName}</h5>
+    <h5 className="text-white">Team: {teamName}</h5>
     <ul className="list-group">
-      {users.map((user, index) => (
-        <UserCard key={index} username={user.username} />
+      {players?.map((player, index) => (
+        <UserCard key={index} username={player.username} />
       ))}
     </ul>
   </div>
 );
 
 // Main Wait Component
-export default function Wait({ teamName, users, waitTime, role }) {
+export default function Wait({
+  getTokens,
+  teamObj,
+  waitTime,
+  setTeam,
+  role,
+  get,
+}) {
+  const access_token = getTokens().access_token;
+  const [isTimeUp, setIsTimeUp] = useState(false);
+  const { roomId, _id: teamId, name: teamName } = teamObj;
+  const [teamPlayersInfo, setTeamPlayersInfo] = useState([]); // 3 players with their info
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchTeamData = async () => {
+      try {
+        // Fetch latest team details
+        const latestTeam = await getTeam(roomId, teamId, access_token);
+        setTeam(latestTeam);
+
+        // Fetch players info for the team
+        const players = await getPlayersFromRoom(roomId, teamId, access_token);
+        setTeamPlayersInfo(players);
+      } catch (error) {
+        console.error("Error fetching team or players:", error);
+      }
+    };
+
+    // Fetch data only when roomId and teamId are available
+    if (roomId && teamId) {
+      fetchTeamData();
+    }
+  }, [roomId, teamId, setTeam]);
+
   const handleTimeOut = () => {
-    // Action when time is up (optional)
-    console.log("Time is up!");
+    setIsTimeUp(true);
   };
+
+  // Redirect after time is up
+  useEffect(() => {
+    if (isTimeUp) {
+      role === "describer write description"
+        ? navigate("/discussion")
+        : navigate("/teams-result");
+    }
+  }, [isTimeUp, navigate]);
 
   return (
     <div className="container py-5">
@@ -51,11 +80,15 @@ export default function Wait({ teamName, users, waitTime, role }) {
         <div className="col-md-3">
           {/* Timer */}
           <div className="mb-4 bg-dark p-3 rounded">
-            <Timer startTime={waitTime} onTimeOut={handleTimeOut} />
+            <Timer
+              startTime={waitTime}
+              onTimeOut={handleTimeOut}
+              small={true}
+            />
           </div>
           {/* Team List */}
           <div className="bg-dark p-3 rounded">
-            <TeamList teamName={teamName} users={users} />
+            <TeamList teamName={teamName} players={teamPlayersInfo} />
           </div>
         </div>
 

@@ -1,5 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { UserSafeDto } from 'src/users/dto/user-safe.dto';
+import { UserSafeDto } from '../users/dto/user-safe.dto';
 import { UsersService } from '../users/users.service';
 
 // leaderboardsService is responsible for retrieving the top players' leaderboards.

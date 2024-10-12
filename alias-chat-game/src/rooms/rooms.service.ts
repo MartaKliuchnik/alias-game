@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ConflictException,
+  forwardRef,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -10,8 +12,8 @@ import mongoose, { Model, Types } from 'mongoose';
 import { Room, RoomDocument } from './schemas/room.schema';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
-import { CreateTeamDto } from 'src/teams/dto/create-team.dto';
-import { TeamsService } from 'src/teams/teams.service';
+import { CreateTeamDto } from '../teams/dto/create-team.dto';
+import { TeamsService } from '../teams/teams.service';
 
 @Injectable()
 export class RoomsService {
@@ -19,6 +21,7 @@ export class RoomsService {
 
   constructor(
     @InjectModel(Room.name) private roomModel: Model<RoomDocument>,
+    @Inject(forwardRef(() => TeamsService))
     private readonly teamsService: TeamsService,
   ) {}
 
@@ -40,7 +43,7 @@ export class RoomsService {
     return await this.roomModel.find().exec();
   }
 
-  async findOne(id: Types.ObjectId) {
+  async findOne(id: Types.ObjectId): Promise<RoomDocument> {
     this.validateId(id);
     const room = await this.roomModel.findById(id).exec();
     if (!room) {
@@ -212,5 +215,27 @@ export class RoomsService {
           ? `Successfully deleted ${deletedCount} rooms.`
           : 'No rooms found to delete.',
     };
+  }
+
+  async isRoomReady(roomId) {
+    const MAX_USERS_IN_TEAM = 3;
+    const room = await this.findOne(roomId);
+    return (
+      await Promise.all(
+        room.teams.map(async (teamId) => {
+          const players = (await this.teamsService.findTeamById(teamId))
+            .players;
+          return players.length >= MAX_USERS_IN_TEAM;
+        }),
+      )
+    ).every(Boolean);
+  }
+
+  async startGame(roomId) {
+    const room = await this.findOne(roomId);
+    room.teams.forEach(async (teamId) => {
+      await this.teamsService.defineDescriberAndLeader(roomId, teamId);
+      await this.teamsService.startIntervalRoundManage(roomId, teamId);
+    });
   }
 }

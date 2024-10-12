@@ -130,37 +130,18 @@ describe('AuthService', () => {
   });
 
   describe('logout', () => {
-    it('should delete the refresh token and logout the user', async () => {
-      const token = 'validToken';
-      jest
-        .spyOn(jwtService, 'verify')
-        .mockReturnValue({ userId: 'testUserId' });
+    it('should logout the user and delete the refresh token', async () => {
+      const userId = 'testUserId';
       jest
         .spyOn(authModel, 'deleteOne')
         .mockResolvedValueOnce({ deletedCount: 1 } as any);
 
-      const result = await authService.logout(token);
+      const result = await authService.logout(userId);
 
-      expect(jwtService.verify).toHaveBeenCalledWith(token, {
-        secret: 'AliasSecret',
-      });
-      expect(authModel.deleteOne).toHaveBeenCalledWith({
-        userId: 'testUserId',
-      });
+      expect(authModel.deleteOne).toHaveBeenCalledWith({ userId });
       expect(result).toEqual({
         message: 'User logged out successfully, refresh token deleted.',
       });
-    });
-
-    it('should throw UnauthorizedException for invalid token', async () => {
-      const token = 'invalidToken';
-      jest.spyOn(jwtService, 'verify').mockImplementation(() => {
-        throw new UnauthorizedException('Invalid token');
-      });
-
-      await expect(authService.logout(token)).rejects.toThrow(
-        UnauthorizedException,
-      );
     });
   });
 

@@ -6,12 +6,13 @@ import {
   Param,
   Delete,
   Put,
+  Query,
 } from '@nestjs/common';
 import { TeamsService } from './teams.service';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
-import { ParseObjectIdPipe } from 'src/parse-id.pipe';
+import { ParseObjectIdPipe } from '../parse-id.pipe';
 import { Types } from 'mongoose';
 
 @Controller('rooms/:roomId/teams')
@@ -32,8 +33,11 @@ export class TeamsController {
 
   // Get all teams in a room
   @Get() // api/v1/rooms/{roomId}/teams
-  findAllTeams(@Param('roomId', ParseObjectIdPipe) roomId: Types.ObjectId) {
-    return this.teamsService.findAll(roomId);
+  findAllTeams(
+    @Param('roomId', ParseObjectIdPipe) roomId: Types.ObjectId,
+    @Query('nestUsers') nestUsers: boolean = false,
+  ) {
+    return this.teamsService.findAll(roomId, nestUsers);
   }
 
   // Deletes all teams from a specific room.
@@ -89,7 +93,8 @@ export class TeamsController {
         return player;
       }),
     );
-    return players.sort((a, b) => b.score - a.score);
+
+    return players.sort((a, b) => Number(b.score) - Number(a.score));
   }
 
   // Add a player to a team
@@ -118,5 +123,21 @@ export class TeamsController {
     @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
   ) {
     return this.teamsService.defineDescriberAndLeader(roomId, teamId);
+  }
+
+  // Reset round fields to null
+  @Put(':teamId/reset') // api/v1/rooms/{roomId}/teams/{teamId}/reset
+  resetRound(
+    @Param('roomId', ParseObjectIdPipe) roomId: Types.ObjectId,
+    @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
+  ) {
+    return this.teamsService.resetRound(roomId, teamId);
+  }
+
+  @Put(':teamId/calculate-scores')
+  async calculateScores(
+    @Param('teamId', ParseObjectIdPipe) teamId: Types.ObjectId,
+  ) {
+    return await this.teamsService.calculateScores(teamId);
   }
 }
