@@ -7,9 +7,8 @@ import getSelectedWordId from "../../fetchers/getSelectedWordId";
 import calculateScores from "../../fetchers/calculateScores";
 
 // eslint-disable-next-line react/prop-types
-export default function LeaderPage({ roomId, teamId }) {
-  console.log('LeaderPage teamId: ', teamId);
-  console.log('LeaderPage roomId: ', roomId);
+export default function LeaderPage({ roomId, teamId, getTokens }) {
+  const access_token = getTokens().access_token;
   const [leaderWord, setLeaderWord] = useState("");
   const [isTimeUp, setIsTimeUp] = useState(false);
   const [message, setMessage] = useState("");
@@ -20,7 +19,11 @@ export default function LeaderPage({ roomId, teamId }) {
   useEffect(() => {
     const fetchWordId = async () => {
       try {
-        const selectedWordId = await getSelectedWordId(roomId, teamId);
+        const selectedWordId = await getSelectedWordId(
+          roomId,
+          teamId,
+          access_token
+        );
         console.log("selectedWordId: ", selectedWordId);
         setWordId(selectedWordId);
       } catch {
@@ -50,10 +53,16 @@ export default function LeaderPage({ roomId, teamId }) {
     }
 
     try {
-      const isCorrect = await checkAnswer(leaderWord, wordId);
+      const isCorrect = await checkAnswer(leaderWord, wordId, access_token);
       console.log("isCorrect: ", isCorrect);
 
-      const success = await saveAnswer(roomId, teamId, leaderWord, isCorrect);
+      const success = await saveAnswer(
+        roomId,
+        teamId,
+        leaderWord,
+        isCorrect,
+        access_token
+      );
 
       if (success) {
         setMessage(
@@ -64,7 +73,7 @@ export default function LeaderPage({ roomId, teamId }) {
         setLeaderWord("");
         wordRef.current.disabled = true;
 
-        await calculateScores(roomId, teamId);
+        await calculateScores(roomId, teamId, access_token);
       } else {
         setMessage("Failed to submit the answer. Please try again later.");
       }

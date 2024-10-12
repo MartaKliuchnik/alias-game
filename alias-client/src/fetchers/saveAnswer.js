@@ -1,9 +1,10 @@
-export const saveAnswer = async (roomId, teamId, answer, success) => {
+export const saveAnswer = async (roomId, teamId, answer, success, token) => {
     try {
         const response = await fetch(`${import.meta.env.VITE_SERVER_URL}/api/v1/rooms/${roomId}/teams/${teamId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
+                authorization: token,
             },
             body: JSON.stringify({
                 answer,
@@ -15,9 +16,9 @@ export const saveAnswer = async (roomId, teamId, answer, success) => {
             throw new Error('Failed to save the answer');
         }
 
-        return true; // Return true if query was successful
+        return true;
     } catch (error) {
         console.error('Error saving answer:', error);
-        return false; // Return false if error occurs
+        return false;
     }
 };

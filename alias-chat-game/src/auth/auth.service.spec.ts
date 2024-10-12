@@ -132,12 +132,16 @@ describe('AuthService', () => {
   describe('logout', () => {
     it('should logout the user and delete the refresh token', async () => {
       const userId = 'testUserId';
-      jest.spyOn(authModel, 'deleteOne').mockResolvedValueOnce({ deletedCount: 1 } as any);
+      jest
+        .spyOn(authModel, 'deleteOne')
+        .mockResolvedValueOnce({ deletedCount: 1 } as any);
 
       const result = await authService.logout(userId);
 
       expect(authModel.deleteOne).toHaveBeenCalledWith({ userId });
-      expect(result).toEqual({ message: 'User logged out successfully, refresh token deleted.' });
+      expect(result).toEqual({
+        message: 'User logged out successfully, refresh token deleted.',
+      });
     });
   });
 

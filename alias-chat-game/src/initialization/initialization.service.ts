@@ -5,6 +5,8 @@ import { CreateRoomDto } from '../rooms/dto/create-room.dto';
 import { CreateTeamDto } from '../teams/dto/create-team.dto';
 import { RoomsService } from '../rooms/rooms.service';
 import { TeamsService } from '../teams/teams.service';
+import { WordsService } from '../words/words.service';
+import { CreateWordDto } from '../words/dto/create-word.dto';
 
 @Injectable()
 export class InitializationService implements OnModuleInit {
@@ -12,11 +14,12 @@ export class InitializationService implements OnModuleInit {
     private readonly roomsService: RoomsService,
     private readonly teamsService: TeamsService,
     private readonly configService: ConfigService,
+    private readonly wordsService: WordsService,
   ) {}
 
   /**
    * Lifecycle hook that is called when the module is initialized.
-   * It triggers the creation of default rooms with teams.
+   * It triggers the creation of default rooms with teams and words if they do not exist.
    */
   async onModuleInit() {
     if (this.configService.get<string>('NODE_ENV') === 'development') {
@@ -24,7 +27,9 @@ export class InitializationService implements OnModuleInit {
       await this.teamsService.deleteAllTeams();
       await this.roomsService.deleteAllRooms();
     }
+
     await this.createDefaultRooms();
+    await this.createWords();
   }
 
   /**
@@ -51,14 +56,13 @@ export class InitializationService implements OnModuleInit {
 
   /**
    * Adds default teams to a specified room.
-   * The default teams created are Team1, Team2, and Team3, each initialized with an empty players array.
+   * The default teams created are Team1 and Team2, each initialized with an empty players array.
    * @param {Types.ObjectId} roomId - The ID of the room to which teams will be added.
    */
   private async addTeamsToRoom(roomId: Types.ObjectId) {
     const teams: (CreateTeamDto & { roomId: Types.ObjectId })[] = [
       { roomId, name: 'Team1', players: [] },
       { roomId, name: 'Team2', players: [] },
-      // { roomId, name: 'Team3', players: [] },
     ];
 
     const teamIds: Types.ObjectId[] = [];
@@ -69,5 +73,70 @@ export class InitializationService implements OnModuleInit {
     }
 
     await this.roomsService.updateTeam(roomId, teamIds);
+  }
+
+  /**
+   * Initializes the default set of words if none exist in the database.
+   */
+  private async createWords() {
+    const existingWords = await this.wordsService.findAll();
+    if (existingWords.length === 0) {
+      const words: CreateWordDto[] = [
+        {
+          word: 'bicycle',
+          similarWords: ['bike', 'cycle'],
+        },
+        {
+          word: 'garden',
+          similarWords: ['lawn', 'yard'],
+        },
+        {
+          word: 'airplane',
+          similarWords: ['plane'],
+        },
+        {
+          word: 'computer',
+          similarWords: ['laptop', 'pc'],
+        },
+        {
+          word: 'mountain',
+          similarWords: ['peak', 'massif'],
+        },
+        {
+          word: 'teacher',
+          similarWords: [
+            'educator',
+            'professor',
+            'tutor',
+            'lecturer',
+            'pedagogue',
+          ],
+        },
+        {
+          word: 'window',
+          similarWords: ['aperture', 'opening'],
+        },
+        {
+          word: 'candle',
+          similarWords: ['taper', 'wax', 'light'],
+        },
+        {
+          word: 'piano',
+          similarWords: ['grand', 'keyboard'],
+        },
+        {
+          word: 'bridge',
+          similarWords: ['link', 'overpass', 'platform'],
+        },
+      ];
+
+      for (const word of words) {
+        try {
+          await this.wordsService.create(word);
+        } catch (error) {
+          console.error(`Failed to create word '${word.word}':`, error.message);
+        }
+      }
+    }
   }
 }

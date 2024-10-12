@@ -3,6 +3,7 @@ import {
   forwardRef,
   Inject,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -36,8 +37,11 @@ export class TeamsService {
     roomId: Types.ObjectId,
     createTeamDto: CreateTeamDto,
   ): Promise<TeamDocument> {
-    const createdTeam = new this.teamModel({ ...createTeamDto, roomId });
-    return createdTeam.save();
+    const createdTeam = await this.teamModel.create({
+      ...createTeamDto,
+      roomId,
+    });
+    return createdTeam;
   }
 
   /**
@@ -356,13 +360,19 @@ export class TeamsService {
     roomId: Types.ObjectId,
     teamId: Types.ObjectId,
   ) {
+    Logger.log(`Start interval ${roomId}-${teamId}`);
+    let turnCounter = 0;
     const intervalId = setInterval(async () => {
       let team = await this.findTeamById(teamId);
-      if (team.tryedWords.length < 3) {
+      // Reset if game continues
+      if (turnCounter < 2) {
+        turnCounter++;
         team = await this.resetRound(roomId, teamId);
         team = await this.defineDescriberAndLeader(roomId, teamId);
       } else {
+        Logger.log(`Stop interval ${roomId}-${teamId}`);
         const room = await this.roomsService.findOne(roomId);
+        // Find winner team and save game results for players
         const topTeam = (
           await Promise.all(
             room.teams.map(async (teamId) => await this.findTeamById(teamId)),
@@ -376,7 +386,35 @@ export class TeamsService {
           ),
         );
         clearInterval(intervalId);
+        setTimeout(() => {
+          Logger.log(`Timeout start ${roomId}-${team._id}`);
+          this.resetTeam(team, roomId);
+        }, 10000);
       }
     }, 85000);
+  }
+
+  async resetTeam(team: TeamDocument, roomId: Types.ObjectId) {
+    // Remove all team players from room
+    const userIds = team.players;
+    const removedIds = [];
+    await Promise.all(
+      userIds.map(async (userId) => {
+        if (removedIds.indexOf(userId) !== -1) {
+          await this.roomsService.removeUserFromRoom(userId, roomId);
+          removedIds.push(userId);
+        }
+      }),
+    );
+    const newTeam: CreateTeamDto & { roomId: Types.ObjectId } = {
+      roomId,
+      name: team.name,
+      players: [],
+    };
+    // Remove old team from DB
+    this.remove(roomId, team._id);
+    // Add new team to DB
+    const createdTeam = await this.create(roomId, newTeam);
+    this.roomsService.updateTeam(roomId, [createdTeam._id]);
   }
 }
