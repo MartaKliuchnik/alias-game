@@ -5,8 +5,8 @@ import { Socket } from 'socket.io-client';
 import { AppModule } from '../../../app.module';
 import { CreateMessageDto } from '../../../messages/dto/create-message.dto';
 import * as io from 'socket.io-client';
-import { AuthGuard } from '../../../auth/gurards/auth.guard';
-import { mockAuthGuard } from '../../../teams/__mocks__/auth.guard.mock';
+import { AuthGuard } from '../../../auth/guards/auth.guard';
+import { mockAuthGuard } from '../../../users/__mocks__/auth.guard.mock';
 import { DatabaseService } from '../../../database/database.service';
 import { Connection, Types } from 'mongoose';
 
