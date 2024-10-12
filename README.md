@@ -22,7 +22,7 @@
    - Endpoint **/api/v1/users/{userId}/team/leave/{teamId}**
    - Endpoint **/api/v1/leaderboards**
 
-   4.2 [Room Management](#room-management)
+     4.2 [Room Management](#room-management)
 
    - Room data model
    - Endpoint **/api/v1/room**
@@ -31,7 +31,7 @@
    - Endpoint **/api/v1/rooms/:roomId**
    - Endpoint **/api/v1/rooms/:roomId**
 
-   4.3 [Team Management](#team-management)
+     4.3 [Team Management](#team-management)
 
    - Team data model.
    - Endpoint **/api/v1/rooms/{roomId}/teams**
@@ -41,15 +41,15 @@
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/describer**
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/leader**
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chat**
-   
-   4.4 [Chat Management](#chat-management)
+
+     4.4 [Chat Management](#chat-management)
 
    - Chat data model.
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chat**
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}**
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}**
 
-   4.5 [Message Management](#message-management)
+     4.5 [Message Management](#message-management)
 
    - Message data model.
    - Endpoint
@@ -57,18 +57,22 @@
    - Endpoint
      **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}/user/{userId}/messages**
 
-   4.6 [Word Management](#word-management)
+     4.6 [Word Management](#word-management)
+
    - Word data model
-   - Endpoint **/api/v1/word**
-   - Endpoint **/api/v1/words**
-   - Endpoint **/api/v1/words/:wordId**
-   - Endpoint **/api/v1/words/:wordId**
-   - Endpoint **/api/v1/words/:wordId**
+   - Endpoint **POST /api/v1/words**
+   - Endpoint **GET /api/v1/words**
+   - Endpoint **GET /api/v1/words/:wordId**
+   - Endpoint **PATCH /api/v1/words/:wordId**
+   - Endpoint **DELETE /api/v1/words/:wordId**
+   - Endpoint **POST /api/v1/words/random**
+   - Endpoint **POST /api/v1/words/:wordId/check-answer**
+   - Endpoint **POST /api/v1/words/:wordId/check-description**
 
 5. [Security](#security)
 6. [Testing](#testing)
-6. [Deployment](#deployment)
-7. [Future Enhancements](#future-enhancements)
+7. [Deployment](#deployment)
+8. [Future Enhancements](#future-enhancements)
 
 ## Description
 
@@ -2637,7 +2641,7 @@ Information about the word
 
 | Column Name  | Data Type | Description                     |
 | :----------- | :-------- | :------------------------------ |
-| \_id         | ObjectId  | Unique identifier for each word |
+| wordId       | ObjectId  | Unique identifier for each word |
 | word         | string    | Word name                       |
 | similarWords | string[]  | An array of similar words       |
 
@@ -2645,11 +2649,10 @@ Information about the word
 
 Endpoint
 
-- URL Path: **_/api/v1/word_**
+- URL Path: **_/api/v1/words_**
 - Description: This endpoint creates a new word. It accepts word details in the
   request body and returns a response indicating the result of the creating
   process.
-- Authentication: Authentication is required for this endpoint.
 
 **Request Body**
 
@@ -2665,7 +2668,7 @@ name and an array of similar words.
 
 ```
 
-curl -X POST http://localhost:8080/api/v1/word \
+curl -X POST http://localhost:8080/api/v1/words \
 -H "Content-Type: application/json" \
 -d '{
   "word": "apple",
@@ -2683,23 +2686,9 @@ success message and the data of the created word.
 
 ```
 {
-    "message": "Word created successfully.",
-    "data": {
-        "_id": "12456789",
-        "word": "apple",
-        "similarWords": ["", ""]
-    }
-}
-```
-
-Status code: **400 Bad Request**
-
-Description: The request was invalid because one or more of the provided fields
-did not meet the required format or were missing.
-
-```
-{
-    "message": "All fields are required and must be in a valid format."
+    "_id": "12456789",
+    "word": "apple",
+    "similarWords": ["", ""]
 }
 ```
 
@@ -2710,7 +2699,7 @@ because the word is already in use.
 
 ```
 {
-    "message": "The word with the specified name is already in use."
+    "message": "Word already exists."
 }
 ```
 
@@ -2752,20 +2741,26 @@ Description: The array of words has been successfully returned. The response
 includes a success message and the array of words.
 
 ```
-{
-    "message": "Words recieved successfully.",
-    "data": [
+[
     {
-        "_id": "12456789",
-        "word": "apple",
-        "similarWords": ["", ""]
+        "_id": "67094a0bb0125c7cc3dbe4f1",
+        "word": "bicycle",
+        "similarWords": [
+            "bike",
+            "cycle"
+        ],
+        "__v": 0
     },
     {
-        "_id": "12458942",
-        "word": "car",
-        "similarWords": ["", ""]
-    }]
-}
+        "_id": "67094a0bb0125c7cc3dbe4f4",
+        "word": "garden",
+        "similarWords": [
+            "lawn",
+            "yard"
+        ],
+        "__v": 0
+    }
+]
 ```
 
 Status Code: **401 Unauthorized**
@@ -2775,7 +2770,9 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 ```
 {
-    "message": "Token not found"
+    "message": "Token not found",
+    "error": "Unauthorized",
+    "statusCode": 401
 }
 ```
 
@@ -2818,12 +2815,13 @@ success message and the data of the word.
 
 ```
 {
-    "message": "Word recieved successfully.",
-    "data": {
-        "_id": "12456789",
-        "word": "apple",
-        "similarWords": ["", ""]
-    }
+    "_id": "67094a0bb0125c7cc3dbe4f1",
+    "word": "bicycle",
+    "similarWords": [
+        "bike",
+        "cycle"
+    ],
+    "__v": 0
 }
 ```
 
@@ -2833,13 +2831,17 @@ Description: The provided ID is invalid or missing.
 
 ```
 {
-    "message": "ID is required."
+    "message": "'Invalid word ID format."
 }
 ```
 
+Status Code: **404 Not Found Exception**
+
+Description: Can not found word with provided ID.
+
 ```
 {
-    "message": "Invalid ID."
+    "message": "Word with ID '${wordId}' not found."
 }
 ```
 
@@ -2904,28 +2906,37 @@ success message and the data of the updated word.
 
 ```
 {
-    "message": "Word recieved successfully.",
-    "data": {
-        "_id": "12456789",
-        "word": "tie",
-        "similarWords": ["", ""]
-    }
+    "word": "updatedWord",
+    "similarWords": [
+        "updatedSimilar1",
+        "updatedSimilar2"
+    ]
 }
 ```
 
 Status Code: **400 Bad Request**
 
-Description: The provided ID is invalid or missing.
+Description: The provided ID is invalid or missing. No field was provided to update.
 
 ```
 {
-    "message": "ID is required."
+    "message": "'Invalid word ID format."
 }
 ```
 
 ```
 {
-    "message": "Invalid ID."
+    "message": "At least one field must be updated."
+}
+```
+
+Status Code: **404 Not Found Exception**
+
+Description: Can not found word with provided ID.
+
+```
+{
+    "message": "Word with ID '${wordId}' not found."
 }
 ```
 
@@ -2947,7 +2958,7 @@ getting the word process.
 
 ```
 {
-    "message": "An unexpected error occurred during getting the word."
+    "message": "An unexpected error occurred during updatting the word."
 }
 ```
 
@@ -2979,7 +2990,7 @@ success message
 
 ```
 {
-    "message": "Wordd deleted successfully.",
+    "message": "Word successfully deleted.",
 }
 ```
 
@@ -2989,13 +3000,17 @@ Description: The provided ID is invalid or missing.
 
 ```
 {
-    "message": "ID is required."
+    "message": "'Invalid word ID format."
 }
 ```
 
+Status Code: **404 Not Found Exception**
+
+Description: Can not found word with provided ID.
+
 ```
 {
-    "message": "Invalid ID."
+    "message": "Word with ID '${wordId}' not found."
 }
 ```
 
@@ -3010,16 +3025,6 @@ token is invalid. Ensure that the correct authentication token is provided.
 }
 ```
 
-Status code: **404 Not Found**
-
-Description: This response indicates a missing word error.
-
-```
-{
-    "message": "The word with specified id doesnt exist"
-}
-```
-
 Status code: **500 Internal Server Error**
 
 Description: This response indicates an unexpected error occurred during the
@@ -3027,10 +3032,274 @@ getting the word process.
 
 ```
 {
-    "message": "An unexpected error occurred during getting the word."
+    "message": "An unexpected error occurred during deleting the word."
 }
+```
+
+#### 7. Get a random word for a team
+
+Endpoint
+
+- URL Path: **_/api/v1/words/random_**
+- Description: This endpoint retrieves a random word that has not been used by the team in the specified room. It ensures that only the current describer can request the word.
+- Authentication: Authentication is required for this endpoint.
+
+**Example Request**
+
+Description: A `POST` request to fetch a random word for the team.
 
 ```
+
+curl -X POST http://localhost:8080/api/v1/words/random \
+-H "Content-Type: application/json" \
+-d '{
+  "roomId": "650fae0b8a8b4c1d7b8f12d3",
+  "teamId": "650fae0b8a8b4c1d7b8f12e7"
+}'
+```
+
+**Request Body**
+
+- roomId: (string, required) The ID of the room where the team is located.
+- teamId: (string, required) The ID of the team requesting the word.
+
+**Example Responses**
+
+Status code: **200 OK**
+
+Description: A random word has been successfully returned along with the updated list of tried words.
+
+```
+{
+  "word": {
+    "_id": "6510a8c8f1234a6d8a8fefb9",
+    "word": "ocean",
+    "similarWords": ["sea", "water", "wave"],
+    "__v": 0
+  },
+  "tryedWords": [
+    "6510a8c8f1234a6d8a8fefb9"
+  ]
+}
+```
+
+Status Code: **400 Bad Request**
+
+Description: The request body is missing required fields or the provided data is not valid.
+
+```
+{
+  "message": "Invalid request. Both 'roomId' and 'teamId' are required."
+}
+```
+
+Status Code: **404 Not Found Exception**
+
+Description: The team was not found, or no unused words are available.
+
+```
+{
+    "message": "No unused words found."
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication or the requesting user is not the describer.
+
+```
+{
+    "message": "Only the describer can get a new word."
+}
+```
+
+Status code: **500 Internal Server Error**
+
+Description: An unexpected error occurred while trying to retrieve the word.
+
+```
+{
+    "message": "An unexpected error occurred while fetching the random word."
+}
+```
+
+#### 8. Check if the provided answer is correct
+
+Endpoint
+
+- URL Path: **_/api/v1/words/
+  /check-answer_**
+- Description: This endpoint checks if the provided answer matches the word or any of its similar words.
+- Authentication: Authentication is required for this endpoint.
+
+**Example Request**
+
+Description: A `POST` request to validate a user's answer for a specific word.
+
+```
+
+curl -X POST http://localhost:8080/api/v1/words/6510a8c8f1234a6d8a8fefb9/check-answer \
+-H "Content-Type: application/json" \
+-d '{
+  "answer": "bicycle"
+}'
+```
+
+**Request Parameters**
+
+- id: (string, required) The ID of the word being checked.
+
+**Request Body**
+
+- answer: (string, required) The user’s answer to be checked.
+
+**Example Responses**
+
+Status code: **200 OK**
+
+Description: The answer was successfully validated. The response indicates whether the answer is correct.
+
+```
+{
+  "correct": true
+}
+```
+
+Status Code: **400 Bad Request**
+
+Description: The provided ID is invalid or the request body is missing the answer.
+
+```
+{
+  "message": "Invalid word ID format or answer is required."
+}
+```
+
+Status Code: **404 Not Found**
+
+Description: The word with the provided ID was not found.
+
+```
+{
+  "message": "Word with ID '6510a8c8f1234a6d8a8fefb9' not found."
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided token is invalid.
+
+```
+{
+    "message": "Unauthorized access."
+}
+```
+
+Status code: **500 Internal Server Error**
+
+Description: This response indicates an unexpected error occurred during the answer validation process.
+
+```
+{
+  "message": "An unexpected error occurred while checking the answer."
+}
+```
+
+#### 9. Check if the provided description is valid
+
+Endpoint
+
+- URL Path: **_/api/v1/words/
+  /check-description_**
+- Description: This endpoint checks if the provided description does not contain the word or any of its similar words.
+- Authentication: Authentication is required for this endpoint.
+
+**Example Request**
+
+Description: A `POST` request to validate a user's description for a specific word.
+
+```
+curl -X POST http://localhost:8080/api/v1/words/6510a8c8f1234a6d8a8fefb9/check-description \
+-H "Content-Type: application/json" \
+-d '{
+  "description": "A vehicle with two wheels used for riding."
+}'
+```
+
+**Request Parameters**
+
+- id: (string, required) The ID of the word being checked.
+
+**Request Body**
+
+- description: (string, required) The description to be validated.
+
+**Example Responses**
+
+Status code: **200 OK**
+
+Description: The description was successfully validated. The response indicates whether the description is valid.
+
+```
+{
+  "correct": true
+}
+```
+
+Status Code: **400 Bad Request**
+
+Description: The provided ID is invalid or the request body is missing the description.
+
+```
+{
+  "message": "Invalid word ID format or description is required."
+}
+```
+
+Status Code: **404 Not Found**
+
+Description: The word with the provided ID was not found.
+
+```
+{
+  "message": "Word with ID '6510a8c8f1234a6d8a8fefb9' not found."
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided token is invalid.
+
+```
+{
+    "message": "Unauthorized access."
+}
+```
+
+Status code: **500 Internal Server Error**
+
+Description: This response indicates an unexpected error occurred during the description validation process.
+
+```
+{
+  "message": "An unexpected error occurred while checking the description."
+}
+```
+
+#### Word Comparison Logic
+
+The `checkAnswer` and `checkDescription` methods use a word comparison function to ensure that the user’s description does not include the target word or any of its similar words. Below is an overview of the compareWords method used in the comparison process:
+
+**Comparison Method Details**
+
+- `Exact Match`:
+  The words are first normalized by converting them to lowercase and trimming whitespace. If both words match exactly, the function returns true.
+
+- `Stemming`:
+  The method leverages Porter Stemming to compare the root form of both words. If the stemmed versions of the words match, they are considered similar.
+
+- `Levenshtein Distance`:
+  The Levenshtein distance measures the number of single-character edits required to change one word into another. A similarity threshold of 0.2 (or 20%) is used to determine if two words are close enough to be considered similar.
 
 ### Chat Management
 
@@ -3076,8 +3345,8 @@ successfull creation and chatId.
 
 ```json
 {
-	"message": "Chat was successfully created",
-	"chatId": "chatId1"
+  "message": "Chat was successfully created",
+  "chatId": "chatId1"
 }
 ```
 
@@ -3163,9 +3432,9 @@ of the requested chat.
 
 ```json
 {
-	"chatId": "chatId1",
-	"writeUsersId": ["userId1", "userId2"],
-	"messagesId": ["messageId1", "messageId2"]
+  "chatId": "chatId1",
+  "writeUsersId": ["userId1", "userId2"],
+  "messagesId": ["messageId1", "messageId2"]
 }
 ```
 
@@ -3348,7 +3617,7 @@ Description: The request was successful, and the response contains message ID.
 
 ```json
 {
-	"messageId": "messageId1"
+  "messageId": "messageId1"
 }
 ```
 
@@ -3464,17 +3733,17 @@ of the requested chat.
 
 ```json
 {
-	"messages": [
-		{
-			"messageId": "messageId1",
-			"user": {
-				"_id": "user",
-				"username": "user123"
-			},
-			"text": "Hello!",
-			"timestamp": "2024-09-25T10:05:00Z"
-		}
-	]
+  "messages": [
+    {
+      "messageId": "messageId1",
+      "user": {
+        "_id": "user",
+        "username": "user123"
+      },
+      "text": "Hello!",
+      "timestamp": "2024-09-25T10:05:00Z"
+    }
+  ]
 }
 ```
 
@@ -3570,10 +3839,10 @@ Client-side security is essential for safeguarding user data and ensuring a safe
 Testing is a crucial part of our development process, ensuring that our application functions correctly and efficiently. In our Node.js-Based Game "Alias" with Chat and Word Checking, we have implemented both unit and integration testing to maintain high code quality and reliability.
 
 - **Unit Testing:**
-Unit tests focus on verifying the functionality of individual components or functions in isolation. By testing these components independently, we can quickly identify and fix issues, ensuring that each part of the application behaves as expected. Our unit tests cover various modules and services, helping to catch bugs early in the development process.
+  Unit tests focus on verifying the functionality of individual components or functions in isolation. By testing these components independently, we can quickly identify and fix issues, ensuring that each part of the application behaves as expected. Our unit tests cover various modules and services, helping to catch bugs early in the development process.
 
 - **Integration Testing:**
-Integration tests check how different parts of the application work together. These tests simulate real-world scenarios to verify that components interact correctly and data flows seamlessly throughout the system. By implementing integration tests, we can ensure that the overall functionality of the application remains intact as new features are added or changes are made.
+  Integration tests check how different parts of the application work together. These tests simulate real-world scenarios to verify that components interact correctly and data flows seamlessly throughout the system. By implementing integration tests, we can ensure that the overall functionality of the application remains intact as new features are added or changes are made.
 
 With both unit and integration testing in place, we aim to deliver a robust and reliable application that meets user expectations and performs well in various scenarios.
 
@@ -3602,7 +3871,8 @@ cd alias-node-js/alias-client
 npm install
 ```
 
-#### 4. Install the dependencies 
+#### 4. Install the dependencies
+
 Set Environment Variables Create a .env file in the root directory of your project and define the necessary environment variables, such as database connection strings and API keys. Ensure sensitive data is not hardcoded in the source code.
 
 #### 5. Build the Application
@@ -3622,7 +3892,7 @@ npm run start
 As we continue to develop and improve our application, we have identified several key enhancements that will enhance user experience, increase security, and broaden accessibility. These future enhancements will help us meet user needs and keep pace with modern technology trends.
 
 - **Integration with Social Login Providers:**
-To simplify the authentication process for users, we plan to implement social login options, such as Google, Facebook, and GitHub. This enhancement not only makes it easier for users to log in but also improves security by utilizing the multi-factor authentication features provided by these platforms.
+  To simplify the authentication process for users, we plan to implement social login options, such as Google, Facebook, and GitHub. This enhancement not only makes it easier for users to log in but also improves security by utilizing the multi-factor authentication features provided by these platforms.
 
 - **Multi-language Support in the Chat System:**
-We aim to enhance our chat application by adding multi-language support. This feature will allow users from different regions to communicate more easily, breaking down language barriers. By integrating translation APIs (like Google Translate API or Microsoft Azure Translator), the system can automatically detect the language of messages and translate them into the recipient's preferred language. Users will have the option to select their preferred language during registration or within chat sessions, significantly improving their overall experience.
+  We aim to enhance our chat application by adding multi-language support. This feature will allow users from different regions to communicate more easily, breaking down language barriers. By integrating translation APIs (like Google Translate API or Microsoft Azure Translator), the system can automatically detect the language of messages and translate them into the recipient's preferred language. Users will have the option to select their preferred language during registration or within chat sessions, significantly improving their overall experience.
