@@ -1,16 +1,25 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import getTeamScoresInRoom from "../../fetchers/getTeamScoresInRoom";
 import getTeamAnswerRes from "../../fetchers/getTeamAnswerRes";
 import getWord from "../../fetchers/getWord";
 import Timer from "../../components/Timer/Timer";
 import { getTeam } from "../../fetchers/getTeam";
 
-// eslint-disable-next-line react/prop-types
 export default function TeamsResultPage({
-  roomId, teamId, teamObj, setTeam,
-  getTokens, getIdFromToken, setRole,
-  turnCounter, setTurnCounter }) {
+  roomId,
+  teamId,
+  teamObj,
+  setTeam,
+  getTokens,
+  getIdFromToken,
+  setRole,
+  turnCounter,
+  setTurnCounter,
+}) {
+  const access_token = getTokens().access_token;
   const navigate = useNavigate();
   const [teamResult, setTeamAnswerRes] = useState(null);
   const [fetchedWord, setFetchedWord] = useState("");
@@ -20,9 +29,9 @@ export default function TeamsResultPage({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await getTeamAnswerRes(roomId, teamId);
+        const result = await getTeamAnswerRes(roomId, teamId, access_token);
         setTeamAnswerRes(result);
-        const word = await getWord(result.selectedWord);
+        const word = await getWord(result.selectedWord, access_token);
         setFetchedWord(word);
       } catch (error) {
         setError(error.message);
@@ -35,7 +44,7 @@ export default function TeamsResultPage({
   useEffect(() => {
     const fetchTeams = async () => {
       try {
-        const fetchedTeams = await getTeamScoresInRoom(roomId);
+        const fetchedTeams = await getTeamScoresInRoom(roomId, access_token);
         setTeams(fetchedTeams);
       } catch (error) {
         setError(error.message);
@@ -57,29 +66,27 @@ export default function TeamsResultPage({
 
   const nextRound = async () => {
     if (turnCounter == 3) {
-      navigate('/final-page');
+      navigate("/final-page");
       return;
     }
     setTurnCounter(turnCounter + 1);
-    const token = getTokens().access_token;
-    const updatedTeam = await getTeam(roomId, teamId, token);
-    console.log(updatedTeam);
-    setTeam(updatedTeam)
+    const updatedTeam = await getTeam(roomId, teamId, access_token);
+    setTeam(updatedTeam);
     const userId = getIdFromToken();
     if (updatedTeam.describer != null && updatedTeam.teamLeader != null) {
       if (updatedTeam.describer == userId) {
-        setRole('describer');
-        navigate('/describer');
+        setRole("describer");
+        navigate("/describer");
         return;
       } else if (updatedTeam.teamLeader == userId) {
-        setRole('leader');
+        setRole("leader");
       } else {
-        setRole('player');
+        setRole("player");
       }
-      navigate('/wait-describer');
+      navigate("/wait-describer");
       return;
     }
-  }
+  };
 
   return (
     <div className="container my-8">

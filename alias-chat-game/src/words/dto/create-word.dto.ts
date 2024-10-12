@@ -19,7 +19,7 @@ export class CreateWordDto {
   @IsString({ message: 'Word must be a string.' })
   @MinLength(1, { message: 'Word must contain at least one character.' })
   @MaxLength(50, { message: 'Word must not exceed 50 characters.' })
-  @Matches(/^\S+$/, { message: 'Word must be a single word without spaces.' }) // Ensures the word is a single word
+  @Matches(/^\S+$/, { message: 'Word must be a single word without spaces.' })
   readonly word: string;
 
   /**

@@ -5,5 +5,7 @@ export const WordsService = jest.fn().mockReturnValue({
   findAll: jest.fn().mockResolvedValue([wordStub()]),
   findOne: jest.fn().mockResolvedValue(wordStub()),
   update: jest.fn().mockResolvedValue(wordStub()),
-  remove: jest.fn().mockResolvedValue({ message: 'Word succesfully deleted.' }),
+  remove: jest
+    .fn()
+    .mockResolvedValue({ message: 'Word successfully deleted.' }),
 });

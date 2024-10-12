@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { AuthGuard } from './gurards/auth.guard';
+import { AuthGuard } from './guards/auth.guard';
 
 /**
  * Controller for authorization endpoint.
@@ -15,7 +15,7 @@ export class AuthController {
      * Authorization service
      */
     private readonly authService: AuthService,
-  ) {}
+  ) { }
 
   /**
    * Endpoint method for registering a new user.

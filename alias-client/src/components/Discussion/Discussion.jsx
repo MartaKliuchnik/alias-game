@@ -32,8 +32,9 @@ export default function Discussion({
   setTeam,
   role,
   getIdFromToken,
+  getTokens,
 }) {
-  console.log("role: ", role);
+  const access_token = getTokens().access_token;
 
   const userId = getIdFromToken();
 
@@ -47,15 +48,15 @@ export default function Discussion({
     const fetchTeamData = async () => {
       try {
         // Fetch latest team details
-        const latestTeam = await getTeam(roomId, teamId);
+        const latestTeam = await getTeam(roomId, teamId, access_token);
         setTeam(latestTeam);
 
         // Fetch players info for the team
-        const players = await getPlayersFromRoom(roomId, teamId);
+        const players = await getPlayersFromRoom(roomId, teamId, access_token);
         setTeamPlayersInfo(players);
 
         // Fetch user info using userId
-        const userData = await getUserById(userId);
+        const userData = await getUserById(userId, access_token);
         if (userData) {
           setUserName(userData.username);
         }
@@ -80,7 +81,7 @@ export default function Discussion({
     if (isTimeUp) {
       role === "leader" ? navigate("/leader") : navigate("/wait-leader");
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isTimeUp, navigate]);
 
   return (
