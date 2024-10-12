@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { LeaderboardsService } from '../leaderboards.service';
 import { UsersService } from '../../users/users.service';
-import { userStub } from '../../users/test/stubs/user.stub';
+import { safeUserStub } from '../../users/test/stubs/safe-user.stub';
 import { InternalServerErrorException } from '@nestjs/common';
 
 describe('LeaderboardsService', () => {
@@ -27,12 +27,12 @@ describe('LeaderboardsService', () => {
 
   describe('getLeaderboards', () => {
     it('should return a list of users from the leaderboard', async () => {
-      mockUsersService.getUsers = jest.fn().mockResolvedValue([userStub()]);
+      mockUsersService.getUsers = jest.fn().mockResolvedValue([safeUserStub()]);
 
       const result = await laderboardsService.getLeaderboards();
 
       expect(mockUsersService.getUsers).toHaveBeenCalled();
-      expect(result).toEqual([userStub()]);
+      expect(result).toEqual([safeUserStub()]);
     });
 
     it('should return an empty array if users are not found', async () => {

@@ -20,13 +20,6 @@ import { LoggingMiddleware } from './middlewares/logging.middleware';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    // MongooseModule.forRootAsync({
-    //   imports: [ConfigModule],
-    //   inject: [ConfigService],
-    //   useFactory: async (configService: ConfigService) => ({
-    //     uri: `mongodb+srv://${configService.get<string>('MONGO_USERNAME')}:${configService.get<string>('MONGO_PASSWORD')}@alias1.odsrw.mongodb.net/${configService.get<string>('MONGO_DB')}?retryWrites=true&w=majority&appName=Alias1`,
-    //   }),
-    // }),
 
     UsersModule,
     TeamsModule,
