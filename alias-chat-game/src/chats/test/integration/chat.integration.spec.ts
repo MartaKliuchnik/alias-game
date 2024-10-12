@@ -70,7 +70,7 @@ describe('Chat And Message Integration Test', () => {
         .collection('messages')
         .findOne({ _id: new Types.ObjectId(message._id) });
 
-      expect(savedMessage).toBeDefined();
+      expect(savedMessage).toBeTruthy();
       expect(savedMessage.roomId).toEqual(createMessageDto.roomId);
       expect(savedMessage.teamId).toEqual(createMessageDto.teamId);
       expect(savedMessage.userId).toEqual(createMessageDto.userId);
