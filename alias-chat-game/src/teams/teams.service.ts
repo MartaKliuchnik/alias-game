@@ -37,8 +37,11 @@ export class TeamsService {
     roomId: Types.ObjectId,
     createTeamDto: CreateTeamDto,
   ): Promise<TeamDocument> {
-    const createdTeam = new this.teamModel({ ...createTeamDto, roomId });
-    return createdTeam.save();
+    const createdTeam = await this.teamModel.create({
+      ...createTeamDto,
+      roomId,
+    });
+    return createdTeam;
   }
 
   /**
