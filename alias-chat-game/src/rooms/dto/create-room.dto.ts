@@ -22,7 +22,6 @@ export class CreateRoomDto {
   /**
    * Array of IDs of teams
    */
-  @IsNotEmpty()
   @IsArray()
   @IsMongoId({ each: true })
   teams: string[];
