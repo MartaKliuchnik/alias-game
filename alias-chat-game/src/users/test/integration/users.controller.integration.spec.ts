@@ -10,7 +10,7 @@ import {
   createTestRoom,
   createTestTeam,
 } from '../stubs/test-data-creators.stub';
-import { AuthGuard } from '../../../auth/gurards/auth.guard';
+import { AuthGuard } from '../../../auth/guards/auth.guard';
 import { mockAuthGuard } from '../../__mocks__/auth.guard.mock';
 
 describe('UsersController (Integration)', () => {

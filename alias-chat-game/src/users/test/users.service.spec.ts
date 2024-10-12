@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from '../dto/update-user.dto';
-import { AuthGuard } from '../../auth/gurards/auth.guard';
+import { AuthGuard } from '../../auth/guards/auth.guard';
 import { mockAuthGuard } from '../__mocks__/auth.guard.mock';
 
 describe('UsersService (Unit)', () => {

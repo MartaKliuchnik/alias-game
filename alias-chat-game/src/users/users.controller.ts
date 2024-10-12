@@ -14,7 +14,7 @@ import { UserSafeDto } from './dto/user-safe.dto';
 import { ParseObjectIdPipe } from '../parse-id.pipe';
 import { Types } from 'mongoose';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AuthGuard } from '../auth/gurards/auth.guard';
+import { AuthGuard } from '../auth/guards/auth.guard';
 import { RoomsService } from '../rooms/rooms.service';
 import { TeamsService } from '../teams/teams.service';
 
