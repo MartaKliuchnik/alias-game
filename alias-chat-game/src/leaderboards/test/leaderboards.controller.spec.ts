@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { LeaderboardsController } from '../leaderboards.controller';
 import { LeaderboardsService } from '../leaderboards.service';
 import { UserSafeDto } from '../../users/dto/user-safe.dto';
-import { leaderboardStub } from './stubs/leaderboards.stub';
+import { leaderboardsStub } from './stubs/leaderboards.stub';
 
 jest.mock('../leaderboards.service');
 
@@ -37,7 +37,7 @@ describe('LeaderboardsController', () => {
       });
 
       test('then it should return an array of leaderboards', () => {
-        expect(leaderboards).toEqual(leaderboardStub());
+        expect(leaderboards).toEqual(leaderboardsStub());
       });
     });
   });
