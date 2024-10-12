@@ -356,7 +356,7 @@ describe('TeamsService', () => {
           new Types.ObjectId(),
           new Types.ObjectId(),
         ],
-        describer: null, \
+        describer: null,
       };
     });
 
