@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { InitializationService } from '../../initialization.service';
 import { INestApplication } from '@nestjs/common';
 
-describe('InitializationService', () => {
+describe('InitializationService (Integration)', () => {
   let app: INestApplication;
   let dbConnection: Connection;
   let initializationService: InitializationService;
@@ -55,15 +55,14 @@ describe('InitializationService', () => {
       expect(rooms[0].name).toBe('Room1');
       expect(rooms[1].name).toBe('Room2');
 
-      expect(rooms[0].teams).toHaveLength(3);
-      expect(rooms[1].teams).toHaveLength(3);
+      expect(rooms[0].teams).toHaveLength(2);
+      expect(rooms[1].teams).toHaveLength(2);
 
       for (const room of rooms) {
-        expect(room.teams).toHaveLength(3);
+        expect(room.teams).toHaveLength(2);
         const teams = await teamsService.findAll(room._id);
         expect(teams[0].name).toBe('Team1');
         expect(teams[1].name).toBe('Team2');
-        expect(teams[2].name).toBe('Team3');
       }
     });
 

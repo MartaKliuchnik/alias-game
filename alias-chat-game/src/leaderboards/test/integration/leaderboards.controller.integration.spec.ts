@@ -6,7 +6,7 @@ import * as request from 'supertest';
 import { createLeaderboardsStub } from '../stubs/create-leaderboards.stub';
 import { leaderboardsStub } from '../stubs/leaderboards.stub';
 
-describe('LeaderboardsController', () => {
+describe('LeaderboardsController (Integration)', () => {
   let dbConnection: Connection;
   let httpServer: any;
   let app: any;

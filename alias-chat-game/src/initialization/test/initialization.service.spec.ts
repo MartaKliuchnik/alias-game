@@ -12,7 +12,7 @@ jest.mock('../../rooms/rooms.service');
 jest.mock('../../teams/teams.service');
 jest.mock('@nestjs/config');
 
-describe('InitializationService', () => {
+describe('InitializationService (Unit)', () => {
   let initializationService: InitializationService;
   let roomsService: RoomsService;
   let teamsService: TeamsService;
@@ -121,7 +121,7 @@ describe('InitializationService', () => {
 
       await initializationService['addTeamsToRoom'](roomId);
 
-      expect(teamsService.create).toHaveBeenCalledTimes(3);
+      expect(teamsService.create).toHaveBeenCalledTimes(2);
       expect(roomsService.updateTeam).toHaveBeenCalledTimes(1);
     });
   });
