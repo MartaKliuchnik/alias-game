@@ -22,7 +22,7 @@ import { ParseObjectIdPipe } from '../parse-id.pipe';
  * including creating, retrieving, updating, and deleting words.
  */
 @Controller('words')
-//@UseGuards(AuthGuard)
+@UseGuards(AuthGuard)
 export class WordsController {
   constructor(
     /** Service for handling business logic related to words. */
