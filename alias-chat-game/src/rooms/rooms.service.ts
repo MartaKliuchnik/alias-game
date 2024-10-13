@@ -26,9 +26,8 @@ export class RoomsService {
   ) {}
 
   async create(createRoomDto: CreateRoomDto) {
-    const createdRoom = new this.roomModel(createRoomDto);
     try {
-      return await createdRoom.save();
+      return await this.roomModel.create(createRoomDto);
     } catch (error) {
       if (error.code === 11000) {
         throw new ConflictException(
@@ -54,9 +53,11 @@ export class RoomsService {
 
   async update(id: Types.ObjectId, updateRoomDto: UpdateRoomDto) {
     this.validateId(id);
-    const updatedRoom = await this.roomModel
-      .findByIdAndUpdate(id, updateRoomDto, { new: true })
-      .exec();
+    const updatedRoom = await this.roomModel.findByIdAndUpdate(
+      id,
+      updateRoomDto,
+      { new: true },
+    );
     if (!updatedRoom) {
       throw new NotFoundException(`Room with ID ${id} not found`);
     }
@@ -67,7 +68,7 @@ export class RoomsService {
   // api/v1/rooms/:roomId
   async delete(id: Types.ObjectId) {
     this.validateId(id);
-    const deletedRoom = await this.roomModel.findByIdAndDelete(id).exec();
+    const deletedRoom = await this.roomModel.findByIdAndDelete(id);
     if (!deletedRoom) {
       throw new NotFoundException(`Room with ID ${id} not found`);
     }
@@ -208,7 +209,7 @@ export class RoomsService {
    * @returns {Promise<{ message: string }>} - A message indicating the result of the deletion operation.
    */
   async deleteAllRooms(): Promise<{ message: string }> {
-    const { deletedCount } = await this.roomModel.deleteMany({}).exec();
+    const { deletedCount } = await this.roomModel.deleteMany({});
     return {
       message:
         deletedCount > 0

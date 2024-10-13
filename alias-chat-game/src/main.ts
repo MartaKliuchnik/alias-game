@@ -8,7 +8,6 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
 
-  // Set global API prefix for all routes
   app.setGlobalPrefix('api/v1');
 
   // Enable validation with whitelisting and forbidding non-whitelisted properties
@@ -19,7 +18,6 @@ async function bootstrap() {
     }),
   );
 
-  // Enable CORS (if needed)
   app.enableCors();
 
   const port = configService.get<number>('APP_PORT') || 4000;

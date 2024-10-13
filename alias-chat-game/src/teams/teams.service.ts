@@ -24,7 +24,7 @@ export class TeamsService {
     private readonly usersService: UsersService,
     @Inject(forwardRef(() => RoomsService))
     private readonly roomsService: RoomsService,
-  ) {}
+  ) { }
 
   /**
    * Creates a new team within a specified room.
@@ -100,6 +100,23 @@ export class TeamsService {
     const team = await this.findTeamById(teamId);
     if (!team) {
       throw new NotFoundException('Team not found.');
+    }
+    const roomTeams = await this.findAll(team.roomId);
+    let joined = false;
+    roomTeams.forEach((team) => {
+      team.players.forEach((playerId) => {
+        if (playerId.toString() == userId.toString()) {
+          joined = true;
+        }
+      });
+    });
+
+    if (joined) {
+      return {
+        message: `User ${userId.toString()} already joined to team`,
+        roomId: null,
+        teamId: null,
+      };
     }
 
     if (team.players.length >= this.MAX_USERS_IN_TEAM) {

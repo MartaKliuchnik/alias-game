@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
   UnauthorizedException,
+  ConflictException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
@@ -26,14 +27,15 @@ export class WordsService {
    *
    * @param createWordDto - The data transfer object containing word details.
    * @returns The created word document.
-   * @throws BadRequestException if the word already exists.
+   * @throws ConflictException if the word already exists.
    */
   async create(createWordDto: CreateWordDto): Promise<WordDocument> {
     const existingWord = await this.wordModel.findOne({
       word: createWordDto.word,
     });
+
     if (existingWord) {
-      throw new BadRequestException(
+      throw new ConflictException(
         `Word '${createWordDto.word}' already exists.`,
       );
     }
