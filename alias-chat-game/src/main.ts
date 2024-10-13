@@ -29,14 +29,14 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.use(
-    rateLimit({
-      windowMs: 15 * 60 * 1000, // 15 minutes
-      max: 1000, // Maximum of 1000 requests from one IP during this time
-      message: 'Too many requests from this IP, please try again later.',
-      headers: true, // Send the limit information in the header
-    }),
-  );
+  // app.use(
+  //   rateLimit({
+  //     windowMs: 15 * 60 * 1000, // 15 minutes
+  //     max: 1000, // Maximum of 1000 requests from one IP during this time
+  //     message: 'Too many requests from this IP, please try again later.',
+  //     headers: true, // Send the limit information in the header
+  //   }),
+  // );
 
   const port = configService.get<number>('APP_PORT') || 4000;
   await app.listen(port);
