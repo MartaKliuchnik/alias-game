@@ -24,12 +24,9 @@
 
    4.2 [Room Management](#room-management)
 
-   - Room data model
-   - Endpoint **/api/v1/room**
-   - Endpoint **/api/v1/room/:roomId**
+   - Room data model.
    - Endpoint **/api/v1/rooms**
-   - Endpoint **/api/v1/rooms/:roomId**
-   - Endpoint **/api/v1/rooms/:roomId**
+   - Endpoint **/api/v1/rooms/{roomId}**
 
    4.3 [Team Management](#team-management)
 
@@ -59,7 +56,7 @@
 
    4.6 [Word Management](#word-management)
 
-   - Word data model
+   - Word data model.
    - Endpoint **POST /api/v1/words**
    - Endpoint **GET /api/v1/words**
    - Endpoint **GET /api/v1/words/:wordId**
@@ -125,7 +122,7 @@ endpoint path. For instance, to access the registration endpoint:
 
 #### 1. User data model
 
-Information about users.
+Information about the user.
 
 | Column Name    | Data Type | Description                                  |
 | :------------- | :-------- | :------------------------------------------- |
@@ -1253,46 +1250,46 @@ request.
 
 #### 1. Room data model
 
-Information about the room
+Information about the room.
 
-| Column Name  | Data Type  | Description                                            |
-| :----------- | :--------- | :----------------------------------------------------- |
-| teamId       | ObjectId   | Unique identifier for each team                        |
-| roomId       | ObjectId   | Unique identifier for the team's room                  |
-| name         | string     | Username chosen by the user (must be unique)           |
-| score        | int        | Total points scored by the team during this game       |
-| players      | ObjectId[] | Array of ids of team's players                         |
-| describer    | ObjectId   | Unique identifier of the player who describes the word |
-| teamLeader   | ObjectId   | Unique identifier of the player who makes a word guess |
-| selectedWord | ObjectId   | Unique identifier for the record of the word to guess  |
-| tryedWords   | string[]   | Array of words tryed by players                        |
+| Column Name  | Data Type  | Description                                              |
+| :----------- | :--------- | :------------------------------------------------------- |
+| roomId       | ObjectId   | A unique identifier for each room                        |
+| name         | string     | The name of the room (must be unique)                    |
+| joinedUsers  | ObjectId[] | Array of ids of players currently joined in the room     |
+| teams        | ObjectId[] | Array of ids for the teams that are part of the room     |
+| turnTime     | int        | The time given for a turn                                |
 
-#### 2. GET `api/v1/v1/rooms/{roomId}/teams`
+#### 2. Create a new room
 
-- Description: Method to get all the room's teams.
+Endpoint
+
+- URL Path: **_/api/v1/rooms_**
+- Description: This endpoint creates a new room using the provided room data. It requires details such as the room name and other necessary configurations.
 - Authentication: This endpoint requires the user to be authenticated with a
-  valid access token
+  valid access token.
 
 **Request Body**
 
 The request body must be in JSON format and include the following fields:
 
-- name: (string, required): The name of the new room. Must be unique
-- teams: (array of teams, required): The array of created teams
-- turnTime: (time, required): The time given for a turn
+- name: The name of the room. Must be unique
+- teams: The array of created teams.
+- turnTime: The time given for a turn.
 
 **Example Request**
 
 Description: A `POST` request to the room creation endpoint. It includes a room
-name, an array of created teams and turn time.
+name, an empty array or array of created teams and turn time.
 
 ```
-curl -X POST http://localhost:8080/api/v1/room \
+curl -X POST http://localhost:8080/api/v1/rooms \
+-H "Authorization: Bearer access_token" \
 -H "Content-Type: application/json" \
 -d '{
   "name": "test_room",
-  "teams": [ObjectId, ObjectId],
-  "turnTime": 30
+  "teams": [],
+  "turnTime": 60
 }
 ```
 
@@ -1300,31 +1297,45 @@ curl -X POST http://localhost:8080/api/v1/room \
 
 Status code: **201 Created**
 
-Description: The room has been successfully created. The response includes a
-success message and the data of the created room.
+Description: This status indicates that the room was successfully created, and the server returns the newly created room details.
 
 ```
 {
-    "message": "Room created successfully.",
-    "data": {
-        "_id": "1245678",
-        "name": "test_room",
-        "joinedUsers": [],
-        "teams": [ObjectId, ObjectId],
-        "createdAt": "Date/time",
-        "turnTime": 30
-    }
+    "name": "test_room",
+    "joinedUsers": [],
+    "teams": [],
+    "turnTime": 60,
+    "_id": "670bbb213bcef0e9e1d325c3",
+    "createdAt": "2024-10-13T12:20:49.767Z",
+    "updatedAt": "2024-10-13T12:20:49.767Z",
 }
 ```
 
 Status code: **400 Bad Request**
 
-Description: The request was invalid because one or more of the provided fields
-did not meet the required format or were missing.
+Description: The request body must contain valid room data. Ensure all required fields are included.
 
 ```
 {
-    "message": "All fields are required and must be in a valid format."
+    "message": [
+        "name should not be empty",
+        "each value in teams must be a mongodb id",
+        "teams must be an array",
+        "turnTime must not be greater than 250",
+        "turnTime must not be less than 15",
+        "turnTime must be an integer number"
+    ]
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
+
+```
+{
+    "message": "Token not found"
 }
 ```
 
@@ -1335,7 +1346,7 @@ because the room name is already in use.
 
 ```
 {
-    "message": "The room with the specified name is already in use."
+    "message": "Room with name test_room already exists"
 }
 ```
 
@@ -1346,49 +1357,82 @@ creation process.
 
 ```
 {
-    "message": "An unexpected error occurred during creation."
+    "message": "Could not create room"
 }
 ```
 
-#### 3. Join to the room
+#### 3. Update a specific room by ID
 
 Endpoint
 
-- URL Path: **_/api/v1/room/:roomId_**
-- Description: This endpoint joins a user to specific room. It accepts userId in
-  the request body and returns a response indicating the result of the joining
-  process.
-- Authentication: Authentication is required for this endpoint.
+- URL Path: **_/api/v1/rooms/{roomId}_**
+- Description: This endpoint updates the details of a specific room based on the provided room ID. It allows for partial updates to the room's information.
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token.
+
+**Request Parameter**
+
+The request must include the following parameter:
+
+- roomId: The unique identifier of the room to update.
+
+**Query Parameter**
+
+- joinedUsers: An array of joined users' IDs.
+- name (optional): The name of the room. Must be unique
+- teams (optional): The array of created teams.
+- turnTime (optional): The time given for a turn.
+
+**Example Request**
+
+Description: A `PATCH` request to update a specific room, including the room ID in the URL and the updated data in the body.
+
+```
+curl -X PUT http://localhost:8080/api/v1/rooms/670bbb213bcef0e9e1d325c3 \
+-H "Authorization: Bearer access_token" \
+-H "Content-Type: application/json" \
+-d '{
+    "joinedUsers": ["64a0d5fa3b9c680017d68c38", "64a0d5fa3b9c680017d68c56"]
+}
+```
 
 **Example Responses**
 
 Status code: **200 OK**
 
-Description: The user has been successfully joined. The response includes a
-success message and the data of the room.
+Description: This status indicates that the room was successfully updated, and the server returns the updated room details.
 
 ```
 {
-    "message": "User joined successfully.",
-    "data": {
-        "_id": "1245678",
-        "name": "test_room",
-        "joinedUsers": [ObjectId],
-        "teams": [ObjectId, ObjectId],
-        "createdAt": "Date/time",
-        "turnTime": 30
-    }
+    "_id": "670bbb213bcef0e9e1d325c3",
+    "name": "test_room",
+    "joinedUsers": ["64a0d5fa3b9c680017d68c38", "64a0d5fa3b9c680017d68c56"],
+    "teams": ["66fdbf1df0eaf8e493933dfe", "66fdbf1df0eaf8e493933drt", "66fdbf1df0eaf8e493933df7"],
+    "turnTime": 60,
+    "createdAt": "2024-10-13T12:20:49.767Z",
+    "updatedAt": "2024-10-13T12:40:49.767Z",
 }
 ```
 
-Status code: **400 Bad Request**
+Status Code: **400 Bad Request**
 
-Description: The request was invalid because one or more of the provided fields
-did not meet the required format or were missing.
+Description: The provided room ID is invalid or improperly formatted.
 
 ```
 {
-    "message": "All fields are required and must be in a valid format."
+    "message": "Invalid ObjectId"
+}
+```
+
+Description: The request body must contain valid room data. Ensure all required fields are correctly formatted.
+
+```
+{
+    "message": [
+        "each value in joinedUsers must be a mongodb id",
+        "joinedUsers must be an array",
+        "joinedUsers should not be empty"
+    ]
 }
 ```
 
@@ -1403,74 +1447,56 @@ token is invalid. Ensure that the correct authentication token is provided.
 }
 ```
 
-Status code: **409 Conflict**
+Status Code: **404 Not Found**
 
-Description: This response indicates that the request could not be processed
-because the user is already joined.
-
-```
-{
-    "message": "The user with the specified id is already joined."
-}
-```
-
-Status code: **500 Internal Server Error**
-
-Description: This response indicates an unexpected error occurred during the
-joining process.
+Description: This status indicates that the specified room ID does not exist in the system.
 
 ```
 {
-    "message": "An unexpected error occurred during registration."
+    "message": "Room with ID 64a0d5fa3b9c680017d68c38 not found"
 }
 ```
 
-#### 4. Get all rooms
+#### 4. Retrieve all rooms
 
 Endpoint
 
 - URL Path: **_/api/v1/rooms_**
-- Description: This endpoint returns all created rooms.
-- Authentication: Authentication is required for this endpoint.
+- Description: This endpoint retrieves a list of all rooms in the system, providing details for each room.
+- Authentication: This endpoint requires the user to be authenticated with a valid access token.
 
 **Example Request**
 
-Description: A `GET` request to the getting all rooms endpoint.
+Description: A `GET` request to retrieve all rooms.
 
 ```
-
 curl -X GET http://localhost:8080/api/v1/rooms \
--H "Content-Type: application/json"
-
+-H "Authorization: Bearer access_token" \
 ```
 
 **Example Responses**
 
 Status code: **200 OK**
 
-Description: The array of rooms has been successfully returned. The response
-includes a success message and the array of rooms.
+Description: This status indicates that the request was successful, and the server returns a list of all rooms.
 
 ```
 {
-    "message": "Rooms recieved successfully.",
-    "data": [
-    {
-        "_id": "1245678",
-        "name": "test_room",
-        "joinedUsers": [ObjectId],
-        "teams": [ObjectId, ObjectId],
-        "createdAt": "Date/time",
-        "turnTime": 30
+    [
+        {
+        "_id": "670bbb1f3bcef0e9e1d325b3",
+        "name": "Room1",
+        "joinedUsers": [],
+        "teams": [
+            "670bbb1f3bcef0e9e1d325b5",
+            "670bbb1f3bcef0e9e1d325b7"
+        ],
+        "turnTime": 60,
+        "createdAt": "2024-10-13T12:20:47.776Z",
+        "updatedAt": "2024-10-13T12:20:47.940Z",
     },
-    {
-        "_id": "12456789",
-        "name": "test_room2",
-        "joinedUsers": [ObjectId, ObjectId],
-        "teams": [ObjectId, ObjectId],
-        "createdAt": "Date/time",
-        "turnTime": 25
-    }]
+    ...
+    ]
 }
 ```
 
@@ -1485,70 +1511,58 @@ token is invalid. Ensure that the correct authentication token is provided.
 }
 ```
 
-Status code: **500 Internal Server Error**
-
-Description: This response indicates an unexpected error occurred during the
-getting all rooms process.
-
-```
-{
-    "message": "An unexpected error occurred during getting all rooms."
-}
-```
-
-#### 5. Get the room by id
+#### 5. Retrieve a specific room by ID
 
 Endpoint
 
-- URL Path: **_/api/v1/rooms/:roomId_**
-- Description: This endpoint returns room with the specified id.
-- Authentication: Authentication is required for this endpoint.
+- URL Path: **_/api/v1/rooms/{roomId}_**
+- Description: This endpoint retrieves the details of a specific room based on the provided room ID. It returns room information.
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token.
+
+**Request Parameter**
+
+The request must include the following parameter:
+
+- roomId: The unique identifier of the room to retrieve.
 
 **Example Request**
 
-Description: A `GET` request to the getting room endpoint.
+Description: A `GET` request to the room details endpoint, including the room's ID in the URL.
 
 ```
-
-curl -X GET http://localhost:8080/api/v1/rooms/:id \
--H "Content-Type: application/json"
-
+curl -X GET http://localhost:8080/api/v1/rooms/64a0d5fa3b9c680017d68c37 \
+-H "Authorization: Bearer access_token" \
 ```
 
 **Example Responses**
 
 Status code: **200 OK**
 
-Description: The room has been successfully returned. The response includes a
-success message and the data of the room.
+Description: This status indicates that the request was successful, and the server returns the requested room details.
 
 ```
 {
-    "message": "Room recieved successfully.",
-    "data": {
-        "_id": "1245678",
-        "name": "test_room",
-        "joinedUsers": [ObjectId],
-        "teams": [ObjectId, ObjectId],
-        "createdAt": "Date/time",
-        "turnTime": 30
-    }
+    "_id": "670bbb1f3bcef0e9e1d325b3",
+    "name": "Room1",
+    "joinedUsers": [],
+    "teams": [
+        "670bbb1f3bcef0e9e1d325b5",
+        "670bbb1f3bcef0e9e1d325b7"
+    ],
+    "turnTime": 60,
+    "createdAt": "2024-10-13T12:20:47.776Z",
+    "updatedAt": "2024-10-13T12:20:47.940Z"
 }
 ```
 
 Status Code: **400 Bad Request**
 
-Description: The provided ID is invalid or missing.
+Description: The provided room ID is invalid or improperly formatted.
 
 ```
 {
-    "message": "ID is required."
-}
-```
-
-```
-{
-    "message": "Invalid ID."
+    "message": "Invalid ObjectId"
 }
 ```
 
@@ -1563,62 +1577,53 @@ token is invalid. Ensure that the correct authentication token is provided.
 }
 ```
 
-Status code: **500 Internal Server Error**
+Status Code: **404 Not Found**
 
-Description: This response indicates an unexpected error occurred during the
-getting the room process.
+Description: This status indicates that the specified room ID does not exist in the system.
 
 ```
 {
-    "message": "An unexpected error occurred during getting the room."
+    "message": "Room with ID 64a0d5fa3b9c680017d68c38 not found"
 }
 ```
 
-#### 6. Delete the room
+#### 6. Delete a specific room by ID
 
 Endpoint
 
-- URL Path: **_/api/v1/rooms/:roomId_**
-- Description: This endpoint deletes room with the specified id.
-- Authentication: Authentication is required for this endpoint.
+- URL Path: **_/api/v1/rooms/{roomId}_**
+- Description: This endpoint deletes a specific room based on the provided room ID. If the room is successfully deleted, no content is returned.
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token.
+
+**Request Parameter**
+
+The request must include the following parameter:
+
+- roomId: The unique identifier of the room to delete.
 
 **Example Request**
 
-Description: A `DELETE` request to the deleting room endpoint.
+Description: A `DELETE` request to the room deletion endpoint, including the room's ID in the URL.
 
 ```
-
-curl -X DELETE http://localhost:8080/api/v1/rooms/:id \
--H "Content-Type: application/json"
-
+curl -X DELETE http://localhost:8080/api/v1/rooms/64a0d5fa3b9c680017d68c37 \
+-H "Authorization: Bearer access_token" \
 ```
 
 **Example Responses**
 
-Status code: **204 DELETED**
+Status code: **204 No Content**
 
-Description: The room has been successfully deleted. The response includes a
-success message
-
-```
-{
-    "message": "Room deleted successfully.",
-}
-```
+Description: This status indicates that the request was successful, and the room has been deleted. No content is returned in the response.
 
 Status Code: **400 Bad Request**
 
-Description: The provided ID is invalid or missing.
+Description: The provided room ID is invalid or improperly formatted.
 
 ```
 {
-    "message": "ID is required."
-}
-```
-
-```
-{
-    "message": "Invalid ID."
+    "message": "Invalid ObjectId"
 }
 ```
 
@@ -1635,22 +1640,67 @@ token is invalid. Ensure that the correct authentication token is provided.
 
 Status code: **404 Not Found**
 
-Description: This response indicates a missing room error.
+Description: This status indicates that the specified room ID does not exist in the system.
 
 ```
 {
-    "message": "The room with specified id doesnt exist"
+    "message": "Room with ID 64a0d5fa3b9c680017d68c37 not found"
 }
 ```
 
-Status code: **500 Internal Server Error**
+#### 7. Delete all rooms
 
-Description: This response indicates an unexpected error occurred during the
-getting the room process.
+Endpoint
+
+- URL Path: **_/api/v1/rooms_**
+- Description: This endpoint deletes all rooms in the database. It returns a message indicating the result of the deletion operation.
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token.
+
+**Example Request**
+
+Description: A `DELETE` request to the endpoint for deleting all rooms.
+
+```
+curl -X DELETE http://localhost:8080/api/v1/rooms \
+-H "Authorization: Bearer access_token" \
+```
+
+**Example Responses**
+
+Status code: **200 OK**
+
+Description: This status indicates that the request was successful, and the server returns a message indicating the number of rooms deleted or if no rooms were found.
 
 ```
 {
-    "message": "An unexpected error occurred during getting the room."
+    "message": "Successfully deleted 6 rooms."
+}
+```
+```
+{
+    "message": "No rooms found to delete."
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
+
+```
+{
+    "message": "Token not found"
+}
+```
+
+Status code: **404 Not Found**
+
+Description: This status indicates that the specified room ID does not exist in the system.
+
+```
+{
+    "message": "Room with ID 64a0d5fa3b9c680017d68c37 not found"
 }
 ```
 
@@ -1658,7 +1708,7 @@ getting the room process.
 
 #### 1. Team data model
 
-Information about users.
+Information about the team.
 
 | Column Name  | Data Type  | Description                                                                  |
 | :----------- | :--------- | :--------------------------------------------------------------------------- |
