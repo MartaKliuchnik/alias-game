@@ -22,7 +22,7 @@
    - Endpoint **/api/v1/users/{userId}/team/leave/{teamId}**
    - Endpoint **/api/v1/leaderboards**
 
-     4.2 [Room Management](#room-management)
+   4.2 [Room Management](#room-management)
 
    - Room data model
    - Endpoint **/api/v1/room**
@@ -31,7 +31,7 @@
    - Endpoint **/api/v1/rooms/:roomId**
    - Endpoint **/api/v1/rooms/:roomId**
 
-     4.3 [Team Management](#team-management)
+   4.3 [Team Management](#team-management)
 
    - Team data model.
    - Endpoint **/api/v1/rooms/{roomId}/teams**
@@ -49,7 +49,7 @@
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}**
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}**
 
-     4.5 [Message Management](#message-management)
+   4.5 [Message Management](#message-management)
 
    - Message data model.
    - Endpoint
@@ -57,7 +57,7 @@
    - Endpoint
      **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}/user/{userId}/messages**
 
-     4.6 [Word Management](#word-management)
+   4.6 [Word Management](#word-management)
 
    - Word data model
    - Endpoint **POST /api/v1/words**
@@ -2276,9 +2276,9 @@ Description: The player was successfully added to the team.
 
 ```
 {
-    message: "Player added to the team successfully.",
-    roomId: 670b835b0824fd6e01fe418e,
-    teamId: 670b83a30824fd6e01fe4190,
+    "message": "Player added to the team successfully.",
+    "roomId": 670b835b0824fd6e01fe418e,
+    "teamId": 670b83a30824fd6e01fe4190,
 }
 ```
 
@@ -2293,7 +2293,9 @@ Description: The team is already full or the user is already in the team.
 ```
 ```
 {
-    "message": "User is already in the team."
+    "message": "User 64a0d5fa3b9c680017d68c45 already joined to team",
+    "roomId": null,
+    "teamId": null,
 }
 ```
 
