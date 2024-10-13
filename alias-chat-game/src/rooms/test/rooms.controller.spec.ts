@@ -53,7 +53,10 @@ describe('RoomsController', () => {
     it('should call update with correct data', async () => {
       const id = new Types.ObjectId();
       const updateRoomDto: UpdateRoomDto = {
-        joinedUsers: ['6703ffd7ba4a6b1dcf6095e6', '6703fff1ba4a6b1dcf609705'] as unknown as Types.ObjectId[]
+        joinedUsers: [
+          '6703ffd7ba4a6b1dcf6095e6',
+          '6703fff1ba4a6b1dcf609705',
+        ] as unknown as Types.ObjectId[],
       };
       mockRoomsService.update.mockResolvedValue(updateRoomDto);
 

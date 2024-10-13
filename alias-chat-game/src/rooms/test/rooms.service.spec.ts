@@ -144,7 +144,10 @@ describe('RoomsService', () => {
   describe('update', () => {
     it('should update and return the room', async () => {
       const updateRoomDto: UpdateRoomDto = {
-        joinedUsers: ['6703ffd7ba4a6b1dcf6095e6', '6703fff1ba4a6b1dcf609705'] as unknown as Types.ObjectId[]
+        joinedUsers: [
+          '6703ffd7ba4a6b1dcf6095e6',
+          '6703fff1ba4a6b1dcf609705',
+        ] as unknown as Types.ObjectId[],
       };
 
       roomModel.findByIdAndUpdate.mockResolvedValue(mockRoom);
@@ -218,7 +221,9 @@ describe('RoomsService', () => {
     });
 
     it('should add teams to the room and return the updated room', async () => {
-      jest.spyOn(roomModel, 'findByIdAndUpdate').mockResolvedValue(mockUpdatedRoom);
+      jest
+        .spyOn(roomModel, 'findByIdAndUpdate')
+        .mockResolvedValue(mockUpdatedRoom);
 
       const result = await service.updateTeam(roomId, teamIds);
 
