@@ -22,7 +22,7 @@
    - Endpoint **/api/v1/users/{userId}/team/leave/{teamId}**
    - Endpoint **/api/v1/leaderboards**
 
-     4.2 [Room Management](#room-management)
+   4.2 [Room Management](#room-management)
 
    - Room data model
    - Endpoint **/api/v1/room**
@@ -31,25 +31,25 @@
    - Endpoint **/api/v1/rooms/:roomId**
    - Endpoint **/api/v1/rooms/:roomId**
 
-     4.3 [Team Management](#team-management)
+   4.3 [Team Management](#team-management)
 
    - Team data model.
    - Endpoint **/api/v1/rooms/{roomId}/teams**
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}**
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/players**
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/players/{userId}**
-   - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/describer**
-   - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/leader**
-   - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chat**
-
-     4.4 [Chat Management](#chat-management)
+   - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/roles**
+   - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/reset**
+   - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/calculate-scores**
+   
+   4.4 [Chat Management](#chat-management)
 
    - Chat data model.
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chat**
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}**
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}**
 
-     4.5 [Message Management](#message-management)
+   4.5 [Message Management](#message-management)
 
    - Message data model.
    - Endpoint
@@ -57,7 +57,7 @@
    - Endpoint
      **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}/user/{userId}/messages**
 
-     4.6 [Word Management](#word-management)
+   4.6 [Word Management](#word-management)
 
    - Word data model
    - Endpoint **POST /api/v1/words**
@@ -1660,124 +1660,36 @@ getting the room process.
 
 Information about users.
 
-| Column Name  | Data Type  | Description                                            |
-| :----------- | :--------- | :----------------------------------------------------- |
-| teamId       | ObjectId   | Unique identifier for each team                        |
-| roomId       | ObjectId   | Unique identifier for the team's room                  |
-| name         | string     | Username chosen by the user (must be unique)           |
-| score        | int        | Total points scored by the team during this game       |
-| players      | ObjectId[] | Array of ids of team's players                         |
-| describer    | ObjectId   | Unique identifier of the player who describes the word |
-| teamLeader   | ObjectId   | Unique identifier of the player who makes a word guess |
-| selectedWord | ObjectId   | Unique identifier for the record of the word to guess  |
-| tryedWords   | string[]   | Array of words tryed by players                        |
+| Column Name  | Data Type  | Description                                                                  |
+| :----------- | :--------- | :--------------------------------------------------------------------------- |
+| teamId       | ObjectId   | Unique identifier for each team                                              |
+| roomId       | ObjectId   | Unique identifier for the team's room                                        |
+| name         | string     | Name of the team                                                             |
+| teamScore    | int        | Total points scored by the team during this game                             |
+| selectedWord | ObjectId   | Unique identifier for the record of the word to guess                        |
+| players      | ObjectId[] | Array of unique identifiers for players on the team                          |
+| chatId       | ObjectId   | Unique identifier for the team's chat room                                   |
+| describer    | ObjectId   | Unique identifier of the player who describes the word                       |
+| description  | string     | Description of the word provided by the describer                            |
+| tryedWords   | ObjectId[] | Array of unique identifiers for words attempted by the team during the game  |
+| teamLeader   | ObjectId   | Unique identifier of the player who makes a word guess                       |
+| success      | boolean    | Status indicating if the word was successfully guessed                       |
+| answer       | string     | The team's submitted guess                                                   |
 
-#### 2. GET `api/v1/v1/rooms/{roomId}/teams`
+#### 2. Add a new team to a room
 
-- Description: Method to get all the room's teams.
+Endpoint
+
+- URL Path: **_/api/v1/rooms/{roomId}/teams_**
+- Description: This endpoint allows the creation of a new team within a specific game room.
 - Authentication: This endpoint requires the user to be authenticated with a
-  valid access token
+  valid access token.
 
-**Request Body**
+**Request Parameter**
 
-Empty
+The request must include the following path parameter:
 
-**Example Request**
-
-Description: A `GET` request to retrieve a list of all teams in a specific room.
-
-```sh
-curl -X GET http://localhost:8080/api/v1/rooms/{roomId}/teams \
--H "Authorization: Bearer access_token"
-```
-
-**Example Responses**
-
-Status code: **200 OK**
-
-Description: The request was successful, and the response contains an array of
-team objects.
-
-```
-[
-    {
-        "teamId": "60d5f9a2b0f8b8e17a15f5f1",
-        "roomId": "60d5f9a2b0f8b8e17a15f5f0",
-        "name": "Alpha Team",
-        "score": 250,
-        "players": [
-            "60d5f9a2b0f8b8e17a15f5f2",
-            "60d5f9a2b0f8b8e17a15f5f3"
-        ],
-        "describer": "60d5f9a2b0f8b8e17a15f5f2",
-        "teamLeader": "60d5f9a2b0f8b8e17a15f5f3",
-        "selectedWord": "60d5f9a2b0f8b8e17a15f5f4",
-        "tryedWords": ["apple", "banana", "orange"]
-    },
-    {
-        "teamId": "60d5f9a2b0f8b8e17a15f5f5",
-        "roomId": "60d5f9a2b0f8b8e17a15f5f0",
-        "name": "Beta Team",
-        "score": 180,
-        "players": [
-            "60d5f9a2b0f8b8e17a15f5f6",
-            "60d5f9a2b0f8b8e17a15f5f7"
-        ],
-        "describer": "60d5f9a2b0f8b8e17a15f5f6",
-        "teamLeader": "60d5f9a2b0f8b8e17a15f5f7",
-        "selectedWord": "60d5f9a2b0f8b8e17a15f5f8",
-        "tryedWords": ["grape", "peach"]
-    }
-]
-```
-
-Status Code: **401 Unauthorized**
-
-Description: The request lacks proper authentication credentials or the provided
-token is invalid. Ensure that the correct authentication token is provided.
-
-```
-{
-    "message": "Token not found"
-}
-```
-
-Status Code: **403 Forbidden**
-
-Description: The user does not have the required permissions to access the teams
-in this room.
-
-```
-{
-    "message": "Access denied. Insufficient permissions."
-}
-```
-
-Status Code: **404 Not Found**
-
-Description: The specified room cannot be found.
-
-```
-{
-    "message": "Room was not found."
-}
-```
-
-Status code: **500 Internal Server Error**
-
-Description: The server encountered an unexpected error while processing the
-request.
-
-```
-{
-    "message": "An unexpected error occurred while retrieving the teams."
-}
-```
-
-#### 3. POST `api/v1/rooms/{roomId}/teams`
-
-Description: Method to create a new team in the specified room. Authentication:
-This endpoint requires the user to be authenticated with a valid access token.
+- roomId: The unique identifier of the room where the team will be created.
 
 **Request Body:**
 
@@ -1789,55 +1701,48 @@ This endpoint requires the user to be authenticated with a valid access token.
 Description: A `POST` request to create a new team in a specific room.
 
 ```
-curl -X POST http://localhost:8080/api/v1/rooms/{roomId}/teams \
+curl -X PUT http://localhost:8080/api/v1/rooms/670aa84ac626acf113cc3b56/teams \
 -H "Authorization: Bearer access_token" \
 -H "Content-Type: application/json" \
 -d '{
-    "name": "Gamma Team",
-    "players": [
-        "60d5f9a2b0f8b8e17a15f5f2",
-        "60d5f9a2b0f8b8e17a15f5f3"
-    ],
-    "describer": "60d5f9a2b0f8b8e17a15f5f2",
-    "teamLeader": "60d5f9a2b0f8b8e17a15f5f3",
-    "selectedWord": "60d5f9a2b0f8b8e17a15f5f4",
-    "tryedWords": []
-}
-
+    "name": "Team Avengers",
+    "players": ["66fdbf1df0eaf8e493933dfe", "66f8f82f027b5bb2be6d0de9", "66f8f812027b5bb2be6d0de6"]
+}'
 ```
 
 **Example Responses**
 
-Status code: **201 Created**
+Status Code: **200 OK**
 
-Description: The team was successfully created, and the response contains the
-created team object.
+Description: The team was successfully created in the specified room, and the team details are returned.
 
 ```
 {
-    "teamId": "60d5f9a2b0f8b8e17a15f5f9",
-    "roomId": "60d5f9a2b0f8b8e17a15f5f0",
-    "name": "Gamma Team",
-    "score": 0,
+    "roomId": "670aa84ac626acf113cc3b56",
+    "name": "Team Avengers",
+    "teamScore": 0,
     "players": [
-        "60d5f9a2b0f8b8e17a15f5f2",
-        "60d5f9a2b0f8b8e17a15f5f3"
+        "66fdbf1df0eaf8e493933dfe",
+        "66f8f82f027b5bb2be6d0de9",
+        "66f8f812027b5bb2be6d0de6"
     ],
-    "describer": "60d5f9a2b0f8b8e17a15f5f2",
-    "teamLeader": "60d5f9a2b0f8b8e17a15f5f3",
-    "selectedWord": "60d5f9a2b0f8b8e17a15f5f4",
-    "tryedWords": []
+    "chatId": null,
+    "describer": null,
+    "description": null,
+    "tryedWords": [],
+    "teamLeader": null,
+    "success": null,
+    "answer": null,
 }
 ```
 
 Status Code: **400 Bad Request**
 
-Description: The request body is missing required fields or contains invalid
-data.
+Description: The provided room ID is invalid or improperly formatted.
 
 ```
 {
-    "message": "Invalid input. Please provide all required fields."
+    "message": "Invalid ObjectId"
 }
 ```
 
@@ -1852,47 +1757,173 @@ token is invalid. Ensure that the correct authentication token is provided.
 }
 ```
 
-Status Code: **403 Forbidden**
+Status code: **409 Conflict**
 
-Description: The user does not have the required permissions to create a team in
-this room.
-
-```
-{
-    "message": "Access denied. Insufficient permissions."
-}
-```
-
-Status Code: **404 Not Found**
-
-Description: The specified room cannot be found.
+Description: This response indicates that the request could not be processed
+because the username is already in use.
 
 ```
 {
-    "message": "Room not found."
+    "message": "User is already in the room."
 }
 ```
 
-Status code: **500 Internal Server Error**
+#### 3. Get all teams in a room
 
-Description: The server encountered an unexpected error while processing the
-request.
+Endpoint
+
+- URL Path: **_/api/v1/rooms/{roomId}/teams_**
+- Description: This endpoint retrieves a list of all teams in a specified room, sorted by team score in descending order. Optionally, it can also nest the user details for each team.
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token.
+
+**Request Parameter**
+
+The request must include the following path parameter:
+
+- roomId: The unique identifier of the room for which the teams will be retrieved.
+
+**Query Parameter (optional)**
+
+- nestUsers: A boolean flag (true or false). If set to true, it nests the user details (players) within the team objects. Defaults to false.
+
+**Example Request**
+
+Description: A `GET` request to retrieve all teams in the room.
+
+```
+curl -X PUT http://localhost:8080/api/v1/rooms/670aa84ac626acf113cc3b56/teams \
+-H "Authorization: Bearer access_token" \
+```
+
+**Example Responses**
+
+Status code: **200 OK**
+
+Description: A list of all teams in the room, optionally with user details if nestUsers is set to true, or an empty array if no teams are found.
+
+```
+[
+    {
+        "_id": "670aa860c626acf113cc3b58",
+        "roomId": "670aa84ac626acf113cc3b56",
+        "name": "team1",
+        "teamScore": 0,
+        "players": [
+            "66fdbf1df0eaf8e493933dfe",
+            "66f8f82f027b5bb2be6d0de9",
+            "66f8f812027b5bb2be6d0de6"
+        ],
+        "chatId": null,
+        "describer": null,
+        "description": null,
+        "tryedWords": [],
+        "teamLeader": null,
+        "success": null,
+        "answer": null,
+    },
+    ...
+]
+```
+
+Status Code: **400 Bad Request**
+
+Description:  The provided room ID is invalid or improperly formatted.
 
 ```
 {
-    "message": "An unexpected error occurred while creating the team."
+    "message": "Invalid ObjectId"
 }
 ```
 
-#### 4. GET `api/v1/rooms/{roomId}/teams/{teamId}`
+Status Code: **401 Unauthorized**
 
-Description: Method to retrieve a specific team by its ID in the specified room.
-Authentication: This endpoint requires the user to be authenticated with a valid
-access token.
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
+
+```
+{
+    "message": "Token not found"
+}
+```
+
+#### 4. Delete all teams from a specific room
+
+Endpoint
+
+- URL Path: **_/api/v1/rooms/{roomId}/teams_**
+- Description:  This endpoint allows an authenticated user to delete all teams from a specified room. The operation will return the number of teams deleted or indicate if no teams were found.
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token.
+
+**Request Parameter**
+
+The request must include the following path parameter:
+
+- roomId: The unique identifier of the room from which all teams will be deleted.
+
+**Example Request**
+
+Description: A `DELETE` request to remove all teams from the room.
+
+```
+curl -X PUT http://localhost:8080/api/v1/rooms/670aa84ac626acf113cc3b56/teams \
+-H "Authorization: Bearer access_token" \
+```
+
+**Example Responses**
+
+Status code: **200 OK**
+
+Description: All teams were successfully deleted from the room, or no teams were found in the room.
+
+```
+{
+    "message": "Successfully deleted 3 team(s) from room 670aa84ac626acf113cc3b56."
+}
+```
+```
+{
+    "message": "No teams found in room 670aa84ac626acf113cc3b56."
+}
+```
+
+Status Code: **400 Bad Request**
+
+Description: The provided room ID is invalid or improperly formatted.
+
+```
+{
+    "message": "Invalid ObjectId"
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
+
+```
+{
+    "message": "Token not found"
+}
+```
+
+#### 5. Get a specific ream by ID
+
+Endpoint
+
+- URL Path: **_/api/v1/rooms/{roomId}/teams/{teamId}_**
+- Description: This endpoint retrieves details about a specific team within a specified room using the team ID and room ID.
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token.
 
 **Request body**
 
-Empty
+The request must include the following parameters:
+
+- roomId: The unique identifier of the room containing the team.
+- teamId: The unique identifier of the team to be retrieved.
 
 **Example Request**
 
@@ -1900,7 +1931,7 @@ Description: A `GET` request to retrieve details of a specific team in a
 specific room.
 
 ```
-curl -X GET http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId} \
+curl -X GET http://localhost:8080/api/v1/rooms/670b835b0824fd6e01fe418e/teams/670b83a30824fd6e01fe4190 \
 -H "Authorization: Bearer access_token"
 ```
 
@@ -1908,23 +1939,36 @@ curl -X GET http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId} \
 
 Status code: **200 OK**
 
-Description: The request was successful, and the response contains the details
-of the requested team.
+Description: The team was successfully found, and the team details are returned.
 
 ```
 {
-    "teamId": "60d5f9a2b0f8b8e17a15f5f1",
-    "roomId": "60d5f9a2b0f8b8e17a15f5f0",
-    "name": "Alpha Team",
-    "score": 250,
+    "_id": "670b83a30824fd6e01fe4190",
+    "roomId": "670b835b0824fd6e01fe418e",
+    "name": "team1",
+    "teamScore": 100,
     "players": [
-        "60d5f9a2b0f8b8e17a15f5f2",
-        "60d5f9a2b0f8b8e17a15f5f3"
+        "66fdbf1df0eaf8e493933dfe",
+        "66f8f82f027b5bb2be6d0de9",
+        "66f8f812027b5bb2be6d0de6"
     ],
-    "describer": "60d5f9a2b0f8b8e17a15f5f2",
-    "teamLeader": "60d5f9a2b0f8b8e17a15f5f3",
-    "selectedWord": "60d5f9a2b0f8b8e17a15f5f4",
-    "tryedWords": ["apple", "banana", "orange"]
+    "chatId": 64a0d5fa3b9c680017d68c4d,
+    "describer": 66fdbf1df0eaf8e493933dfe,
+    "description": null,
+    "tryedWords": [],
+    "teamLeader": 66f8f82f027b5bb2be6d0de9,
+    "success": null,
+    "answer": null,
+}
+```
+
+Status Code: **400 Bad Request**
+
+Description: The provided team or room ID is invalid or improperly formatted.
+
+```
+{
+    "message": "Invalid ObjectId"
 }
 ```
 
@@ -1939,76 +1983,55 @@ token is invalid. Ensure that the correct authentication token is provided.
 }
 ```
 
-Status Code: **403 Forbidden**
-
-Description: The user does not have the required permissions to access the team
-in this room.
-
-```
-{
-    "message": "Access denied. Insufficient permissions."
-}
-```
-
 Status Code: **404 Not Found**
 
-Description: The specified team cannot be found in the specified room.
+Description: The specified team does not exist in the room.
 
 ```
 {
-    "message": "Team not found."
+    "message": ""Team 64a0d5fa3b9c680017d68c4a in room 64a0d5fa3b9c680017d68c3e not found!!!""
 }
 ```
 
-Status code: **500 Internal Server Error**
+#### 6. Update a team by ID
+Endpoint
 
-Description: The server encountered an unexpected error while processing the
-request.
+- URL Path: **_/api/v1/rooms/{roomId}/teams/{teamId}_**
+- Description: This endpoint allows updating specific details of a team within a specified room using the team ID and room ID.
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token.
 
-```
-{
-    "message": "An unexpected error occurred while retrieving the team."
-}
-```
+**Request Parameter**
 
-#### 5. PUT `api/v1/rooms/{roomId}/teams/{teamId}`
+The request must include the following parameters:
 
-Description: Method to update the details of a specific team in the specified
-room. Authentication: This endpoint requires the user to be authenticated with a
-valid access token.
+- roomId: The unique identifier of the room containing the team.
+- teamId: The unique identifier of the team to be updated.
 
-**Request Body**
+**Query Parameter (optional)**
 
-- name (string, optional): The updated name of the team.
-- players (array of strings, optional): An updated array of player IDs to be
-  added to the team.
-- describer (string, optional): The updated ID of the user who will describe the
-  selected word.
-- teamLeader (string, optional): The updated ID of the user who will lead the
-  team.
-- selectedWord (string, optional): The updated ID of the word selected for the
-  game.
-- tryedWords (array of strings, optional): An updated array of words that have
-  been tried by the team.
+- name: The updated name of the team.
+- players: An updated array of player IDs to be added to the team.
+- describer: The updated ID of the user who will describe the selected word.
+- description: Description of the word provided by the describer.
+- teamLeader: The updated ID of the user who will lead the team.
+- selectedWord: The updated ID of the word selected for the game.
+- tryedWords (array of strings, optional): An updated array of words that have been tried by the team.
+- success: A boolean flag (true or false). Status indicating if the word was successfully guessed
+- answer: The team's submitted guess.
 
 **Example Request**
 
 Description: A `PUT` request to update a specific team in a specific room.
 
 ```
-curl -X PUT http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId} \
+curl -X PUT http://localhost:8080/api/v1/rooms/670b835b0824fd6e01fe418e/teams/670b83a30824fd6e01fe4190 \
 -H "Authorization: Bearer access_token" \
 -H "Content-Type: application/json" \
 -d '{
     "name": "Alpha Team Updated",
-    "players": [
-        "60d5f9a2b0f8b8e17a15f5f2",
-        "60d5f9a2b0f8b8e17a15f5f3"
-    ],
-    "describer": "60d5f9a2b0f8b8e17a15f5f2",
-    "teamLeader": "60d5f9a2b0f8b8e17a15f5f3",
-    "selectedWord": "60d5f9a2b0f8b8e17a15f5f4",
-    "tryedWords": ["apple", "banana"]
+    "success": true,
+    "answer": "town"
 }
 ```
 
@@ -2016,34 +2039,36 @@ curl -X PUT http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId} \
 
 Status code: **200 OK**
 
-Description: The team was successfully updated, and the response contains the
-updated team object.
+Description: The team was successfully updated, and the updated team details are returned.
 
 ```
 {
-    "teamId": "60d5f9a2b0f8b8e17a15f5f1",
-    "roomId": "60d5f9a2b0f8b8e17a15f5f0",
+    "_id": "670b83a30824fd6e01fe4190",
+    "roomId": "670b835b0824fd6e01fe418e",
     "name": "Alpha Team Updated",
-    "score": 250,
+    "teamScore": 100,
     "players": [
-        "60d5f9a2b0f8b8e17a15f5f2",
-        "60d5f9a2b0f8b8e17a15f5f3"
+        "66fdbf1df0eaf8e493933dfe",
+        "66f8f82f027b5bb2be6d0de9",
+        "66f8f812027b5bb2be6d0de6"
     ],
-    "describer": "60d5f9a2b0f8b8e17a15f5f2",
-    "teamLeader": "60d5f9a2b0f8b8e17a15f5f3",
-    "selectedWord": "60d5f9a2b0f8b8e17a15f5f4",
-    "tryedWords": ["apple", "banana"]
+    "chatId": 64a0d5fa3b9c680017d68c4d,
+    "describer": 66fdbf1df0eaf8e493933dfe,
+    "description": null,
+    "tryedWords": [],
+    "teamLeader": 66f8f82f027b5bb2be6d0de9,
+    "success": true,
+    "answer": "town",
 }
 ```
 
 Status Code: **400 Bad Request**
 
-Description: The request body is missing required fields or contains invalid
-data.
+Description: The provided team ID or room ID is invalid or improperly formatted.
 
 ```
 {
-    "message": "Invalid input. Please provide valid fields."
+    "message": "Invalid ObjectId"
 }
 ```
 
@@ -2058,124 +2083,38 @@ token is invalid. Ensure that the correct authentication token is provided.
 }
 ```
 
-Status Code: **403 Forbidden**
-
-Description: The user does not have the required permissions to update the team
-in this room.
-
-```
-{
-    "message": "Access denied. Insufficient permissions."
-}
-```
-
 Status Code: **404 Not Found**
 
-Description: The specified team or room cannot be found.
+Description: The specified team does not exist in the room.
 
 ```
 {
-    "message": "Team or room not found."
+    "message": "Team 64a0d5fa3b9c680017d68c4a in room 64a0d5fa3b9c680017d68c3e not found!!!"
 }
 ```
 
-Status code: **500 Internal Server Error**
+#### 7. Delete a team by ID
 
-Description: The server encountered an unexpected error while processing the
-request.
+Endpoint
 
-```
-{
-    "message": "An unexpected error occurred while updating the team."
-}
-```
+- URL Path: **_/api/v1/rooms/{roomId}/teams/{teamId}_**
+- Description: This endpoint allows the deletion of a specific team from a room using the team ID and room ID.
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token.
 
-#### 6. DELETE `api/v1/rooms/{roomId}/teams/{teamId}`
+**Request body**
 
-Description: Method to delete a specific team in the specified room.
-Authentication: This endpoint requires the user to be authenticated with a valid
-access token.
+The request must include the following parameters:
 
-**Request body:**
-
-Empty
+- roomId: The unique identifier of the room containing the team.
+- teamId: The unique identifier of the team to be deleted.
 
 **Example Request**
 
 Description: A `DELETE` request to remove a specific team from a specific room.
 
 ```
-curl -X DELETE http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId} \
--H "Authorization: Bearer access_token"
-```
-
-**Example Responses**
-
-Status code: **204 No Content**
-
-Description: The request was successful, and the team has been deleted. No
-content is returned in the response.
-
-Status Code: **401 Unauthorized**
-
-Description: The request lacks proper authentication credentials or the provided
-token is invalid. Ensure that the correct authentication token is provided.
-
-```
-{
-    "message": "Token not found"
-}
-```
-
-Status Code: **403 Forbidden**
-
-Description: The user does not have the required permissions to delete the team
-in this room.
-
-```
-{
-    "message": "Access denied. Insufficient permissions."
-}
-```
-
-Status Code: **404 Not Found**
-
-Description: The specified team or room cannot be found.
-
-```
-{
-    "message": "Team or room not found."
-}
-```
-
-Status code: **500 Internal Server Error**
-
-Description: The server encountered an unexpected error while processing the
-request.
-
-```
-{
-    "message": "An unexpected error occurred while deleting the team."
-}
-```
-
-#### 7. GET `api/v1/rooms/{roomId}/teams/{teamId}/players`
-
-Description: Method to get all players in a specific team within a specified
-room. Authentication: This endpoint requires the user to be authenticated with a
-valid access token.
-
-**Request Body**
-
-Empty
-
-**Example Request**
-
-Description: A `GET` request to retrieve a list of all players in a specific
-team of a specific room.
-
-```
-curl -X GET http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/players \
+curl -X DELETE http://localhost:8080/api/v1/rooms/670b835b0824fd6e01fe418e/teams/670b83a30824fd6e01fe4190 \
 -H "Authorization: Bearer access_token"
 ```
 
@@ -2183,26 +2122,16 @@ curl -X GET http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/players \
 
 Status code: **200 OK**
 
-Description: The request was successful, and the response contains an array of
-player objects.
+Description: The request was successful, and the team has been deleted.
+
+Status Code: **400 Bad Request**
+
+Description: The provided team ID or room ID is invalid or improperly formatted,
 
 ```
-[
-    {
-        "userId": "60d5f9a2b0f8b8e17a15f5f3",
-        "username": "Alex",
-        "score": 1500,
-        "played": 20,
-        "wins": 10
-    },
-    {
-        "userId": "60d5f9a2b0f8b8e17a15f5f3",
-        "username": "Jack",
-        "score": 3000,
-        "played": 29,
-        "wins": 15
-    }
-]
+{
+    "message": "Invalid ObjectId"
+}
 ```
 
 Status Code: **401 Unauthorized**
@@ -2216,79 +2145,165 @@ token is invalid. Ensure that the correct authentication token is provided.
 }
 ```
 
-Status Code: **403 Forbidden**
-
-Description: The user does not have the required permissions to access the
-players in this team.
-
-```
-{
-    "message": "Access denied. Insufficient permissions."
-}
-```
-
 Status Code: **404 Not Found**
 
-Description: The specified room or team cannot be found, or there are no players
-associated with the team.
+Description: The specified team was not found in the room.
 
 ```
 {
-    "message": "No players found for the specified team."
+    "message": "Team 64a0d5fa3b9c680017d68c4a in room 64a0d5fa3b9c680017d68c3e not found"
 }
 ```
 
-Status code: **500 Internal Server Error**
+#### 8. Get all players in a team
 
-Description: The server encountered an unexpected error while processing the
-request.
+Endpoint
 
-```
-{
-    "message": "An unexpected error occurred while retrieving the players."
-}
-```
+- URL Path: **_/api/v1/rooms/{roomId}/teams/{teamId}/players_**
+- Description: This endpoint retrieves all players within a specified team in a given room. Players will be returned in descending order based on their score.
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token.
 
-#### 8. POST `api/v1/rooms/{roomId}/teams/{teamId}/players/{userId}`
+**Request body**
 
-Description: Method to add a player (specified by userId) to a team in a
-particular room. Authentication: This endpoint requires the user to be
-authenticated with a valid access token.
+The request must include the following parameters:
 
-**Request Body**
-
-Empty
+- roomId: The unique identifier of the room containing the team.
+- teamId: The unique identifier of the team from which players will be retrieved.
 
 **Example Request**
 
-Description: A `POST` request to add a player (specified by userId) to a team in
-a specific room.
+Description: A `GET` request to retrieve all players in the team within room.
 
 ```
-curl -X POST http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/players/{userId} \
+curl -X GET http://localhost:8080/api/v1/rooms/670b835b0824fd6e01fe418e/teams/670b83a30824fd6e01fe4190/players \
 -H "Authorization: Bearer access_token"
 ```
 
 **Example Responses**
 
-Status Code: **201 Created**
+Status code: **200 OK**
 
-Description: The player was successfully added to the specified team.
+Description: The list of players in the specified team is returned, sorted by their score in descending order.
+
+```
+[
+    {
+        "userId": "60d5f9a2b0f8b8e17a15f5f3",
+        "username": "Alex",
+        "score": 3000,
+        "played": 30,
+        "wins": 20
+    },
+    {
+        "userId": "670b8af60824fd6e01fe4198",
+        "username": "Jack",
+        "score": 1500,
+        "played": 29,
+        "wins": 15
+    }
+]
+```
+
+Status Code: **400 Bad Request**
+
+Description: The provided team ID or room ID is invalid or improperly formatted.
 
 ```
 {
-    "message": "Player added to the team successfully."
+    "message": "Invalid ObjectId"
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided
+token is invalid. Ensure that the correct authentication token is provided.
+
+```
+{
+    "message": "Token not found"
+}
+```
+
+Status Code: **404 Not Found**
+
+Description: The specified team cannot be found, or there are no players
+associated with the team.
+
+```
+{
+    "message": "Team 64a0d5fa3b9c680017d68c4a in room 64a0d5fa3b9c680017d68c3e not found!!!"
+}
+```
+```
+{
+    "message": "User not found."
+}
+```
+
+#### 9. Add a player to a team
+
+Endpoint
+
+- URL Path: **_/api/v1/rooms/{roomId}/teams/{teamId}/players/{userId}_**
+- Description: This endpoint allows adding a user to a specified team in a given room. If the team is full or the user is already in the team, an appropriate error will be returned.
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token.
+
+**Request body**
+
+The request must include the following parameters:
+
+- roomId: The unique identifier of the room containing the team.
+- teamId: The unique identifier of the team to which the player will be added.
+- userId: The unique identifier of the user (player) to be added to the team.
+
+**Example Request**
+
+Description: A `POST` request to add a player (specified by userId) to a team in a specific room.
+
+```
+curl -X POST http://localhost:8080/api/v1/rooms/670b835b0824fd6e01fe418e/teams/670b83a30824fd6e01fe4190/players/64a0d5fa3b9c680017d68c45 \
+-H "Authorization: Bearer access_token"
+```
+
+**Example Responses**
+
+Status Code: **200 OK**
+
+Description: The player was successfully added to the team.
+
+```
+{
+    "message": "Player added to the team successfully.",
+    "roomId": 670b835b0824fd6e01fe418e,
+    "teamId": 670b83a30824fd6e01fe4190,
 }
 ```
 
 Status Code: **400 Bad Request**
 
-Description: The request was malformed, possibly due to incorrect or missing
-parameters.
+Description: The team is already full or the user is already in the team.
 
 ```
 {
-    "message": "Invalid room, team, or user ID."
+    "message": "Team is already full."
+}
+```
+```
+{
+    "message": "User 64a0d5fa3b9c680017d68c45 already joined to team",
+    "roomId": null,
+    "teamId": null,
+}
+```
+
+Description: The provided user ID, team ID or room ID is invalid or improperly formatted.
+
+```
+{
+    "message": "Invalid ObjectId"
 }
 ```
 
@@ -2303,47 +2318,32 @@ token is invalid.
 }
 ```
 
-Status Code: **403 Forbidden**
-
-Description: The user does not have sufficient permissions to add players to
-this team.
-
-```
-{
-    "message": "Access denied. Insufficient permissions."
-}
-```
-
 Status Code: **404 Not Found**
 
-Description: The specified room, team, or user cannot be found.
+Description: The specified team or user was not found.
 
 ```
 {
-    "message": "Room, team, or user not found."
+    "message": "Team not found."
 }
 ```
 
-Status Code: **500 Internal Server Error**
+#### 10. Remove a player from a team
 
-Description: The server encountered an unexpected error while processing the
-request.
+Endpoint
 
-```
-{
-    "message": "An unexpected error occurred while adding the player."
-}
-```
+- URL Path: **_/api/v1/rooms/{roomId}/teams/{teamId}/players/{userId}_**
+- Description: This endpoint allows removing a player (user) from a specified team in a given room.
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token.
 
-#### 9. DELETE `api/v1/rooms/{roomId}/teams/{teamId}/players/{userId}`
+**Request body**
 
-Description: Method to remove a player (specified by userId) from a team in a
-particular room. Authentication: This endpoint requires the user to be
-authenticated with a valid access token.
+The request must include the following parameters:
 
-**Request Body**
-
-Empty
+- roomId: The unique identifier of the room containing the team.
+- teamId: The unique identifier of the team to which the player will be added.
+- userId: The unique identifier of the user (player) to be removed from the team.
 
 **Example Request**
 
@@ -2351,7 +2351,7 @@ Description: A `DELETE` request to remove a player (specified by userId) from a
 team in a specific room.
 
 ```
-curl -X DELETE http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/players/{userId} \
+curl -X DELETE http://localhost:8080/api/v1/rooms/670b835b0824fd6e01fe418e/teams/670b83a30824fd6e01fe4190/players/64a0d5fa3b9c680017d68c45 \
 -H "Authorization: Bearer access_token"
 ```
 
@@ -2363,18 +2363,28 @@ Description: The player was successfully removed from the specified team.
 
 ```
 {
-    "message": "Player removed from the team successfully."
+    "_id": "670b83a30824fd6e01fe4190",
+    "roomId": "670b835b0824fd6e01fe418e",
+    "name": "TeamTest",
+    "teamScore": 0,
+    "players": [66fdbf1df0eaf8e493933dfe, 66f8f82f027b5bb2be6d0de9],
+    "chatId": 64a0d5fa3b9c680017d68c4d,
+    "describer": 66fdbf1df0eaf8e493933dfe,
+    "description": null,
+    "tryedWords": [],
+    "teamLeader": 66f8f82f027b5bb2be6d0de9,
+    "success": null,
+    "answer": null,
 }
 ```
 
 Status Code: **400 Bad Request**
 
-Description: The request was malformed, possibly due to incorrect or missing
-parameters.
+Description: The provided user ID, team ID or room ID is invalid or improperly formatted.
 
 ```
 {
-    "message": "Invalid room, team, or user ID."
+    "message": "Invalid ObjectId"
 }
 ```
 
@@ -2389,50 +2399,33 @@ token is invalid.
 }
 ```
 
-Status Code: **403 Forbidden**
-
-Description: The user does not have sufficient permissions to remove players
-from this team.
-
-```
-{
-    "message": "Access denied. Insufficient permissions."
-}
-```
-
 Status Code: **404 Not Found**
 
-Description: The specified room, team, or user cannot be found, or the player is
-not part of the team.
+Description: The specified team was not found.
 
 ```
 {
-    "message": "Player not found in the specified team."
+    "message": "Team 64a0d5fa3b9c680017d68c4a in room 64a0d5fa3b9c680017d68c3e not found"
 }
 ```
 
-Status Code: **500 Internal Server Error**
+#### 11. Define a describer and leader for a round
 
-Description: The server encountered an unexpected error while processing the
-request.
+Endpoint
 
-```
-{
-    "message": "An unexpected error occurred while removing the player."
-}
-```
+- URL Path: **_/api/v1/rooms/{roomId}/teams/{teamId}/roles_**
+- Description: This endpoint sets the next describer and team leader for a specified team in a room. It cycles through the players in the team to assign these roles in each round:
+    - If no describer is currently set (first round), the first player is assigned as the describer, and the second player is assigned as the leader.
+    - In subsequent rounds, the next describer and leader are selected cyclically from the list of players.
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token.
 
-#### 10. PUT `/api/v1/rooms/{roomId}/teams/{teamId}/describer`
+**Request body**
 
-Description: This method sets a specific player (from the list of players in the
-team) as the describer of the team. The describer is responsible for explaining
-or describing selected words during the game. Authentication: This endpoint
-requires the user to be authenticated with a valid access token.
+The request must include the following parameters:
 
-**Request Body**
-
-userId (string): The ID of the player to be set as the describer. This player
-must be part of the players array in the team.
+- roomId: The unique identifier of the room containing the team.
+- teamId: The unique identifier of the team for which to assign the describer and leader.
 
 **Example Request**
 
@@ -2440,46 +2433,44 @@ Description: A `PUT` request to set a player (specified by userId) as the
 describer in a specific team within a room.
 
 ```
-curl -X PUT http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/describer \
+curl -X PUT http://localhost:8080/api/v1/rooms/670b835b0824fd6e01fe418e/teams/670b83a30824fd6e01fe4190/roles \
 -H "Authorization: Bearer access_token" \
--H "Content-Type: application/json" \
--d '{"userId": "60d5f9a2b0f8b8e17a15f5f2"}'
 ```
 
 **Example Responses**
 
 Status Code: **200 OK**
 
-Description: The describer was successfully updated.
+Description: The describer and leader were successfully assigned for the round.
 
 ```
 {
-    "message": "Player has been successfully set as the describer.",
-    "team": {
-        "teamId": "60d5f9a2b0f8b8e17a15f5f1",
-        "roomId": "60d5f9a2b0f8b8e17a15f5f0",
-        "name": "Alpha Team Updated",
-        "score": 250,
-        "players": [
-            "60d5f9a2b0f8b8e17a15f5f2",
-            "60d5f9a2b0f8b8e17a15f5f3"
-        ],
-        "describer": "60d5f9a2b0f8b8e17a15f5f2",
-        "teamLeader": "60d5f9a2b0f8b8e17a15f5f3",
-        "selectedWord": "60d5f9a2b0f8b8e17a15f5f4",
-        "tryedWords": ["apple", "banana"]
-    }
+    "_id": "670b83a30824fd6e01fe4190",
+    "roomId": "670b835b0824fd6e01fe418e",
+    "name": "team1",
+    "teamScore": 100,
+    "players": [
+        "66fdbf1df0eaf8e493933dfe",
+        "66f8f82f027b5bb2be6d0de9",
+        "66f8f812027b5bb2be6d0de6"
+    ],
+    "chatId": 64a0d5fa3b9c680017d68c4d,
+    "describer": 66fdbf1df0eaf8e493933dfe,
+    "description": null,
+    "tryedWords": [],
+    "teamLeader": 66f8f82f027b5bb2be6d0de9,
+    "success": null,
+    "answer": null,
 }
 ```
 
 Status Code: **400 Bad Request**
 
-Description: The request body is invalid, or the specified user is not part of
-the team.
+Description: The provided team ID or room ID is invalid or improperly formatted.
 
 ```
 {
-    "message": "Invalid request body or the player is not part of the team."
+    "message": "Invalid ObjectId"
 }
 ```
 
@@ -2494,98 +2485,76 @@ token is invalid.
 }
 ```
 
-Status Code: **403 Forbidden**
-
-Description: The user does not have sufficient permissions to update the
-describer.
-
-```
-{
-    "message": "Access denied. Insufficient permissions."
-}
-```
-
 Status Code: **404 Not Found**
 
-Description: The specified room or team cannot be found, or the player is not
-part of the team.
+Description: The specified team was not found.
 
 ```
 {
-    "message": "Team, room, or player not found."
+    "message": "Team 64a0d5fa3b9c680017d68c4a in room 64a0d5fa3b9c680017d68c3e not found!!!"
 }
 ```
 
-Status Code: **500 Internal Server Error**
+#### 12. Reset round fields
 
-Description: The server encountered an unexpected error while processing the
-request.
+Endpoint
 
-```
-{
-    "message": "An unexpected error occurred while setting the describer."
-}
-```
+- URL Path: **_/api/v1/rooms/{roomId}/teams/{teamId}/reset**
+- Description: This endpoint resets the round-specific fields (selectedWord, description, success, answer) to null for a specified team within a room. It ensures that the team is ready for a new round.
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token.
 
-#### 11. PUT `/api/v1/rooms/{roomId}/teams/{teamId}/teamLeader`
+**Request body**
 
-Description: This method sets a specific player (from the list of players in the
-team) as the team leader. The team leader may have additional responsibilities,
-such as managing the team or making strategic decisions during the game.
-Authentication: This endpoint requires the user to be authenticated with a valid
-access token.
+The request must include the following parameters:
 
-**Request Body**
-
-userId (string): The ID of the player to be set as the team leader. This player
-must be part of the players array in the team.
+- roomId: The unique identifier of the room where the team is located.
+- teamId: The unique identifier of the team whose round-specific fields are to be reset.
 
 **Example Request**
 
-Description: A `PUT` request to set a player (specified by userId) as the team
-leader in a specific team within a room.
+Description: A `PUT` request to reset the round fields for team within a room.
 
 ```
-curl -X PUT http://localhost:8080/api/v1/rooms/{roomId}/teams/{teamId}/teamLeader \
+curl -X PUT http://localhost:8080/api/v1/rooms/670b835b0824fd6e01fe418e/teams/670b83a30824fd6e01fe4190/reset \
 -H "Authorization: Bearer access_token" \
--H "Content-Type: application/json" \
--d '{"userId": "60d5f9a2b0f8b8e17a15f5f3"}'
 ```
 
 **Example Responses**
 
 Status Code: **200 OK**
 
-Description: The team leader was successfully updated.
+Description: The round fields were successfully reset to null.
 
 ```
 {
-    "message": "Player has been successfully set as the team leader.",
-    "team": {
-        "teamId": "60d5f9a2b0f8b8e17a15f5f1",
-        "roomId": "60d5f9a2b0f8b8e17a15f5f0",
-        "name": "Alpha Team Updated",
-        "score": 250,
-        "players": [
-            "60d5f9a2b0f8b8e17a15f5f2",
-            "60d5f9a2b0f8b8e17a15f5f3"
-        ],
-        "describer": "60d5f9a2b0f8b8e17a15f5f2",
-        "teamLeader": "60d5f9a2b0f8b8e17a15f5f3",
-        "selectedWord": "60d5f9a2b0f8b8e17a15f5f4",
-        "tryedWords": ["apple", "banana"]
-    }
+    "_id": "670b83a30824fd6e01fe4190",
+    "roomId": "670b835b0824fd6e01fe418e",
+    "name": "team1",
+    "teamScore": 100,
+    "selectedWord": null,
+    "players": [
+        "66fdbf1df0eaf8e493933dfe",
+        "66f8f82f027b5bb2be6d0de9",
+        "66f8f812027b5bb2be6d0de6"
+    ],
+    "chatId": 64a0d5fa3b9c680017d68c4d,
+    "describer": 66fdbf1df0eaf8e493933dfe,
+    "description": null,
+    "tryedWords": [64a0d5fa3b9c680017d68c45],
+    "teamLeader": 66f8f82f027b5bb2be6d0de9,
+    "success": null,
+    "answer": null,
 }
 ```
 
 Status Code: **400 Bad Request**
 
-Description: The request body is invalid, or the specified user is not part of
-the team.
+Description: The provided team ID or room ID is invalid or improperly formatted.
 
 ```
 {
-    "message": "Invalid request body or the player is not part of the team."
+    "message": "Invalid ObjectId"
 }
 ```
 
@@ -2600,36 +2569,89 @@ token is invalid.
 }
 ```
 
-Status Code: **403 Forbidden**
+Status Code: **404 Not Found**
 
-Description: The user does not have sufficient permissions to update the team
-leader.
+Description: The specified team was not found.
 
 ```
 {
-    "message": "Access denied. Insufficient permissions."
+    "message": "Team 64a0d5fa3b9c680017d68c4a in room 64a0d5fa3b9c680017d68c3e not found"
+}
+```
+
+#### 13. Calculate and update scores
+
+Endpoint
+
+- URL Path: **_/api/v1/rooms/{roomId}/teams/{teamId}/calculate-scores**
+- Description: This endpoint calculates and updates the team’s score as well as each player’s score based on the round's result. If the team succeeded in the round, points are awarded to both the team and its players.
+- Authentication: This endpoint requires the user to be authenticated with a
+  valid access token.
+
+**Request body**
+
+The request must include the following parameters:
+
+- roomId: The unique identifier of the room where the team is located.
+- teamId: The unique identifier of the team whose score needs to be calculated.
+
+**Example Request**
+
+Description: A `PUT` request to reset the round fields for team within a room.
+
+```
+curl -X PUT http://localhost:8080/api/v1/rooms/670b835b0824fd6e01fe418e/teams/670b83a30824fd6e01fe4190/calculate-scores \
+-H "Authorization: Bearer access_token" \
+```
+
+**Example Responses**
+
+Status Code: **200 OK**
+
+Description: The scores were successfully updated.
+
+```
+{   
+    "message": "Team and player scores have been successfully updated."
+}
+```
+
+Description: No score update occurred as the team did not succeed in the round.
+
+```
+{
+    "message": "No score update as the team did not succeed."
+}
+```
+
+Status Code: **400 Bad Request**
+
+Description: The provided team ID or room ID is invalid or improperly formatted.
+
+```
+{
+    "message": "Invalid ObjectId"
+}
+```
+
+Status Code: **401 Unauthorized**
+
+Description: The request lacks proper authentication credentials or the provided
+token is invalid.
+
+```
+{
+    "message": "Token not found"
 }
 ```
 
 Status Code: **404 Not Found**
 
-Description: The specified room or team cannot be found, or the player is not
-part of the team.
+Description: The specified team was not found.
 
 ```
 {
-    "message": "Team, room, or player not found."
-}
-```
-
-Status Code: **500 Internal Server Error**
-
-Description: The server encountered an unexpected error while processing the
-request.
-
-```
-{
-    "message": "An unexpected error occurred while setting the team leader."
+    "message": "Team not found."
 }
 ```
 
