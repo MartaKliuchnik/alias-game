@@ -40,4 +40,4 @@ jobs:
         run: npm run lint
 
       - name: Run Tests
-        run: npm run test words.service
+        run: npm run test
