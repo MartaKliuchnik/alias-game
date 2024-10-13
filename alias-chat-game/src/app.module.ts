@@ -14,6 +14,7 @@ import { LeaderboardsModule } from './leaderboards/leaderboards.module';
 import { InitializationService } from './initialization/initialization.service';
 import { DatabaseModule } from './database/database.module';
 import { LoggingMiddleware } from './middlewares/logging.middleware';
+import { XssMiddleware } from './middlewares/xss.middleware';
 
 @Module({
   imports: [
@@ -36,6 +37,6 @@ import { LoggingMiddleware } from './middlewares/logging.middleware';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggingMiddleware).forRoutes('*');
+    consumer.apply(LoggingMiddleware, XssMiddleware).forRoutes('*');
   }
 }

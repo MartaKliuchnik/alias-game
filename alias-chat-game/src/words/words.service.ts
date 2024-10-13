@@ -232,24 +232,26 @@ export class WordsService {
       ...wordDocument.similarWords,
     ];
 
-    // Normalize the description by removing punctuation and splitting into words
-    const descriptionWords = description
+    const sanitizedDescription = description
       .toLowerCase()
-      .trim()
-      .replace(/[.,!?]/g, '')
-      .split(/\s+/);
+      .replace(/[^a-z\s]/g, '') // Remove all non-alphabetic characters except spaces
+      .replace(/\s+/g, ' ') // Normalize multiple spaces to a single space
+      .trim(); // Remove leading and trailing spaces
 
-    // Check if any word from the list is present in the description
+    const descriptionWords = sanitizedDescription.split(' ');
+
     for (const word of wordsToCompareWith) {
       for (const descWord of descriptionWords) {
-        const isSimilar = await this.compareWords(word, descWord);
-        if (isSimilar) {
-          return false;
+        const isExactMatch = await this.compareWords(word, descWord);
+        const isSubstringMatch = descWord.includes(word); // Check for substring match
+
+        if (isExactMatch || isSubstringMatch) {
+          return false; // Invalid description if any match is found
         }
       }
     }
 
-    return true;
+    return true; // Description is valid if no matches are found
   }
 
   /**
