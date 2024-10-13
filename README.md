@@ -22,7 +22,7 @@
    - Endpoint **/api/v1/users/{userId}/team/leave/{teamId}**
    - Endpoint **/api/v1/leaderboards**
 
-   4.2 [Room Management](#room-management)
+     4.2 [Room Management](#room-management)
 
    - Room data model
    - Endpoint **/api/v1/room**
@@ -31,7 +31,7 @@
    - Endpoint **/api/v1/rooms/:roomId**
    - Endpoint **/api/v1/rooms/:roomId**
 
-   4.3 [Team Management](#team-management)
+     4.3 [Team Management](#team-management)
 
    - Team data model.
    - Endpoint **/api/v1/rooms/{roomId}/teams**
@@ -41,15 +41,15 @@
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/roles**
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/reset**
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/calculate-scores**
-   
-   4.4 [Chat Management](#chat-management)
+
+     4.4 [Chat Management](#chat-management)
 
    - Chat data model.
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chat**
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}**
    - Endpoint **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}**
 
-   4.5 [Message Management](#message-management)
+     4.5 [Message Management](#message-management)
 
    - Message data model.
    - Endpoint
@@ -57,7 +57,7 @@
    - Endpoint
      **/api/v1/rooms/{roomId}/teams/{teamId}/chats/{chatId}/user/{userId}/messages**
 
-   4.6 [Word Management](#word-management)
+     4.6 [Word Management](#word-management)
 
    - Word data model
    - Endpoint **POST /api/v1/words**
@@ -649,7 +649,7 @@ Endpoint
   - Hard Delete: Permanently removes the user's account and all associated data.
     This action requires special query parameter (hardDelete).
 - Authentication: The request must include a valid access token for the
-  authenticated user. 
+  authenticated user.
 
 **Request Parameter**
 
@@ -661,7 +661,7 @@ The request must include the following path parameter:
 Optional query parameter:
 
 - hardDelete: If set to true, attempts a hard delete (permanent removal of the
-  user). 
+  user).
 
 **Example Request**
 
@@ -879,7 +879,7 @@ The request must include the following path parameter:
 
 **Example Request**
 
-Description:  A `POST` request to add the user to an available room. If the room reaches maximum capacity, a new room will be created automatically.
+Description: A `POST` request to add the user to an available room. If the room reaches maximum capacity, a new room will be created automatically.
 
 ```
 curl -X PUT http://localhost:8080/api/v1/users/64a0d5fa3b9c680017d68c37/room/join \
@@ -1084,11 +1084,13 @@ Description: The request contains invalid data or the team is already full.
     "message": "Invalid ObjectId"
 }
 ```
+
 ```
 {
     "message": "Team is already full."
 }
 ```
+
 ```
 {
     "message": "User is already in the team.""
@@ -1134,7 +1136,7 @@ The request must include the following path parameters:
 
 **Example Request**
 
-Description:  A `DELETE` request to remove the authenticated user from a specified team.
+Description: A `DELETE` request to remove the authenticated user from a specified team.
 
 ```
 curl -X PUT http://localhost:8080/api/v1/users/64a0d5fa3b9c680017d68c37/team/leave/64a0d5fa3b9c680017d68c3e \
@@ -1164,6 +1166,7 @@ Description: The request contains invalid data or the user is not a member of th
     "message": "Invalid ObjectId"
 }
 ```
+
 ```
 {
     "message": "User is not in the team."
@@ -1233,7 +1236,7 @@ Description: This status indicates that the request was successful, and the serv
         "score": 1500,
         "played": 20,
         "wins": 10
-    }, 
+    },
     ...
 ]
 ```
@@ -1660,21 +1663,21 @@ getting the room process.
 
 Information about users.
 
-| Column Name  | Data Type  | Description                                                                  |
-| :----------- | :--------- | :--------------------------------------------------------------------------- |
-| teamId       | ObjectId   | Unique identifier for each team                                              |
-| roomId       | ObjectId   | Unique identifier for the team's room                                        |
-| name         | string     | Name of the team                                                             |
-| teamScore    | int        | Total points scored by the team during this game                             |
-| selectedWord | ObjectId   | Unique identifier for the record of the word to guess                        |
-| players      | ObjectId[] | Array of unique identifiers for players on the team                          |
-| chatId       | ObjectId   | Unique identifier for the team's chat room                                   |
-| describer    | ObjectId   | Unique identifier of the player who describes the word                       |
-| description  | string     | Description of the word provided by the describer                            |
-| tryedWords   | ObjectId[] | Array of unique identifiers for words attempted by the team during the game  |
-| teamLeader   | ObjectId   | Unique identifier of the player who makes a word guess                       |
-| success      | boolean    | Status indicating if the word was successfully guessed                       |
-| answer       | string     | The team's submitted guess                                                   |
+| Column Name  | Data Type  | Description                                                                 |
+| :----------- | :--------- | :-------------------------------------------------------------------------- |
+| teamId       | ObjectId   | Unique identifier for each team                                             |
+| roomId       | ObjectId   | Unique identifier for the team's room                                       |
+| name         | string     | Name of the team                                                            |
+| teamScore    | int        | Total points scored by the team during this game                            |
+| selectedWord | ObjectId   | Unique identifier for the record of the word to guess                       |
+| players      | ObjectId[] | Array of unique identifiers for players on the team                         |
+| chatId       | ObjectId   | Unique identifier for the team's chat room                                  |
+| describer    | ObjectId   | Unique identifier of the player who describes the word                      |
+| description  | string     | Description of the word provided by the describer                           |
+| tryedWords   | ObjectId[] | Array of unique identifiers for words attempted by the team during the game |
+| teamLeader   | ObjectId   | Unique identifier of the player who makes a word guess                      |
+| success      | boolean    | Status indicating if the word was successfully guessed                      |
+| answer       | string     | The team's submitted guess                                                  |
 
 #### 2. Add a new team to a room
 
@@ -1828,7 +1831,7 @@ Description: A list of all teams in the room, optionally with user details if ne
 
 Status Code: **400 Bad Request**
 
-Description:  The provided room ID is invalid or improperly formatted.
+Description: The provided room ID is invalid or improperly formatted.
 
 ```
 {
@@ -1852,7 +1855,7 @@ token is invalid. Ensure that the correct authentication token is provided.
 Endpoint
 
 - URL Path: **_/api/v1/rooms/{roomId}/teams_**
-- Description:  This endpoint allows an authenticated user to delete all teams from a specified room. The operation will return the number of teams deleted or indicate if no teams were found.
+- Description: This endpoint allows an authenticated user to delete all teams from a specified room. The operation will return the number of teams deleted or indicate if no teams were found.
 - Authentication: This endpoint requires the user to be authenticated with a
   valid access token.
 
@@ -1882,6 +1885,7 @@ Description: All teams were successfully deleted from the room, or no teams were
     "message": "Successfully deleted 3 team(s) from room 670aa84ac626acf113cc3b56."
 }
 ```
+
 ```
 {
     "message": "No teams found in room 670aa84ac626acf113cc3b56."
@@ -1994,6 +1998,7 @@ Description: The specified team does not exist in the room.
 ```
 
 #### 6. Update a team by ID
+
 Endpoint
 
 - URL Path: **_/api/v1/rooms/{roomId}/teams/{teamId}_**
@@ -2236,6 +2241,7 @@ associated with the team.
     "message": "Team 64a0d5fa3b9c680017d68c4a in room 64a0d5fa3b9c680017d68c3e not found!!!"
 }
 ```
+
 ```
 {
     "message": "User not found."
@@ -2291,6 +2297,7 @@ Description: The team is already full or the user is already in the team.
     "message": "Team is already full."
 }
 ```
+
 ```
 {
     "message": "User 64a0d5fa3b9c680017d68c45 already joined to team",
@@ -2415,8 +2422,8 @@ Endpoint
 
 - URL Path: **_/api/v1/rooms/{roomId}/teams/{teamId}/roles_**
 - Description: This endpoint sets the next describer and team leader for a specified team in a room. It cycles through the players in the team to assign these roles in each round:
-    - If no describer is currently set (first round), the first player is assigned as the describer, and the second player is assigned as the leader.
-    - In subsequent rounds, the next describer and leader are selected cyclically from the list of players.
+  - If no describer is currently set (first round), the first player is assigned as the describer, and the second player is assigned as the leader.
+  - In subsequent rounds, the next describer and leader are selected cyclically from the list of players.
 - Authentication: This endpoint requires the user to be authenticated with a
   valid access token.
 
@@ -2499,7 +2506,7 @@ Description: The specified team was not found.
 
 Endpoint
 
-- URL Path: **_/api/v1/rooms/{roomId}/teams/{teamId}/reset**
+- URL Path: **\_/api/v1/rooms/{roomId}/teams/{teamId}/reset**
 - Description: This endpoint resets the round-specific fields (selectedWord, description, success, answer) to null for a specified team within a room. It ensures that the team is ready for a new round.
 - Authentication: This endpoint requires the user to be authenticated with a
   valid access token.
@@ -2583,7 +2590,7 @@ Description: The specified team was not found.
 
 Endpoint
 
-- URL Path: **_/api/v1/rooms/{roomId}/teams/{teamId}/calculate-scores**
+- URL Path: **\_/api/v1/rooms/{roomId}/teams/{teamId}/calculate-scores**
 - Description: This endpoint calculates and updates the team’s score as well as each player’s score based on the round's result. If the team succeeded in the round, points are awarded to both the team and its players.
 - Authentication: This endpoint requires the user to be authenticated with a
   valid access token.
@@ -2611,7 +2618,7 @@ Status Code: **200 OK**
 Description: The scores were successfully updated.
 
 ```
-{   
+{
     "message": "Team and player scores have been successfully updated."
 }
 ```
@@ -3840,9 +3847,19 @@ Server-side security is essential for protecting user data and maintaining the i
 
 - **Authentication & Authorization:** JWT (JSON Web Token) is used to keep sessions secure. When a user logs in, a unique JWT is created, allowing only authenticated users to access specific features;
 
-- **Data Encryption:** Passwords are securely hashed using bcrypt before being stored in the database. This ensures that even if the database is compromised, passwords remain safe;
+- **Data Encryption:** Passwords are securely hashed using bcrypt along with a salt to enhance security. A salt is a random value added to the password before hashing, making it resistant to rainbow table attacks. This ensures that even if two users have the same password, their hashes will differ.
+During authentication, only the hashed password is compared with the stored hash, never the plain text version.
 
 - **Input Validation & Sanitization:** All user input is validated with specific rules using DTO (Data Transfer Object) validation to prevent NoSQL injection attacks. Global validation only allows expected properties;
+
+- **CORS (Cross-Origin Resource Sharing)**:
+  CORS policies are enabled to restrict which domains can access server resources. This mitigates Cross-Origin attacks, allowing only trusted origins to interact with the API;
+
+- **Helmet for HTTP Header Security**:
+  The Helmet middleware is used to configure HTTP headers. It prevents vulnerabilities such as clickjacking, MIME sniffing, and reduces the risk of cross-site scripting attacks by setting appropriate security-related headers.
+
+- **Rate Limiting**:
+  To mitigate brute-force attacks and prevent DDoS (Distributed Denial of Service) attacks, a Rate Limiting strategy is implemented. The server limits the number of requests from a single IP address in a given time frame, blocking abusive behavior.
 
 - **Database Security:** Safeguards against NoSQL injection are implemented by sanitizing all input queries and performing validation checks. ParseObjectIdPipe is used to ensure only valid MongoDB ObjectId values are processed;
 
