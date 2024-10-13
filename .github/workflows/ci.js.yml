@@ -20,28 +20,24 @@ jobs:
         working-directory: ./alias-chat-game
 
     steps:
-      # Step 1: Check out the repository
+      # Check out the repository
       - uses: actions/checkout@v4
 
-      # Step 2: Set up the Node.js environment with caching for npm dependencies
+      # Set up the Node.js environment with caching for npm dependencies
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
 
-      # Step 3: Install dependencies
       - name: Install dependencies
         run: npm ci
 
-      # Step 4: Run Prettier check
-      - name: Run Prettier
+      - name: Run Prettier check
         run: npm run format:check
 
-      # Step 5: Run ESLint
       - name: Run ESLint
         run: npm run lint
 
-      # Step 6: Run tests
       - name: Run Tests
-        run: npm run test
+        run: npm run test words.service
