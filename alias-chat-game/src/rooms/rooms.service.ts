@@ -24,7 +24,7 @@ export class RoomsService {
     @InjectModel(Room.name) private roomModel: Model<RoomDocument>,
     @Inject(forwardRef(() => TeamsService))
     private readonly teamsService: TeamsService,
-  ) {}
+  ) { }
 
   /**
    * Creates a new room in the database.
@@ -52,6 +52,12 @@ export class RoomsService {
    */
   async findAll() {
     return await this.roomModel.find().exec();
+  }
+
+  async clearTeams(roomId: Types.ObjectId) {
+    const room = await this.findOne(roomId);
+    room.teams = [];
+    room.save();
   }
 
   /**
