@@ -219,7 +219,8 @@ export class WordsService {
    *
    * @param wordId - The ObjectId of the word to be checked.
    * @param description - The description string to be validated.
-   * @returns A promise that resolves to a boolean indicating if the description is valid (i.e., contains no matching words).
+   * @returns A promise that resolves to a boolean indicating if the description is valid
+   *          (i.e., contains no matching words or disguised versions of them).
    */
   async checkDescription(
     wordId: Types.ObjectId,
@@ -227,31 +228,46 @@ export class WordsService {
   ): Promise<boolean> {
     const wordDocument = await this.findById(wordId);
 
+    // Get the word and its similar words for comparison.
     const wordsToCompareWith = [
       wordDocument.word,
       ...wordDocument.similarWords,
     ];
 
+    // Sanitize the description:
     const sanitizedDescription = description
       .toLowerCase()
-      .replace(/[^a-z\s]/g, '') // Remove all non-alphabetic characters except spaces
-      .replace(/\s+/g, ' ') // Normalize multiple spaces to a single space
-      .trim(); // Remove leading and trailing spaces
+      .replace(/[^a-z\s]/g, '') // Remove non-alphabet characters (except spaces)
+      .replace(/\s+/g, ' ') // Normalize multiple spaces to one space
+      .trim();
 
+    // Generate a "collapsed" version of the description (no spaces between letters or words).
+    const collapsedDescription = sanitizedDescription.replace(/\s+/g, '');
+
+    // Split the sanitized description into individual words.
     const descriptionWords = sanitizedDescription.split(' ');
 
+    // Check if the description contains exact matches or disguised versions of the words.
     for (const word of wordsToCompareWith) {
+      const normalizedWord = word.toLowerCase();
+
+      // Check collapsed description for hidden word (e.g., "c a t" -> "cat")
+      if (collapsedDescription.includes(normalizedWord)) {
+        return false;
+      }
+
+      // Check individual words in the sanitized description
       for (const descWord of descriptionWords) {
-        const isExactMatch = await this.compareWords(word, descWord);
-        const isSubstringMatch = descWord.includes(word); // Check for substring match
+        const isExactMatch = await this.compareWords(normalizedWord, descWord);
+        const isSubstringMatch = descWord.includes(normalizedWord);
 
         if (isExactMatch || isSubstringMatch) {
-          return false; // Invalid description if any match is found
+          return false;
         }
       }
     }
 
-    return true; // Description is valid if no matches are found
+    return true;
   }
 
   /**
