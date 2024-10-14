@@ -3748,15 +3748,26 @@ Client-side security is essential for safeguarding user data and ensuring a safe
 
 ## Testing
 
-Testing is a crucial part of our development process, ensuring that our application functions correctly and efficiently. In our Node.js-Based Game "Alias" with Chat and Word Checking, we have implemented both unit and integration testing to maintain high code quality and reliability.
+This project has both unit and integration testing implemented to maintain high code quality and reliability.
 
-- **Unit Testing:**
-  Unit tests focus on verifying the functionality of individual components or functions in isolation. By testing these components independently, we can quickly identify and fix issues, ensuring that each part of the application behaves as expected. Our unit tests cover various modules and services, helping to catch bugs early in the development process.
+- **Unit Testing:** Files have extension .spec.ts. One testing file per service or controller.
 
-- **Integration Testing:**
-  Integration tests check how different parts of the application work together. These tests simulate real-world scenarios to verify that components interact correctly and data flows seamlessly throughout the system. By implementing integration tests, we can ensure that the overall functionality of the application remains intact as new features are added or changes are made.
+- **Integration Testing:** Files have extension .integration.spec.ts. One testing file per module.
 
-With both unit and integration testing in place, we aim to deliver a robust and reliable application that meets user expectations and performs well in various scenarios.
+**Testing commands:**
+
+Before tests use `cd ./alias-chat-game` to navigate to server directory.
+- Run tests: `npm run test`
+- Run tests in watch mode: `npm run test:watch`
+- Run tests and get coverage: `npm run test:cov`
+
+**Current test coverage**
+| File       | % Stmts  | % Branch | % Funcs |  % Lines |
+|:-----------|:---------|:---------|:--------|:---------|
+| All files  |   87.23  |    72.07 |   86.27 |    86.21 |
+
+
+
 
 ## Deployment
 
@@ -3764,39 +3775,66 @@ Before deploying, ensure that you have the following:
 
 - Node.js and npm installed on the server.
 - MongoDB instance set up and accessible.
+- Git installed (for cloning the repository).
+- Docker installed (for containerized deployment).
 
-#### 1. Clone current repository into a your directory:
+#### 1. Clone the repository
 
 ```
 git clone https://github.com/Aliko-XIII/alias-node-js.git
 ```
 
-#### 2. Switch to project folder:
+#### 2. Navigate to the project folder
 
 ```
-cd alias-node-js/alias-client
+cd alias-node-js/alias-chat-game
 ```
 
-#### 3. Install the dependencies:
+#### 3. Install dependencies
 
 ```
 npm install
 ```
 
-#### 4. Install the dependencies
+#### 4. Set up environment variables
 
-Set Environment Variables Create a .env file in the root directory of your project and define the necessary environment variables, such as database connection strings and API keys. Ensure sensitive data is not hardcoded in the source code.
+Create a .env file in the root directory of your project and define the necessary environment variables. Refer to .env.example for a sample configuration.
 
-#### 5. Build the Application
+#### 5. Build the application
 
 ```
 npm run build
 ```
 
-#### 6. Start the Application
+#### 6. Start the application
 
 ```
 npm run start
+```
+
+#### Docker Deployment:
+
+To run the Alias game in a Docker container:
+
+#### 1. Build and run the application  
+Ensure you're in the project directory, then run:
+
+```
+docker compose up
+```
+
+#### 2. Access the application
+Once the containers are running, you can access the API at:
+
+```
+http://localhost:8080/api/v1/
+```
+
+#### 3. Stop the application
+When you’re finished, stop the application and clean up the resources by running:
+
+```
+docker compose down
 ```
 
 ## Future Enhancements

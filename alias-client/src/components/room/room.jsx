@@ -113,7 +113,8 @@ export default function Room({
 		teams.forEach(async (team) => {
 			if (team._id === teamId && team.players.length < maxUsers) {
 				const teamToJoin = await joinTeam(userId, teamId, cookies.access_token);
-				if(!teamToJoin._id){
+				console.log(teamToJoin);
+				if(!teamToJoin.teamId){
 					return;
 				}
 				setTeam(teams.find((team) => team._id == teamToJoin.teamId));

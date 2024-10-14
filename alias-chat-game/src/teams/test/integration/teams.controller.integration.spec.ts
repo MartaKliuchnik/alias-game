@@ -3,12 +3,10 @@ import { AppModule } from '../../../app.module';
 import { Connection, Types } from 'mongoose';
 import request from 'supertest';
 import { DatabaseService } from '../../../database/database.service';
-import { createTeamStub, teamArrStub, teamStub } from '../stubs/team.stub';
+import { createTeamStub } from '../stubs/team.stub';
 
 describe('TeamsController (integration)', () => {
   const createTeam = createTeamStub();
-  const teams = teamArrStub();
-  const team = teamStub();
   let roomId: Types.ObjectId;
   let dbConnection: Connection;
   let httpServer: any;

@@ -11,7 +11,7 @@ import {
   createTestTeam,
 } from '../stubs/test-data-creators.stub';
 import { AuthGuard } from '../../../auth/guards/auth.guard';
-import { mockAuthGuard } from '../../__mocks__/auth.guard.mock';
+import { mockAuthGuard } from '../../__mocks__/users-auth.guard.mock';
 
 describe('UsersController (Integration)', () => {
   let dbConnection: Connection;
