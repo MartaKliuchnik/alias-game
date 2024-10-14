@@ -24,7 +24,7 @@ export class TeamsService {
     private readonly usersService: UsersService,
     @Inject(forwardRef(() => RoomsService))
     private readonly roomsService: RoomsService,
-  ) {}
+  ) { }
 
   /**
    * Creates a new team within a specified room.
@@ -110,7 +110,7 @@ export class TeamsService {
         }
       });
     });
-
+    joined = false;
     if (joined) {
       return {
         message: `User ${userId.toString()} already joined to team`,
@@ -448,13 +448,25 @@ export class TeamsService {
       } else {
         Logger.log(`Stop interval ${roomId}-${teamId}`);
         const room = await this.roomsService.findOne(roomId);
-        // Find winner team and save game results for players
-        const topTeam = (
-          await Promise.all(
-            room.teams.map(async (teamId) => await this.findTeamById(teamId)),
-          )
-        ).sort((a, b) => b.teamScore - a.teamScore)[0];
-        const teamWon = topTeam._id.toString() == teamId.toString();
+        const teams = await Promise.all(
+          room.teams.map(async (teamId) => await this.findTeamById(teamId)),
+        );
+
+        const highestScore = Math.max(...teams.map((team) => team.teamScore));
+
+        const allTeamsSameScore = teams.every(
+          (team) => team.teamScore === highestScore,
+        );
+
+        let teamWon = false;
+
+        if (!allTeamsSameScore) {
+          teamWon = teams.some(
+            (team) =>
+              team.teamScore === highestScore &&
+              team._id.toString() === teamId.toString(),
+          );
+        }
         await Promise.all(
           team.players.map(
             async (userId) =>
