@@ -3775,39 +3775,66 @@ Before deploying, ensure that you have the following:
 
 - Node.js and npm installed on the server.
 - MongoDB instance set up and accessible.
+- Git installed (for cloning the repository).
+- Docker installed (for containerized deployment).
 
-#### 1. Clone current repository into a your directory:
+#### 1. Clone the repository
 
 ```
 git clone https://github.com/Aliko-XIII/alias-node-js.git
 ```
 
-#### 2. Switch to project folder:
+#### 2. Navigate to the project folder
 
 ```
-cd alias-node-js/alias-client
+cd alias-node-js/alias-chat-game
 ```
 
-#### 3. Install the dependencies:
+#### 3. Install dependencies
 
 ```
 npm install
 ```
 
-#### 4. Install the dependencies
+#### 4. Set up environment variables
 
-Set Environment Variables Create a .env file in the root directory of your project and define the necessary environment variables, such as database connection strings and API keys. Ensure sensitive data is not hardcoded in the source code.
+Create a .env file in the root directory of your project and define the necessary environment variables. Refer to .env.example for a sample configuration.
 
-#### 5. Build the Application
+#### 5. Build the application
 
 ```
 npm run build
 ```
 
-#### 6. Start the Application
+#### 6. Start the application
 
 ```
 npm run start
+```
+
+#### Docker Deployment:
+
+To run the Alias game in a Docker container:
+
+#### 1. Build and run the application  
+Ensure you're in the project directory, then run:
+
+```
+docker compose up
+```
+
+#### 2. Access the application
+Once the containers are running, you can access the API at:
+
+```
+http://localhost:8080/api/v1/
+```
+
+#### 3. Stop the application
+When you’re finished, stop the application and clean up the resources by running:
+
+```
+docker compose down
 ```
 
 ## Future Enhancements
