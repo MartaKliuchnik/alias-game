@@ -490,14 +490,9 @@ export class TeamsService {
    */
   async resetTeam(team: TeamDocument, roomId: Types.ObjectId) {
     // Remove all team players from room
-    const userIds = team.players;
-    const removedIds = [];
     await Promise.all(
-      userIds.map(async (userId) => {
-        if (removedIds.indexOf(userId) !== -1) {
-          await this.roomsService.removeUserFromRoom(userId, roomId);
-          removedIds.push(userId);
-        }
+      team.players.map(async (userId) => {
+        await this.roomsService.removeUserFromRoom(userId, roomId);
       }),
     );
     const newTeam: CreateTeamDto & { roomId: Types.ObjectId } = {
@@ -507,6 +502,7 @@ export class TeamsService {
     };
     // Remove old team from DB
     await this.remove(roomId, team._id);
+    await this.roomsService.clearTeams(roomId);
 
     // Add new team to DB
     const createdTeam = await this.create(roomId, newTeam);
