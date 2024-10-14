@@ -110,7 +110,6 @@ export class TeamsService {
         }
       });
     });
-    joined = false;
     if (joined) {
       return {
         message: `User ${userId.toString()} already joined to team`,
