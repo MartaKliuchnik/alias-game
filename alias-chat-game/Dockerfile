@@ -33,13 +33,10 @@ ENV MONGO_USERNAME=nodejsteam5 \
 
 COPY --from=build /app/dist ./app/dist
 COPY --from=build /app/node_modules ./app/node_modules
-# COPY .env ./app/.env
+
 
 # Expose the port the app runs in
 EXPOSE 8080
-
-# Start the application (for development environment)
-# CMD ["npm", "run", "start:prod"]
 
 # Start the application (for production-ready application)
 CMD ["node", "app/dist/main.js"]

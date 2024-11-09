@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+
 export default function ErrorMessage({ error }) {
 	return (
 		<div className='d-flex justify-content-center align-items-center mt-5'>

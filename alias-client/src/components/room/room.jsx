@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import TeamCard from './TeamCard';
+import TeamCard from '../TeamCard/TeamCard';
 import { leaveRoom } from '../../fetchers/userRoom';
 import { getTeamsFromRoom } from '../../fetchers/getTeamsFromRoom';
 import { getPlayersFromRoom } from '../../fetchers/getPlayersFromRoom';
@@ -54,7 +54,11 @@ export default function Room({
 			let fetchedTeams = await getTeamsFromRoom(roomObj._id, authToken);
 			fetchedTeams = await Promise.all(
 				fetchedTeams.map(async (team) => {
-					const players = await getPlayersFromRoom(team.roomId, team._id, authToken);
+					const players = await getPlayersFromRoom(
+						team.roomId,
+						team._id,
+						authToken
+					);
 					team.players = players;
 					return team;
 				})
@@ -76,7 +80,7 @@ export default function Room({
 			loadTeams();
 		}, 500);
 		return () => clearInterval(intervalId);
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [cookies, roomObj, navigate]);
 
 	const updateTeam = async () => {
@@ -105,7 +109,7 @@ export default function Room({
 				return;
 			}
 		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [teams, navigate]);
 
 	const addUserToTeam = (teamId) => {
@@ -114,7 +118,7 @@ export default function Room({
 			if (team._id === teamId && team.players.length < maxUsers) {
 				const teamToJoin = await joinTeam(userId, teamId, cookies.access_token);
 				console.log(teamToJoin);
-				if(!teamToJoin.teamId){
+				if (!teamToJoin.teamId) {
 					return;
 				}
 				setTeam(teams.find((team) => team._id == teamToJoin.teamId));
@@ -148,7 +152,6 @@ export default function Room({
 				</button>
 			</div>
 
-			{/* <div className="row"> */}
 			{teams.map((team) => (
 				<div key={team.id} className='col-md-4 mb-4'>
 					<TeamCard
@@ -159,7 +162,6 @@ export default function Room({
 					/>
 				</div>
 			))}
-			{/* </div> */}
 		</div>
 	);
 }

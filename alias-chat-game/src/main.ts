@@ -3,7 +3,6 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
-// import rateLimit from 'express-rate-limit';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -23,20 +22,11 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: '*', //'http://localhost:5174',
+    origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
     credentials: true,
   });
-
-  // app.use(
-  //   rateLimit({
-  //     windowMs: 15 * 60 * 1000, // 15 minutes
-  //     max: 1000, // Maximum of 1000 requests from one IP during this time
-  //     message: 'Too many requests from this IP, please try again later.',
-  //     headers: true, // Send the limit information in the header
-  //   }),
-  // );
 
   const port = configService.get<number>('APP_PORT') || 4000;
   await app.listen(port);
