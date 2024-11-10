@@ -1,10 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useTimer } from 'react-timer-hook';
 
 // eslint-disable-next-line react/prop-types
 const Timer = ({ startTime, onTimeOut, small }) => {
-	const expiryTimestamp = new Date();
-	expiryTimestamp.setSeconds(expiryTimestamp.getSeconds() + startTime); // set expiry time
+	// Memoize the expiry timestamp to ensure it's consistent across renders
+	const expiryTimestamp = useMemo(() => {
+		const newExpiry = new Date();
+		newExpiry.setSeconds(newExpiry.getSeconds() + startTime);
+		return newExpiry;
+	}, [startTime]);
 
 	const { seconds, minutes, restart } = useTimer({
 		expiryTimestamp,

@@ -27,10 +27,13 @@ export default function LoginPage() {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			const res = await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/v1/auth/login`, {
-				username: user,
-				password: pwd,
-			});
+			const res = await axios.post(
+				`${import.meta.env.VITE_SERVER_URL}/api/v1/auth/login`,
+				{
+					username: user,
+					password: pwd,
+				}
+			);
 			const { access_token, refresh_token } = res.data.data;
 
 			setCookie('access_token', access_token, {
